@@ -937,6 +937,43 @@ h1, h2, h3, h4, h5, h6 {
   cursor: not-allowed;
 }
 
+/* Coupon Apply/Remove Buttons */
+.coupon-apply-btn,
+.coupon-remove-btn {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.coupon-apply-btn {
+  background: #7a9053;
+  color: white;
+}
+
+.coupon-apply-btn:hover:not(:disabled) {
+  background: #5a6c3a;
+  transform: translateY(-2px);
+}
+
+.coupon-apply-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.coupon-remove-btn {
+  background: #fde8e8;
+  color: #dc2626;
+}
+
+.coupon-remove-btn:hover {
+  background: #dc2626;
+  color: white;
+}
+
 /* Payment Result Pages */
 .payment-result-container {
   min-height: 80vh;
