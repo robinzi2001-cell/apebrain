@@ -72,13 +72,28 @@ const HomePage = () => {
                 onClick={() => navigate(`/blog/${blog.id}`)}
                 data-testid={`blog-card-${blog.id}`}
               >
-                {blog.image_base64 && (
+                {blog.image_base64 ? (
                   <img
                     src={`data:image/png;base64,${blog.image_base64}`}
                     alt={blog.title}
                     className="blog-card-image"
                     data-testid={`blog-image-${blog.id}`}
                   />
+                ) : (
+                  <div 
+                    className="blog-card-image"
+                    style={{ 
+                      background: 'linear-gradient(135deg, #7a9053 0%, #5a6c3a 100%)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white',
+                      fontSize: '1.2rem'
+                    }}
+                    data-testid={`blog-placeholder-${blog.id}`}
+                  >
+                    <Leaf size={64} />
+                  </div>
                 )}
                 <div className="blog-card-content">
                   <h3 data-testid={`blog-title-${blog.id}`}>{blog.title}</h3>
