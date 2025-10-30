@@ -263,6 +263,46 @@ const CreateBlog = () => {
                   <Upload size={18} /> Choose Image
                 </label>
               </div>
+
+              {/* Video URL */}
+              <div style={{ marginTop: '1.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>YouTube Video URL (Optional)</label>
+                <input
+                  type="url"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '2px solid #e8ebe0' }}
+                  data-testid="video-url-input"
+                />
+                <small style={{ color: '#7a9053', display: 'block', marginTop: '0.5rem' }}>
+                  Paste a YouTube video URL to embed it in your blog post
+                </small>
+              </div>
+
+              {/* Audio Upload */}
+              <div style={{ marginTop: '1.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Audio File (Optional)</label>
+                <input
+                  type="file"
+                  accept="audio/*"
+                  onChange={(e) => setAudioFile(e.target.files[0])}
+                  style={{ display: 'none' }}
+                  id="audio-upload"
+                  data-testid="audio-upload-input"
+                />
+                <label htmlFor="audio-upload" className="btn btn-secondary" style={{ cursor: 'pointer', display: 'inline-block' }}>
+                  <Upload size={18} /> Choose Audio File
+                </label>
+                {audioFile && (
+                  <span style={{ marginLeft: '1rem', color: '#7a9053' }}>
+                    {audioFile.name}
+                  </span>
+                )}
+                <small style={{ color: '#7a9053', display: 'block', marginTop: '0.5rem' }}>
+                  Upload audio files (MP3, WAV, etc.) for podcasts or audiobooks
+                </small>
+              </div>
             </div>
           </div>
         )}
