@@ -577,6 +577,246 @@ class MushroomBlogAPITester:
         
         return False
 
+    def test_get_default_blog_features(self):
+        """Test getting default blog feature settings (first time)"""
+        success, response = self.run_test(
+            "Get Default Blog Features",
+            "GET",
+            "blog-features",
+            200
+        )
+        
+        if success:
+            # Verify default values
+            expected_defaults = {
+                "enable_video": True,
+                "enable_audio": True,
+                "enable_text_to_speech": True
+            }
+            
+            for key, expected_value in expected_defaults.items():
+                if key not in response:
+                    print(f"❌ Missing required field: {key}")
+                    return False
+                if response[key] != expected_value:
+                    print(f"❌ Incorrect default value for {key}: expected {expected_value}, got {response[key]}")
+                    return False
+            
+            print("✅ Default blog features returned correctly")
+            print(f"   enable_video: {response['enable_video']}")
+            print(f"   enable_audio: {response['enable_audio']}")
+            print(f"   enable_text_to_speech: {response['enable_text_to_speech']}")
+            return True
+        
+        return False
+
+    def test_save_blog_features(self):
+        """Test saving blog feature settings"""
+        settings_data = {
+            "enable_video": False,
+            "enable_audio": True,
+            "enable_text_to_speech": False
+        }
+        
+        success, response = self.run_test(
+            "Save Blog Features",
+            "POST",
+            "blog-features",
+            200,
+            data=settings_data
+        )
+        
+        if success and response.get('success'):
+            print("✅ Blog features saved successfully")
+            print(f"   Message: {response.get('message', 'No message')}")
+            return True
+        
+        return False
+
+    def test_get_saved_blog_features(self):
+        """Test getting saved blog feature settings"""
+        success, response = self.run_test(
+            "Get Saved Blog Features",
+            "GET",
+            "blog-features",
+            200
+        )
+        
+        if success:
+            # Verify saved values match what we posted
+            expected_values = {
+                "enable_video": False,
+                "enable_audio": True,
+                "enable_text_to_speech": False
+            }
+            
+            for key, expected_value in expected_values.items():
+                if key not in response:
+                    print(f"❌ Missing required field: {key}")
+                    return False
+                if response[key] != expected_value:
+                    print(f"❌ Incorrect saved value for {key}: expected {expected_value}, got {response[key]}")
+                    return False
+            
+            print("✅ Saved blog features returned correctly")
+            print(f"   enable_video: {response['enable_video']}")
+            print(f"   enable_audio: {response['enable_audio']}")
+            print(f"   enable_text_to_speech: {response['enable_text_to_speech']}")
+            return True
+        
+        return False
+
+    def create_test_audio_data(self):
+        """Create a small test audio file in MP3 format"""
+        # Create a minimal MP3 header (not a real MP3, but enough for testing)
+        mp3_header = b'\xff\xfb\x90\x00' + b'\x00' * 100  # Minimal MP3-like data
+        return mp3_header
+
+    def test_create_blog_with_video_url(self):
+        """Test creating a blog post with video_url field"""
+        blog_data = {
+            "id": f"test-video-blog-{int(time.time())}",
+            "title": "Test Blog with Video",
+            "content": "This is a test blog post with a YouTube video embedded.",
+            "keywords": "test video blog",
+            "video_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "status": "draft"
+        }
+        
+        success, response = self.run_test(
+            "Create Blog with Video URL",
+            "POST",
+            "blogs",
+            200,
+            data=blog_data
+        )
+        
+        if success and response.get('id'):
+            self.test_video_blog_id = response['id']
+            print(f"✅ Created blog with video URL, ID: {self.test_video_blog_id}")
+            
+            # Verify video_url is stored correctly
+            if response.get('video_url') == blog_data['video_url']:
+                print(f"✅ Video URL stored correctly: {response['video_url']}")
+                return True
+            else:
+                print(f"❌ Video URL not stored correctly. Expected: {blog_data['video_url']}, Got: {response.get('video_url')}")
+                return False
+        
+        return False
+
+    def test_get_blog_with_video_url(self):
+        """Test fetching a blog with video_url field"""
+        if not hasattr(self, 'test_video_blog_id'):
+            print("❌ Cannot test blog with video URL fetch - no video blog ID available")
+            return False
+            
+        success, response = self.run_test(
+            "Get Blog with Video URL",
+            "GET",
+            f"blogs/{self.test_video_blog_id}",
+            200
+        )
+        
+        if success and response.get('id') == self.test_video_blog_id:
+            if response.get('video_url'):
+                print(f"✅ Successfully fetched blog with video URL: {response['video_url']}")
+                return True
+            else:
+                print("❌ Blog missing video_url field")
+                return False
+        
+        return False
+
+    def test_upload_blog_audio(self):
+        """Test uploading an audio file to a blog"""
+        if not hasattr(self, 'test_video_blog_id'):
+            print("❌ Cannot test blog audio upload - no blog ID available")
+            return False
+            
+        # Create test audio data
+        audio_data = self.create_test_audio_data()
+        
+        success, response = self.run_multipart_test(
+            "Upload Blog Audio",
+            f"blogs/{self.test_video_blog_id}/upload-audio",
+            200,
+            audio_data
+        )
+        
+        if success and response.get('success') and response.get('audio_url'):
+            print(f"✅ Audio uploaded successfully")
+            # Verify audio_url format
+            audio_url = response['audio_url']
+            if audio_url.startswith('data:audio/') and 'base64,' in audio_url:
+                print(f"✅ Audio URL format is correct: {audio_url[:50]}...")
+                return True
+            else:
+                print(f"❌ Invalid audio URL format: {audio_url}")
+                return False
+        
+        return False
+
+    def test_get_blog_with_audio_url(self):
+        """Test fetching a blog with audio_url field after upload"""
+        if not hasattr(self, 'test_video_blog_id'):
+            print("❌ Cannot test blog with audio URL fetch - no blog ID available")
+            return False
+            
+        success, response = self.run_test(
+            "Get Blog with Audio URL",
+            "GET",
+            f"blogs/{self.test_video_blog_id}",
+            200
+        )
+        
+        if success and response.get('id') == self.test_video_blog_id:
+            if response.get('audio_url'):
+                print(f"✅ Successfully fetched blog with audio URL: {response['audio_url'][:50]}...")
+                return True
+            else:
+                print("❌ Blog missing audio_url field after upload")
+                return False
+        
+        return False
+
+    def test_upload_audio_to_nonexistent_blog(self):
+        """Test uploading audio to non-existent blog (error handling)"""
+        fake_blog_id = "nonexistent-blog-123"
+        audio_data = self.create_test_audio_data()
+        
+        success, response = self.run_multipart_test(
+            "Upload Audio to Non-existent Blog",
+            f"blogs/{fake_blog_id}/upload-audio",
+            404,
+            audio_data
+        )
+        
+        if success:
+            print("✅ Correctly returned 404 for non-existent blog")
+            return True
+        
+        return False
+
+    def test_cleanup_test_video_blog(self):
+        """Test deleting the test video blog"""
+        if not hasattr(self, 'test_video_blog_id'):
+            print("❌ Cannot test video blog deletion - no blog ID available")
+            return False
+            
+        success, response = self.run_test(
+            "Delete Test Video Blog",
+            "DELETE",
+            f"blogs/{self.test_video_blog_id}",
+            200
+        )
+        
+        if success and response.get('success'):
+            print("✅ Test video blog deleted successfully")
+            return True
+        
+        return False
+
 def main():
     print("🍄 Starting Mushroom Blog API Tests")
     print("=" * 50)
