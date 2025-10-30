@@ -87,6 +87,11 @@ const AdminSettings = () => {
     navigate('/shroomsadmin');
   };
 
+  // Prevent rendering if not authenticated
+  if (!localStorage.getItem('adminAuth')) {
+    return null;
+  }
+
   return (
     <div>
       <nav className="navbar" data-testid="navbar">
