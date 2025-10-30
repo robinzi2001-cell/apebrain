@@ -664,6 +664,78 @@ async def delete_coupon(coupon_id: str):
         logging.error(f"Error deleting coupon: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to delete coupon")
 
+# ============= PRODUCT MANAGEMENT ENDPOINTS =============
+
+# Get all products
+@api_router.get("/products")
+async def get_products():
+    try:
+        # For now, return hardcoded products (can be made dynamic later)
+        products = [
+            {"id": "phys-1", "name": "Lion's Mane Extract", "price": 29.99, "description": "Premium quality Lion's Mane mushroom extract for cognitive support", "category": "Supplements", "type": "physical"},
+            {"id": "phys-2", "name": "Reishi Capsules", "price": 24.99, "description": "Pure Reishi mushroom capsules for immune system support", "category": "Supplements", "type": "physical"},
+            {"id": "phys-3", "name": "Mushroom Growing Kit", "price": 49.99, "description": "Complete kit to grow your own gourmet mushrooms at home", "category": "Kits", "type": "physical"},
+            {"id": "phys-4", "name": "Cordyceps Powder", "price": 34.99, "description": "Organic Cordyceps mushroom powder for energy and vitality", "category": "Supplements", "type": "physical"},
+            {"id": "digi-1", "name": "Mushroom Identification Guide", "price": 19.99, "description": "Comprehensive digital guide to identifying edible mushrooms", "category": "eBooks", "type": "digital"},
+            {"id": "digi-2", "name": "Holistic Health Course", "price": 79.99, "description": "Complete online course on natural wellness and mushroom medicine", "category": "Courses", "type": "digital"},
+            {"id": "digi-3", "name": "Meditation & Consciousness Pack", "price": 29.99, "description": "Guided meditations and consciousness expansion exercises", "category": "Audio", "type": "digital"}
+        ]
+        
+        # Also get from database
+        db_products = await db.products.find({}, {"_id": 0}).to_list(1000)
+        
+        # Merge with hardcoded (avoid duplicates by ID)
+        existing_ids = [p["id"] for p in db_products]
+        for prod in products:
+            if prod["id"] not in existing_ids:
+                db_products.append(prod)
+        
+        return db_products
+    except Exception as e:
+        logging.error(f"Error fetching products: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch products")
+
+# Create product
+@api_router.post("/products")
+async def create_product(product: dict):
+    try:
+        await db.products.insert_one(product)
+        return product
+    except Exception as e:
+        logging.error(f"Error creating product: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create product")
+
+# Update product
+@api_router.put("/products/{product_id}")
+async def update_product(product_id: str, product: dict):
+    try:
+        result = await db.products.update_one(
+            {"id": product_id},
+            {"$set": product}
+        )
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Product not found")
+        return product
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating product: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update product")
+
+# Delete product
+@api_router.delete("/products/{product_id}")
+async def delete_product(product_id: str):
+    try:
+        result = await db.products.delete_one({"id": product_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Product not found")
+        return {"success": True, "message": "Product deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting product: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete product")
+
 # Include the router in the main app
 app.include_router(api_router)
 
