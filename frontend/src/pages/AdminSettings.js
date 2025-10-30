@@ -102,6 +102,20 @@ const AdminSettings = () => {
     navigate('/shroomsadmin');
   };
 
+  const handleLandingSettingsSave = async () => {
+    try {
+      await axios.post(`${API}/landing-settings`, {
+        show_blog: showBlog,
+        show_shop: showShop,
+        show_minigames: showMinigames
+      });
+      setSuccess('Landing page settings updated successfully!');
+    } catch (error) {
+      console.error('Error updating landing settings:', error);
+      setError('Failed to update landing page settings');
+    }
+  };
+
   // Prevent rendering if not authenticated
   if (!localStorage.getItem('adminAuth')) {
     return null;
