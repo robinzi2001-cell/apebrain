@@ -11,6 +11,7 @@ import PaymentCancel from '@/pages/PaymentCancel';
 import AdminLogin from '@/pages/AdminLogin';
 import AdminDashboard from '@/pages/AdminDashboard';
 import AdminSettings from '@/pages/AdminSettings';
+import AdminCoupons from '@/pages/AdminCoupons';
 import CreateBlog from '@/pages/CreateBlog';
 import EditBlog from '@/pages/EditBlog';
 
@@ -26,11 +27,12 @@ function App() {
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/payment/success" element={<PaymentSuccess />} />
           <Route path="/payment/cancel" element={<PaymentCancel />} />
-          <Route path="/blogadmin" element={<AdminLogin />} />
-          <Route path="/blogadmin/dashboard" element={<AdminDashboard />} />
-          <Route path="/blogadmin/settings" element={<AdminSettings />} />
-          <Route path="/blogadmin/create" element={<CreateBlog />} />
-          <Route path="/blogadmin/edit/:id" element={<EditBlog />} />
+          <Route path="/shroomsadmin" element={<AdminLogin />} />
+          <Route path="/shroomsadmin/dashboard" element={<AdminDashboard />} />
+          <Route path="/shroomsadmin/settings" element={<AdminSettings />} />
+          <Route path="/shroomsadmin/coupons" element={<AdminCoupons />} />
+          <Route path="/shroomsadmin/create" element={<CreateBlog />} />
+          <Route path="/shroomsadmin/edit/:id" element={<EditBlog />} />
         </Routes>
       </BrowserRouter>
     </div>
