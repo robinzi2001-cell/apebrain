@@ -56,7 +56,6 @@ class AdminLogin(BaseModel):
 class GenerateResponse(BaseModel):
     title: str
     content: str
-    image_base64: str
 
 # Admin authentication
 @api_router.post("/admin/login")
