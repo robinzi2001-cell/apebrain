@@ -22,7 +22,7 @@ const AdminLogin = () => {
       const response = await axios.post(`${API}/admin/login`, { username, password });
       if (response.data.success) {
         localStorage.setItem('adminAuth', 'true');
-        navigate('/blogadmin/dashboard');
+        navigate('/shroomsadmin/dashboard');
       }
     } catch (error) {
       setError(error.response?.data?.detail || 'Invalid credentials');

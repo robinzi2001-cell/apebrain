@@ -18,7 +18,7 @@ const CreateBlog = () => {
 
   useEffect(() => {
     if (!localStorage.getItem('adminAuth')) {
-      navigate('/blogadmin');
+      navigate('/shroomsadmin');
     }
   }, [navigate]);
 
@@ -53,7 +53,7 @@ const CreateBlog = () => {
       };
 
       await axios.post(`${API}/blogs`, blogData);
-      navigate('/blogadmin/dashboard');
+      navigate('/shroomsadmin/dashboard');
     } catch (error) {
       console.error('Error saving blog:', error);
       setError('Failed to save blog. Please try again.');
@@ -66,12 +66,12 @@ const CreateBlog = () => {
     <div>
       <nav className="navbar" data-testid="navbar">
         <div className="navbar-content">
-          <a href="/blogadmin/dashboard" className="logo" data-testid="logo-link">
+          <a href="/shroomsadmin/dashboard" className="logo" data-testid="logo-link">
             <Leaf size={32} />
             ApeBrain.cloud - Create Blog
           </a>
           <div className="nav-links">
-            <a href="/blogadmin/dashboard" data-testid="dashboard-link">Dashboard</a>
+            <a href="/shroomsadmin/dashboard" data-testid="dashboard-link">Dashboard</a>
           </div>
         </div>
       </nav>

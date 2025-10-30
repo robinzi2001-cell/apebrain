@@ -25,7 +25,7 @@ const EditBlog = () => {
 
   useEffect(() => {
     if (!localStorage.getItem('adminAuth')) {
-      navigate('/blogadmin');
+      navigate('/shroomsadmin');
       return;
     }
     fetchBlog();
@@ -99,7 +99,7 @@ const EditBlog = () => {
 
       setSuccess('Blog updated successfully!');
       setTimeout(() => {
-        navigate('/blogadmin/dashboard');
+        navigate('/shroomsadmin/dashboard');
       }, 1500);
     } catch (error) {
       console.error('Error updating blog:', error);
@@ -117,12 +117,12 @@ const EditBlog = () => {
     <div>
       <nav className="navbar" data-testid="navbar">
         <div className="navbar-content">
-          <a href="/blogadmin/dashboard" className="logo" data-testid="logo-link">
+          <a href="/shroomsadmin/dashboard" className="logo" data-testid="logo-link">
             <Leaf size={32} />
             ApeBrain.cloud - Edit Blog
           </a>
           <div className="nav-links">
-            <a href="/blogadmin/dashboard" data-testid="dashboard-link">Dashboard</a>
+            <a href="/shroomsadmin/dashboard" data-testid="dashboard-link">Dashboard</a>
           </div>
         </div>
       </nav>

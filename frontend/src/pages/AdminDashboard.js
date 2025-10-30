@@ -13,7 +13,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (!localStorage.getItem('adminAuth')) {
-      navigate('/blogadmin');
+      navigate('/shroomsadmin');
       return;
     }
     fetchBlogs();
@@ -54,7 +54,7 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('adminAuth');
-    navigate('/blogadmin');
+    navigate('/shroomsadmin');
   };
 
   const formatDate = (dateString) => {
@@ -76,7 +76,7 @@ const AdminDashboard = () => {
           <div className="nav-links">
             <a href="/" data-testid="home-link">View Site</a>
             <button 
-              onClick={() => navigate('/blogadmin/settings')} 
+              onClick={() => navigate('/shroomsadmin/settings')} 
               className="btn btn-secondary" 
               style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
               data-testid="settings-button"
@@ -95,7 +95,7 @@ const AdminDashboard = () => {
         <div className="dashboard-header">
           <h1 data-testid="dashboard-title">Blog Management</h1>
           <button
-            onClick={() => navigate('/blogadmin/create')}
+            onClick={() => navigate('/shroomsadmin/create')}
             className="btn btn-primary"
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             data-testid="create-blog-button"
@@ -147,7 +147,7 @@ const AdminDashboard = () => {
                         </button>
                       )}
                       <button
-                        onClick={() => navigate(`/blogadmin/edit/${blog.id}`)}
+                        onClick={() => navigate(`/shroomsadmin/edit/${blog.id}`)}
                         className="btn btn-secondary"
                         style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                         data-testid={`edit-button-${blog.id}`}
