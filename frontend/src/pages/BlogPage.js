@@ -289,6 +289,7 @@ const BlogPage = () => {
           <ReactMarkdown>{blog.content}</ReactMarkdown>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
