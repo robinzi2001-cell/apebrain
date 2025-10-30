@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Footer from '@/components/Footer';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Leaf, ArrowLeft, Home } from 'lucide-react';
+import { Leaf, ArrowLeft, Home, Play, Pause, Square, Volume2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -14,10 +14,44 @@ const BlogPage = () => {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [features, setFeatures] = useState({ enable_video: true, enable_audio: true, enable_text_to_speech: true });
+  
+  // Text-to-speech state
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [voices, setVoices] = useState([]);
+  const [selectedVoice, setSelectedVoice] = useState(null);
 
   useEffect(() => {
     fetchBlog();
+    fetchFeatures();
+    loadVoices();
   }, [id]);
+
+  const fetchFeatures = async () => {
+    try {
+      const response = await axios.get(`${API}/blog-features`);
+      setFeatures(response.data);
+    } catch (error) {
+      console.error('Error fetching blog features:', error);
+    }
+  };
+
+  const loadVoices = () => {
+    const synth = window.speechSynthesis;
+    const loadedVoices = synth.getVoices();
+    if (loadedVoices.length > 0) {
+      setVoices(loadedVoices);
+      setSelectedVoice(loadedVoices[0]);
+    }
+    synth.onvoiceschanged = () => {
+      const newVoices = synth.getVoices();
+      setVoices(newVoices);
+      if (!selectedVoice && newVoices.length > 0) {
+        setSelectedVoice(newVoices[0]);
+      }
+    };
+  };
 
   const fetchBlog = async () => {
     try {
