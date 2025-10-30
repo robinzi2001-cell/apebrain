@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Footer from '@/components/Footer';
-import { Leaf, Home, Package, Download, ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react';
+import { Leaf, Home, Package, Download, ShoppingCart, Plus, Minus, Trash2, Instagram } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import FloatingCoupon from '@/components/FloatingCoupon';
 
