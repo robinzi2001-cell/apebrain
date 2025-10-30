@@ -46,6 +46,8 @@ class BlogPost(BaseModel):
     keywords: str
     image_url: Optional[str] = None
     image_base64: Optional[str] = None
+    video_url: Optional[str] = None  # YouTube URL
+    audio_url: Optional[str] = None  # Audio file URL or base64
     status: str = "draft"  # draft or published
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     published_at: Optional[datetime] = None
