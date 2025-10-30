@@ -378,6 +378,29 @@ async def upload_blog_audio(blog_id: str, file: UploadFile = File(...)):
         logging.error(f"Error uploading audio: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to upload audio")
 
+# Fetch image from web based on keywords
+@api_router.get("/fetch-image")
+async def fetch_image_from_web(keywords: str):
+    try:
+        # Use Unsplash API (free, no API key needed for basic usage)
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://source.unsplash.com/800x600/",
+                params={"query": keywords},
+                follow_redirects=True
+            )
+            
+            if response.status_code == 200:
+                # Convert image to base64
+                image_base64 = base64.b64encode(response.content).decode('utf-8')
+                image_url = f"data:image/jpeg;base64,{image_base64}"
+                return {"success": True, "image_url": image_url}
+            else:
+                raise HTTPException(status_code=404, detail="No image found for the given keywords")
+    except Exception as e:
+        logging.error(f"Error fetching image from web: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch image from web")
+
 # Create/Save blog post
 @api_router.post("/blogs", response_model=BlogPost)
 async def create_blog(blog: BlogPost):
