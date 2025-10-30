@@ -175,6 +175,50 @@ async def update_admin_settings(settings: AdminSettingsUpdate):
     
     return {"success": True, "message": "Settings updated successfully"}
 
+# Get landing page settings (button visibility)
+@api_router.get("/landing-settings")
+async def get_landing_settings():
+    try:
+        settings = await db.settings.find_one({"type": "landing_page"}, {"_id": 0})
+        if not settings:
+            # Return defaults
+            return {
+                "show_blog": True,
+                "show_shop": True,
+                "show_minigames": True
+            }
+        return settings
+    except Exception as e:
+        logging.error(f"Error fetching landing settings: {str(e)}")
+        # Return defaults on error
+        return {
+            "show_blog": True,
+            "show_shop": True,
+            "show_minigames": True
+        }
+
+# Update landing page settings (button visibility)
+@api_router.post("/landing-settings")
+async def update_landing_settings(settings: dict):
+    try:
+        settings_doc = {
+            "type": "landing_page",
+            "show_blog": settings.get("show_blog", True),
+            "show_shop": settings.get("show_shop", True),
+            "show_minigames": settings.get("show_minigames", True)
+        }
+        
+        await db.settings.update_one(
+            {"type": "landing_page"},
+            {"$set": settings_doc},
+            upsert=True
+        )
+        
+        return {"success": True, "message": "Landing page settings updated successfully"}
+    except Exception as e:
+        logging.error(f"Error updating landing settings: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update landing settings")
+
 # Generate blog post with AI
 @api_router.post("/blogs/generate", response_model=GenerateResponse)
 async def generate_blog(input: BlogPostCreate):
