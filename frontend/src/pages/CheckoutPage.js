@@ -201,6 +201,55 @@ const CheckoutPage = () => {
               </small>
             </div>
 
+            <div className="form-group">
+              <label htmlFor="coupon">
+                <ShoppingCart size={18} style={{ display: 'inline', marginRight: '0.5rem' }} />
+                Coupon Code (Optional)
+              </label>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input
+                  type="text"
+                  id="coupon"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                  placeholder="Enter coupon code"
+                  disabled={applyingCoupon || appliedCoupon}
+                  data-testid="coupon-input"
+                  style={{ flex: 1 }}
+                />
+                {!appliedCoupon ? (
+                  <button
+                    type="button"
+                    onClick={applyCoupon}
+                    disabled={applyingCoupon || !couponCode.trim()}
+                    className="coupon-apply-btn"
+                    data-testid="apply-coupon-button"
+                  >
+                    {applyingCoupon ? 'Applying...' : 'Apply'}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={removeCoupon}
+                    className="coupon-remove-btn"
+                    data-testid="remove-coupon-button"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+              {couponError && (
+                <small style={{ color: '#dc3545', marginTop: '0.5rem', display: 'block' }}>
+                  {couponError}
+                </small>
+              )}
+              {appliedCoupon && (
+                <small style={{ color: '#4caf50', marginTop: '0.5rem', display: 'block' }}>
+                  ✓ Coupon "{appliedCoupon.code}" applied! You saved ${appliedCoupon.discount_amount.toFixed(2)}
+                </small>
+              )}
+            </div>
+
             <div className="payment-section">
               <h3>Payment Method</h3>
               <button
