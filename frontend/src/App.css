@@ -253,7 +253,17 @@ h1, h2, h3, h4, h5, h6 {
 .btn-primary:hover {
   background: #5a6c3a;
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(122, 144, 83, 0.3);
+  box-shadow: 0 4px 15px rgba(122, 144, 83, 0.5);
+}
+
+/* Shop button - Golden glow */
+.shop-btn:hover {
+  box-shadow: 0 4px 15px rgba(251, 191, 36, 0.6) !important;
+}
+
+/* Blog button - Red glow */
+.blog-btn:hover {
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.6) !important;
 }
 
 .btn-secondary {
