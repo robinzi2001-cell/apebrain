@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Depends
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,10 +6,14 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
-
+import asyncio
+from emergentintegrations.llm.chat import LlmChat, UserMessage
+from emergentintegrations.llm.gemeni.image_generation import GeminiImageGeneration
+import base64
+import io
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -25,46 +29,209 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
-
 # Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
+class BlogPost(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    title: str
+    content: str
+    keywords: str
+    image_url: Optional[str] = None
+    image_base64: Optional[str] = None
+    status: str = "draft"  # draft or published
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    published_at: Optional[datetime] = None
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class BlogPostCreate(BaseModel):
+    keywords: str
 
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
+class BlogPostUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+    keywords: Optional[str] = None
+    status: Optional[str] = None
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
+class AdminLogin(BaseModel):
+    password: str
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
+class GenerateResponse(BaseModel):
+    title: str
+    content: str
+    image_base64: str
+
+# Admin authentication
+@api_router.post("/admin/login")
+async def admin_login(login: AdminLogin):
+    if login.password == os.environ.get('ADMIN_PASSWORD', 'apebrain2024'):
+        return {"success": True, "message": "Login successful"}
+    raise HTTPException(status_code=401, detail="Invalid password")
+
+# Generate blog post with AI
+@api_router.post("/blogs/generate", response_model=GenerateResponse)
+async def generate_blog(input: BlogPostCreate):
+    try:
+        gemini_api_key = os.environ.get('GEMINI_API_KEY')
+        
+        # Generate blog content using Gemini Flash Lite
+        chat = LlmChat(
+            api_key=gemini_api_key,
+            session_id=f"blog-gen-{uuid.uuid4()}",
+            system_message="You are an expert writer specializing in mushrooms, mycology, and their health benefits. Write engaging, informative blog posts that are SEO-friendly and educational. Focus on scientific facts, practical applications, and health benefits."
+        ).with_model("gemini", "gemini-2.0-flash-lite")
+        
+        user_message = UserMessage(
+            text=f"Write a comprehensive blog post about: {input.keywords}. Include an engaging title, detailed content with sections covering what the mushroom is, its health benefits, scientific research, how to use it, and safety considerations. Make it around 800-1200 words. Format with proper headings using markdown."
+        )
+        
+        blog_content = await chat.send_message(user_message)
+        
+        # Extract title from content (first line)
+        lines = blog_content.strip().split('\n')
+        title = lines[0].replace('#', '').strip() if lines else input.keywords
+        content = '\n'.join(lines[1:]).strip() if len(lines) > 1 else blog_content
+        
+        # Generate image
+        image_gen = GeminiImageGeneration(api_key=gemini_api_key)
+        images = await image_gen.generate_images(
+            prompt=f"Beautiful, realistic photograph of {input.keywords}, natural lighting, high quality, detailed, nature photography",
+            model="imagen-3.0-generate-002",
+            number_of_images=1
+        )
+        
+        # Convert image to base64
+        image_base64 = base64.b64encode(images[0]).decode('utf-8') if images else ""
+        
+        return GenerateResponse(
+            title=title,
+            content=content,
+            image_base64=image_base64
+        )
+    except Exception as e:
+        logging.error(f"Error generating blog: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate blog: {str(e)}")
+
+# Create/Save blog post
+@api_router.post("/blogs", response_model=BlogPost)
+async def create_blog(blog: BlogPost):
+    try:
+        doc = blog.model_dump()
+        doc['created_at'] = doc['created_at'].isoformat()
+        if doc['published_at']:
+            doc['published_at'] = doc['published_at'].isoformat()
+        
+        await db.blogs.insert_one(doc)
+        return blog
+    except Exception as e:
+        logging.error(f"Error creating blog: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create blog")
+
+# Get all published blogs (public)
+@api_router.get("/blogs", response_model=List[BlogPost])
+async def get_blogs(status: Optional[str] = "published"):
+    try:
+        query = {"status": status} if status else {}
+        blogs = await db.blogs.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+        
+        for blog in blogs:
+            if isinstance(blog.get('created_at'), str):
+                blog['created_at'] = datetime.fromisoformat(blog['created_at'])
+            if blog.get('published_at') and isinstance(blog['published_at'], str):
+                blog['published_at'] = datetime.fromisoformat(blog['published_at'])
+        
+        return blogs
+    except Exception as e:
+        logging.error(f"Error fetching blogs: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch blogs")
+
+# Get single blog
+@api_router.get("/blogs/{blog_id}", response_model=BlogPost)
+async def get_blog(blog_id: str):
+    try:
+        blog = await db.blogs.find_one({"id": blog_id}, {"_id": 0})
+        if not blog:
+            raise HTTPException(status_code=404, detail="Blog not found")
+        
+        if isinstance(blog.get('created_at'), str):
+            blog['created_at'] = datetime.fromisoformat(blog['created_at'])
+        if blog.get('published_at') and isinstance(blog['published_at'], str):
+            blog['published_at'] = datetime.fromisoformat(blog['published_at'])
+        
+        return blog
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error fetching blog: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch blog")
+
+# Update blog
+@api_router.put("/blogs/{blog_id}", response_model=BlogPost)
+async def update_blog(blog_id: str, update: BlogPostUpdate):
+    try:
+        update_data = {k: v for k, v in update.model_dump().items() if v is not None}
+        
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No fields to update")
+        
+        result = await db.blogs.update_one(
+            {"id": blog_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Blog not found")
+        
+        blog = await db.blogs.find_one({"id": blog_id}, {"_id": 0})
+        
+        if isinstance(blog.get('created_at'), str):
+            blog['created_at'] = datetime.fromisoformat(blog['created_at'])
+        if blog.get('published_at') and isinstance(blog['published_at'], str):
+            blog['published_at'] = datetime.fromisoformat(blog['published_at'])
+        
+        return blog
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating blog: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update blog")
+
+# Publish blog
+@api_router.post("/blogs/{blog_id}/publish")
+async def publish_blog(blog_id: str):
+    try:
+        result = await db.blogs.update_one(
+            {"id": blog_id},
+            {"$set": {
+                "status": "published",
+                "published_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Blog not found")
+        
+        return {"success": True, "message": "Blog published successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error publishing blog: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to publish blog")
+
+# Delete blog
+@api_router.delete("/blogs/{blog_id}")
+async def delete_blog(blog_id: str):
+    try:
+        result = await db.blogs.delete_one({"id": blog_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Blog not found")
+        
+        return {"success": True, "message": "Blog deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting blog: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete blog")
 
 # Include the router in the main app
 app.include_router(api_router)
