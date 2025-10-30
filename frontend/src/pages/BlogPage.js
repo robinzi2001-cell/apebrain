@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Footer from '@/components/Footer';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Leaf, ArrowLeft, Home } from 'lucide-react';
