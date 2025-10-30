@@ -41,40 +41,46 @@ const LandingPage = () => {
         </div>
 
         <div className="landing-cards" data-testid="landing-cards">
-          <div 
-            className="landing-card blog-card-landing"
-            onClick={() => navigate('/blog')}
-            data-testid="blog-card"
-          >
-            <div className="card-icon">
-              <BookOpen size={48} />
+          {showBlog && (
+            <div 
+              className="landing-card blog-card-landing"
+              onClick={() => navigate('/blog')}
+              data-testid="blog-card"
+            >
+              <div className="card-icon">
+                <BookOpen size={48} />
+              </div>
+              <h2>Blog</h2>
+              <p>Explore health, nature, consciousness and the mysteries of life</p>
             </div>
-            <h2>Blog</h2>
-            <p>Explore health, nature, consciousness and the mysteries of life</p>
-          </div>
+          )}
 
-          <div 
-            className="landing-card shop-card-landing"
-            onClick={() => navigate('/shop')}
-            data-testid="shop-card"
-          >
-            <div className="card-icon">
-              <ShoppingBag size={48} />
+          {showShop && (
+            <div 
+              className="landing-card shop-card-landing"
+              onClick={() => navigate('/shop')}
+              data-testid="shop-card"
+            >
+              <div className="card-icon">
+                <ShoppingBag size={48} />
+              </div>
+              <h2>Shop</h2>
+              <p>Discover natural products for your wellness journey</p>
             </div>
-            <h2>Shop</h2>
-            <p>Discover natural products for your wellness journey</p>
-          </div>
+          )}
 
-          <div 
-            className="landing-card coming-soon-card"
-            data-testid="coming-soon-card"
-          >
-            <div className="card-icon">
-              <Sparkles size={48} />
+          {showMinigames && (
+            <div 
+              className="landing-card coming-soon-card"
+              data-testid="coming-soon-card"
+            >
+              <div className="card-icon">
+                <Sparkles size={48} />
+              </div>
+              <h2>Minigames</h2>
+              <p>Coming Soon</p>
             </div>
-            <h2>Mini Games</h2>
-            <p>Coming Soon...</p>
-          </div>
+          )}
         </div>
 
         <div className="landing-footer">
