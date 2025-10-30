@@ -17,8 +17,11 @@ const AdminProducts = () => {
     price: 0,
     description: '',
     category: '',
-    type: 'physical'
+    type: 'physical',
+    image_url: ''
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
