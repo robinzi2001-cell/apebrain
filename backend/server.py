@@ -699,11 +699,17 @@ async def get_products():
 @api_router.post("/products")
 async def create_product(product: dict):
     try:
+        # Ensure _id is not in the product dict
+        if "_id" in product:
+            del product["_id"]
+        
         await db.products.insert_one(product)
-        return product
+        
+        # Return without MongoDB _id
+        return {k: v for k, v in product.items() if k != "_id"}
     except Exception as e:
         logging.error(f"Error creating product: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to create product")
+        raise HTTPException(status_code=500, detail=f"Failed to create product: {str(e)}")
 
 # Update product
 @api_router.put("/products/{product_id}")
