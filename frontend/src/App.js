@@ -5,6 +5,9 @@ import LandingPage from '@/pages/LandingPage';
 import BlogHomePage from '@/pages/BlogHomePage';
 import BlogPage from '@/pages/BlogPage';
 import ShopPage from '@/pages/ShopPage';
+import CheckoutPage from '@/pages/CheckoutPage';
+import PaymentSuccess from '@/pages/PaymentSuccess';
+import PaymentCancel from '@/pages/PaymentCancel';
 import AdminLogin from '@/pages/AdminLogin';
 import AdminDashboard from '@/pages/AdminDashboard';
 import AdminSettings from '@/pages/AdminSettings';
@@ -20,6 +23,9 @@ function App() {
           <Route path="/blog" element={<BlogHomePage />} />
           <Route path="/blog/:id" element={<BlogPage />} />
           <Route path="/shop" element={<ShopPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/payment/success" element={<PaymentSuccess />} />
+          <Route path="/payment/cancel" element={<PaymentCancel />} />
           <Route path="/blogadmin" element={<AdminLogin />} />
           <Route path="/blogadmin/dashboard" element={<AdminDashboard />} />
           <Route path="/blogadmin/settings" element={<AdminSettings />} />
