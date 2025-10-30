@@ -93,10 +93,10 @@ const CreateBlog = () => {
             params: { keywords: keywords || title }
           });
           if (imageResponse.data.success && imageResponse.data.image_url) {
-            await axios.post(`${API}/blogs/${blogId}/upload-image`, 
-              new Blob([imageResponse.data.image_url]), 
-              { headers: { 'Content-Type': 'multipart/form-data' } }
-            );
+            // Update blog with the fetched image URL
+            await axios.put(`${API}/blogs/${blogId}`, {
+              image_url: imageResponse.data.image_url
+            });
           }
         } catch (imgError) {
           console.error('Error fetching image from web:', imgError);
