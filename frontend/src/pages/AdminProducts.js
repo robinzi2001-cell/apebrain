@@ -303,6 +303,19 @@ const AdminProducts = () => {
                     }}
                     data-testid={`product-item-${product.id}`}
                   >
+                    {product.image_url && (
+                      <img 
+                        src={product.image_url} 
+                        alt={product.name}
+                        style={{ 
+                          width: '80px', 
+                          height: '80px', 
+                          objectFit: 'cover', 
+                          borderRadius: '8px',
+                          marginRight: '1rem'
+                        }}
+                      />
+                    )}
                     <div style={{ flex: 1 }}>
                       <h3 style={{ marginBottom: '0.5rem' }}>{product.name}</h3>
                       <div style={{ fontSize: '0.9rem', color: '#5a6c3a' }}>
