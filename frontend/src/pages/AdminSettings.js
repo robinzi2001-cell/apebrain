@@ -14,6 +14,9 @@ const AdminSettings = () => {
   const [showBlog, setShowBlog] = useState(true);
   const [showShop, setShowShop] = useState(true);
   const [showMinigames, setShowMinigames] = useState(true);
+  const [enableVideo, setEnableVideo] = useState(true);
+  const [enableAudio, setEnableAudio] = useState(true);
+  const [enableTextToSpeech, setEnableTextToSpeech] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [saving, setSaving] = useState(false);
@@ -26,6 +29,7 @@ const AdminSettings = () => {
     }
     fetchSettings();
     fetchLandingSettings();
+    fetchBlogFeatures();
   }, [navigate]);
 
   const fetchSettings = async () => {
