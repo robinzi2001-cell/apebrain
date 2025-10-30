@@ -21,6 +21,7 @@ const BlogPage = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState(null);
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
 
   useEffect(() => {
     fetchBlog();
@@ -41,16 +42,39 @@ const BlogPage = () => {
     const synth = window.speechSynthesis;
     const loadedVoices = synth.getVoices();
     if (loadedVoices.length > 0) {
-      setVoices(loadedVoices);
-      setSelectedVoice(loadedVoices[0]);
+      // Sort voices: English first, then others
+      const sortedVoices = loadedVoices.sort((a, b) => {
+        if (a.lang.startsWith('en') && !b.lang.startsWith('en')) return -1;
+        if (!a.lang.startsWith('en') && b.lang.startsWith('en')) return 1;
+        return a.lang.localeCompare(b.lang);
+      });
+      setVoices(sortedVoices);
+      // Set default to first English voice
+      const defaultVoice = sortedVoices.find(v => v.lang.startsWith('en')) || sortedVoices[0];
+      setSelectedVoice(defaultVoice);
     }
     synth.onvoiceschanged = () => {
       const newVoices = synth.getVoices();
-      setVoices(newVoices);
-      if (!selectedVoice && newVoices.length > 0) {
-        setSelectedVoice(newVoices[0]);
+      const sortedVoices = newVoices.sort((a, b) => {
+        if (a.lang.startsWith('en') && !b.lang.startsWith('en')) return -1;
+        if (!a.lang.startsWith('en') && b.lang.startsWith('en')) return 1;
+        return a.lang.localeCompare(b.lang);
+      });
+      setVoices(sortedVoices);
+      if (!selectedVoice && sortedVoices.length > 0) {
+        const defaultVoice = sortedVoices.find(v => v.lang.startsWith('en')) || sortedVoices[0];
+        setSelectedVoice(defaultVoice);
       }
     };
+  };
+
+  const getAvailableLanguages = () => {
+    const languages = [...new Set(voices.map(v => v.lang.split('-')[0]))];
+    return languages.sort();
+  };
+
+  const getVoicesForLanguage = (lang) => {
+    return voices.filter(v => v.lang.startsWith(lang));
   };
 
   const fetchBlog = async () => {
