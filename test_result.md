@@ -137,15 +137,18 @@ backend:
 
   - task: "Landing page settings endpoints"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added GET /api/landing-settings and POST /api/landing-settings endpoints. Settings stored in MongoDB 'settings' collection with type 'landing_page'. Fields: show_blog, show_shop, show_minigames (all boolean). Returns defaults (all true) if no settings exist."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Landing page settings endpoints working perfectly. Successfully tested: 1) GET /api/landing-settings returns correct defaults (show_blog=true, show_shop=true, show_minigames=true), 2) POST /api/landing-settings saves settings correctly with success message, 3) GET /api/landing-settings returns saved values (show_blog=false, show_shop=true, show_minigames=false), 4) POST /api/landing-settings updates settings to all true, 5) GET /api/landing-settings verifies updated values. All CRUD operations working correctly with proper MongoDB storage and retrieval."
 
 frontend:
   - task: "Admin product image upload form"
