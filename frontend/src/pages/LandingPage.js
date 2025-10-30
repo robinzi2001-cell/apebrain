@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Leaf, ShoppingBag, BookOpen, Sparkles } from 'lucide-react';
+import { ShoppingBag, BookOpen, Sparkles } from 'lucide-react';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -11,7 +11,7 @@ const LandingPage = () => {
       
       <div className="landing-content">
         <div className="landing-header">
-          <Leaf size={64} className="landing-logo" />
+          <div className="landing-logo" style={{ fontSize: '4rem' }}>🍄</div>
           <h1 className="landing-title" data-testid="landing-title">ApeBrain.cloud</h1>
           <p className="landing-tagline" data-testid="landing-tagline">god knows how</p>
         </div>

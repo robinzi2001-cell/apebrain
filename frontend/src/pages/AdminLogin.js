@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Leaf, Lock } from 'lucide-react';
+import { Lock } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const AdminLogin = () => {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,13 +19,13 @@ const AdminLogin = () => {
     setError('');
 
     try {
-      const response = await axios.post(`${API}/admin/login`, { password });
+      const response = await axios.post(`${API}/admin/login`, { username, password });
       if (response.data.success) {
         localStorage.setItem('adminAuth', 'true');
         navigate('/blogadmin/dashboard');
       }
     } catch (error) {
-      setError('Invalid password');
+      setError(error.response?.data?.detail || 'Invalid credentials');
     } finally {
       setLoading(false);
     }
@@ -34,7 +35,7 @@ const AdminLogin = () => {
     <div className="admin-container" data-testid="admin-login-container">
       <div className="admin-box">
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <Leaf size={48} color="#7a9053" style={{ margin: '0 auto' }} />
+          <div style={{ fontSize: '3rem', margin: '0 auto' }}>🍄</div>
           <h1 style={{ marginTop: '1rem' }} data-testid="admin-login-title">Admin Login</h1>
           <p style={{ color: '#7a9053', marginTop: '0.5rem' }} data-testid="admin-login-subtitle">ApeBrain.cloud</p>
         </div>
@@ -43,13 +44,26 @@ const AdminLogin = () => {
 
         <form onSubmit={handleLogin} data-testid="admin-login-form">
           <div className="form-group">
+            <label htmlFor="username">Username</label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter admin username"
+              required
+              data-testid="username-input"
+            />
+          </div>
+
+          <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
               type="password"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter admin password"
+              placeholder="Enter password"
               required
               data-testid="password-input"
             />
@@ -67,7 +81,7 @@ const AdminLogin = () => {
         </form>
 
         <div style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem', color: '#7a9053' }}>
-          Default password: apebrain2024
+          Default: admin / apebrain2024
         </div>
 
         <div style={{ marginTop: '2rem', textAlign: 'center' }}>

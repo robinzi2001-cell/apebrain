@@ -7,6 +7,7 @@ import BlogPage from '@/pages/BlogPage';
 import ShopPage from '@/pages/ShopPage';
 import AdminLogin from '@/pages/AdminLogin';
 import AdminDashboard from '@/pages/AdminDashboard';
+import AdminSettings from '@/pages/AdminSettings';
 import CreateBlog from '@/pages/CreateBlog';
 import EditBlog from '@/pages/EditBlog';
 
@@ -21,6 +22,7 @@ function App() {
           <Route path="/shop" element={<ShopPage />} />
           <Route path="/blogadmin" element={<AdminLogin />} />
           <Route path="/blogadmin/dashboard" element={<AdminDashboard />} />
+          <Route path="/blogadmin/settings" element={<AdminSettings />} />
           <Route path="/blogadmin/create" element={<CreateBlog />} />
           <Route path="/blogadmin/edit/:id" element={<EditBlog />} />
         </Routes>

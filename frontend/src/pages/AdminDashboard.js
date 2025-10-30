@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Leaf, Plus, Trash2, Eye, Edit } from 'lucide-react';
+import { Leaf, Plus, Trash2, Eye, Edit, Settings } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -75,6 +75,15 @@ const AdminDashboard = () => {
           </a>
           <div className="nav-links">
             <a href="/" data-testid="home-link">View Site</a>
+            <button 
+              onClick={() => navigate('/blogadmin/settings')} 
+              className="btn btn-secondary" 
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              data-testid="settings-button"
+            >
+              <Settings size={18} />
+              Settings
+            </button>
             <button onClick={handleLogout} className="btn btn-secondary" data-testid="logout-button">
               Logout
             </button>
