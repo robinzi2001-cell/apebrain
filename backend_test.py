@@ -823,8 +823,26 @@ def main():
     
     tester = MushroomBlogAPITester()
     
-    # Test sequence - Landing Settings Tests (High Priority)
+    # Test sequence - Blog Multimedia Features Tests (High Priority)
     tests = [
+        # Blog Feature Settings Tests
+        ("Get Default Blog Features", tester.test_get_default_blog_features),
+        ("Save Blog Features", tester.test_save_blog_features),
+        ("Get Saved Blog Features", tester.test_get_saved_blog_features),
+        
+        # Blog with Video URL Tests
+        ("Create Blog with Video URL", tester.test_create_blog_with_video_url),
+        ("Get Blog with Video URL", tester.test_get_blog_with_video_url),
+        
+        # Blog Audio Upload Tests
+        ("Upload Blog Audio", tester.test_upload_blog_audio),
+        ("Get Blog with Audio URL", tester.test_get_blog_with_audio_url),
+        ("Upload Audio to Non-existent Blog", tester.test_upload_audio_to_nonexistent_blog),
+        
+        # Cleanup
+        ("Delete Test Video Blog", tester.test_cleanup_test_video_blog),
+        
+        # Previous Tests (for completeness)
         ("Get Default Landing Settings", tester.test_get_default_landing_settings),
         ("Save Landing Settings", tester.test_save_landing_settings),
         ("Get Saved Landing Settings", tester.test_get_saved_landing_settings),
