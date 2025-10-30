@@ -254,3 +254,5 @@ agent_communication:
     message: "✅ BACKEND TESTING COMPLETE - Product image upload feature fully functional. All test scenarios passed: product creation, image upload, image retrieval, product updates, and error handling. Fixed minor HTTPException handling issue. Backend APIs ready for production use."
   - agent: "main"
     message: "Phase 2 & 3 complete. Added Instagram icon to BlogHomePage, ShopPage, Impressum navigation. Implemented button toggle feature: backend endpoints for landing settings, admin UI for toggles, and conditional rendering on landing page. Ready for testing."
+  - agent: "testing"
+    message: "✅ LANDING SETTINGS TESTING COMPLETE - All landing page settings endpoints working perfectly. Tested complete CRUD cycle: GET defaults, POST save settings, GET saved values, POST update settings, GET verify updates. MongoDB storage and retrieval working correctly. Backend ready for frontend integration."
