@@ -241,6 +241,25 @@ const AdminProducts = () => {
                 </select>
               </div>
 
+              <div className="form-group">
+                <label>Product Image (Optional)</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  data-testid="image-input"
+                />
+                {imagePreview && (
+                  <div style={{ marginTop: '1rem' }}>
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '8px' }} 
+                    />
+                  </div>
+                )}
+              </div>
+
               <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
                 <button type="submit" className="btn btn-primary" data-testid="save-product-button">
                   {editingProduct ? 'Update' : 'Create'} Product
