@@ -85,8 +85,28 @@ const CreateBlog = () => {
       const blogResponse = await axios.post(`${API}/blogs`, blogData);
       const blogId = blogResponse.data.id;
 
-      // Upload image if selected
-      if (imageFile) {
+      // Fetch image from web if checkbox is checked
+      if (fetchImageFromWeb) {
+        try {
+          setFetchingImage(true);
+          const imageResponse = await axios.get(`${API}/fetch-image`, {
+            params: { keywords: keywords || title }
+          });
+          if (imageResponse.data.success && imageResponse.data.image_url) {
+            await axios.post(`${API}/blogs/${blogId}/upload-image`, 
+              new Blob([imageResponse.data.image_url]), 
+              { headers: { 'Content-Type': 'multipart/form-data' } }
+            );
+          }
+        } catch (imgError) {
+          console.error('Error fetching image from web:', imgError);
+          // Continue without image
+        } finally {
+          setFetchingImage(false);
+        }
+      }
+      // Upload image if manually selected
+      else if (imageFile) {
         const formData = new FormData();
         formData.append('file', imageFile);
         await axios.post(`${API}/blogs/${blogId}/upload-image`, formData, {
