@@ -221,6 +221,49 @@ async def update_landing_settings(settings: dict):
         logging.error(f"Error updating landing settings: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to update landing settings")
 
+# Get blog feature settings
+@api_router.get("/blog-features")
+async def get_blog_features():
+    try:
+        settings = await db.settings.find_one({"type": "blog_features"}, {"_id": 0})
+        if not settings:
+            # Return defaults
+            return {
+                "enable_video": True,
+                "enable_audio": True,
+                "enable_text_to_speech": True
+            }
+        return settings
+    except Exception as e:
+        logging.error(f"Error fetching blog features: {str(e)}")
+        return {
+            "enable_video": True,
+            "enable_audio": True,
+            "enable_text_to_speech": True
+        }
+
+# Update blog feature settings
+@api_router.post("/blog-features")
+async def update_blog_features(settings: dict):
+    try:
+        settings_doc = {
+            "type": "blog_features",
+            "enable_video": settings.get("enable_video", True),
+            "enable_audio": settings.get("enable_audio", True),
+            "enable_text_to_speech": settings.get("enable_text_to_speech", True)
+        }
+        
+        await db.settings.update_one(
+            {"type": "blog_features"},
+            {"$set": settings_doc},
+            upsert=True
+        )
+        
+        return {"success": True, "message": "Blog features updated successfully"}
+    except Exception as e:
+        logging.error(f"Error updating blog features: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update blog features")
+
 # Generate blog post with AI
 @api_router.post("/blogs/generate", response_model=GenerateResponse)
 async def generate_blog(input: BlogPostCreate):
