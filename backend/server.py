@@ -80,6 +80,7 @@ class CreateOrder(BaseModel):
     items: List[OrderItem]
     total: float
     customer_email: str
+    coupon_code: Optional[str] = None
 
 class Order(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -89,9 +90,37 @@ class Order(BaseModel):
     items: List[dict]
     total: float
     customer_email: str
+    coupon_code: Optional[str] = None
+    discount_amount: float = 0.0
     status: str = "pending"  # pending, completed, cancelled
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     completed_at: Optional[datetime] = None
+
+# Coupon Models
+class Coupon(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    code: str
+    discount_type: str  # percentage or fixed
+    discount_value: float
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    expires_at: Optional[datetime] = None
+
+class CouponCreate(BaseModel):
+    code: str
+    discount_type: str
+    discount_value: float
+    is_active: bool = True
+    expires_at: Optional[datetime] = None
+
+class CouponUpdate(BaseModel):
+    code: Optional[str] = None
+    discount_type: Optional[str] = None
+    discount_value: Optional[float] = None
+    is_active: Optional[bool] = None
+    expires_at: Optional[datetime] = None
 
 class GenerateResponse(BaseModel):
     title: str
