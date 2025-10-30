@@ -17,7 +17,7 @@ const AdminDashboard = () => {
       return;
     }
     fetchBlogs();
-  }, []);
+  }, [navigate]);
 
   const fetchBlogs = async () => {
     try {
