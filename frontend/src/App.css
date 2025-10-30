@@ -1157,11 +1157,56 @@ h1, h2, h3, h4, h5, h6 {
   
   .floating-coupon {
     left: 10px;
-    top: 10px;
+    top: 70px;
     padding: 0.75rem 1rem;
   }
   
   .coupon-code {
     font-size: 1rem;
   }
+}
+
+/* Footer */
+.footer {
+  background: #3a4520;
+  color: #e8ebe0;
+  padding: 3rem 2rem 2rem;
+  margin-top: 4rem;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.footer-section h3 {
+  color: #fff;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.footer-section a {
+  color: #e8ebe0;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 0.5rem;
+  transition: color 0.3s;
+}
+
+.footer-section a:hover {
+  color: #7a9053;
+}
+
+.footer-bottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(232, 235, 224, 0.2);
+  text-align: center;
+  color: #e8ebe0;
+  opacity: 0.8;
 }
