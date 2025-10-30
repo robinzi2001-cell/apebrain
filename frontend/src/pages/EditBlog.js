@@ -109,6 +109,11 @@ const EditBlog = () => {
     }
   };
 
+  // Prevent rendering if not authenticated
+  if (!localStorage.getItem('adminAuth')) {
+    return null;
+  }
+
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
