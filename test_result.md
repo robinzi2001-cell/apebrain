@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Add product image upload functionality to the apebrain.cloud e-commerce shop. Allow admins to upload images when creating/editing products, display images in admin panel and shop page."
+user_problem_statement: "Add product image upload functionality, Instagram icon on navigation, and button toggle feature for landing page."
 
 backend:
   - task: "Product image upload endpoint"
@@ -134,6 +134,18 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ PASSED - All product CRUD endpoints working with image support. Successfully tested: 1) GET /api/products returns products with image_url field, 2) POST /api/products creates products successfully, 3) PUT /api/products/{id} updates products, 4) DELETE /api/products/{id} removes products, 5) Products with uploaded images retain image_url field in all operations."
+
+  - task: "Landing page settings endpoints"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added GET /api/landing-settings and POST /api/landing-settings endpoints. Settings stored in MongoDB 'settings' collection with type 'landing_page'. Fields: show_blog, show_shop, show_minigames (all boolean). Returns defaults (all true) if no settings exist."
 
 frontend:
   - task: "Admin product image upload form"
@@ -172,6 +184,54 @@ frontend:
         agent: "main"
         comment: "Converted ShopPage from hardcoded products to fetch from backend API. Added useEffect to load products on mount. Display product images (200px height, cover fit) if available, fallback to icon placeholders."
 
+  - task: "Instagram icon on navigation"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/BlogHomePage.js, /app/frontend/src/pages/ShopPage.js, /app/frontend/src/pages/Impressum.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added Instagram icon with link to https://www.instagram.com/apebrain.cloud on BlogHomePage, ShopPage, and Impressum pages. Opens in new tab. Small icon positioned in navigation bar."
+
+  - task: "Admin settings button toggles"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminSettings.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added Landing Page Settings section to AdminSettings with checkboxes for show_blog, show_shop, show_minigames. Added fetchLandingSettings and handleLandingSettingsSave functions."
+
+  - task: "Landing page conditional button rendering"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/LandingPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Updated LandingPage to fetch settings from /api/landing-settings on mount. Each button (Blog, Shop, Minigames) now wrapped with conditional rendering based on settings. Buttons completely hidden when disabled."
+
+  - task: "Admin route security fix"
+    implemented: true
+    working: true
+    file: "Multiple admin pages"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Fixed security issue where admin pages could be accessed by pasting URL directly. Added authentication guard (return null) before render in all admin pages: AdminDashboard, AdminProducts, AdminCoupons, AdminSettings, CreateBlog, EditBlog. Pages now redirect to login and show no content if not authenticated."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
@@ -179,7 +239,8 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Landing page settings endpoints"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -189,3 +250,5 @@ agent_communication:
     message: "Implemented product image upload feature. Backend has new upload endpoint at POST /api/products/{product_id}/upload-image. Frontend AdminProducts.js has image upload field with preview. ShopPage.js now fetches products from backend and displays images. Ready for backend testing. Note: Image upload happens AFTER product creation, not during."
   - agent: "testing"
     message: "✅ BACKEND TESTING COMPLETE - Product image upload feature fully functional. All test scenarios passed: product creation, image upload, image retrieval, product updates, and error handling. Fixed minor HTTPException handling issue. Backend APIs ready for production use."
+  - agent: "main"
+    message: "Phase 2 & 3 complete. Added Instagram icon to BlogHomePage, ShopPage, Impressum navigation. Implemented button toggle feature: backend endpoints for landing settings, admin UI for toggles, and conditional rendering on landing page. Ready for testing."
