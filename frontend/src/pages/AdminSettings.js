@@ -131,6 +131,20 @@ const AdminSettings = () => {
     }
   };
 
+  const handleBlogFeaturesSave = async () => {
+    try {
+      await axios.post(`${API}/blog-features`, {
+        enable_video: enableVideo,
+        enable_audio: enableAudio,
+        enable_text_to_speech: enableTextToSpeech
+      });
+      setSuccess('Blog features updated successfully!');
+    } catch (error) {
+      console.error('Error updating blog features:', error);
+      setError('Failed to update blog features');
+    }
+  };
+
   // Prevent rendering if not authenticated
   if (!localStorage.getItem('adminAuth')) {
     return null;
