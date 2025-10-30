@@ -253,6 +253,8 @@ async def upload_product_image(product_id: str, file: UploadFile = File(...)):
             raise HTTPException(status_code=404, detail="Product not found")
         
         return {"success": True, "image_url": image_url}
+    except HTTPException:
+        raise
     except Exception as e:
         logging.error(f"Error uploading product image: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to upload product image")
