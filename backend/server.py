@@ -74,11 +74,11 @@ async def generate_blog(input: BlogPostCreate):
         chat = LlmChat(
             api_key=gemini_api_key,
             session_id=f"blog-gen-{uuid.uuid4()}",
-            system_message="You are an expert writer specializing in mushrooms, mycology, and their health benefits. Write engaging, informative blog posts that are SEO-friendly and educational. Focus on scientific facts, practical applications, and health benefits."
+            system_message="You are an expert writer specializing in health, nature, consciousness, spirituality, and holistic wellness. Write engaging, informative blog posts that are SEO-friendly and educational. Cover topics like natural remedies, mindfulness, nutrition, herbal medicine, sustainable living, and personal growth. Focus on scientific facts when available, practical applications, and inspiring content."
         ).with_model("gemini", "gemini-2.0-flash-lite")
         
         user_message = UserMessage(
-            text=f"Write a comprehensive blog post about: {input.keywords}. Include an engaging title, detailed content with sections covering what the mushroom is, its health benefits, scientific research, how to use it, and safety considerations. Make it around 800-1200 words. Format with proper headings using markdown."
+            text=f"Write a comprehensive blog post about: {input.keywords}. Include an engaging title, detailed content with sections covering the main topic, benefits, scientific research (if applicable), practical applications, and important considerations. Make it around 800-1200 words. Format with proper headings using markdown. Be creative and informative."
         )
         
         blog_content = await chat.send_message(user_message)
@@ -88,28 +88,38 @@ async def generate_blog(input: BlogPostCreate):
         title = lines[0].replace('#', '').strip() if lines else input.keywords
         content = '\n'.join(lines[1:]).strip() if len(lines) > 1 else blog_content
         
-        # Try to generate image, but continue if it fails
-        image_base64 = ""
-        try:
-            image_gen = GeminiImageGeneration(api_key=gemini_api_key)
-            images = await image_gen.generate_images(
-                prompt=f"Beautiful, realistic photograph of {input.keywords}, natural lighting, high quality, detailed, nature photography",
-                model="imagen-3.0-generate-002",
-                number_of_images=1
-            )
-            image_base64 = base64.b64encode(images[0]).decode('utf-8') if images else ""
-        except Exception as img_error:
-            logging.warning(f"Image generation failed, continuing without image: {str(img_error)}")
-            # Continue without image
-        
         return GenerateResponse(
             title=title,
-            content=content,
-            image_base64=image_base64
+            content=content
         )
     except Exception as e:
         logging.error(f"Error generating blog: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to generate blog: {str(e)}")
+
+# Upload image for blog
+@api_router.post("/blogs/{blog_id}/upload-image")
+async def upload_blog_image(blog_id: str, file: UploadFile = File(...)):
+    try:
+        # Read file content
+        contents = await file.read()
+        
+        # Convert to base64 for storage
+        image_base64 = base64.b64encode(contents).decode('utf-8')
+        image_url = f"data:image/{file.content_type.split('/')[-1]};base64,{image_base64}"
+        
+        # Update blog with image
+        result = await db.blogs.update_one(
+            {"id": blog_id},
+            {"$set": {"image_url": image_url}}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Blog not found")
+        
+        return {"success": True, "image_url": image_url}
+    except Exception as e:
+        logging.error(f"Error uploading image: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to upload image")
 
 # Create/Save blog post
 @api_router.post("/blogs", response_model=BlogPost)
