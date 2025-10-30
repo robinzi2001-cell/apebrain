@@ -11,6 +11,9 @@ const AdminSettings = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [adminUsername, setAdminUsername] = useState('');
+  const [showBlog, setShowBlog] = useState(true);
+  const [showShop, setShowShop] = useState(true);
+  const [showMinigames, setShowMinigames] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [saving, setSaving] = useState(false);
@@ -22,6 +25,7 @@ const AdminSettings = () => {
       return;
     }
     fetchSettings();
+    fetchLandingSettings();
   }, [navigate]);
 
   const fetchSettings = async () => {
@@ -30,6 +34,17 @@ const AdminSettings = () => {
       setAdminUsername(response.data.admin_username || '');
     } catch (error) {
       console.error('Error fetching settings:', error);
+    }
+  };
+
+  const fetchLandingSettings = async () => {
+    try {
+      const response = await axios.get(`${API}/landing-settings`);
+      setShowBlog(response.data.show_blog);
+      setShowShop(response.data.show_shop);
+      setShowMinigames(response.data.show_minigames);
+    } catch (error) {
+      console.error('Error fetching landing settings:', error);
     }
   };
 
