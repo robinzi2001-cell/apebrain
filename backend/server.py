@@ -60,6 +60,9 @@ class BlogPostUpdate(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
     keywords: Optional[str] = None
+    image_url: Optional[str] = None
+    video_url: Optional[str] = None
+    audio_url: Optional[str] = None
     status: Optional[str] = None
 
 class AdminLogin(BaseModel):
