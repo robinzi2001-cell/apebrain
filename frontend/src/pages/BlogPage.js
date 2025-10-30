@@ -308,7 +308,7 @@ const BlogPage = () => {
                   >
                     {getAvailableLanguages().map((lang) => (
                       <option key={lang} value={lang}>
-                        {new Intl.DisplayNames(['en'], { type: 'language' }).of(lang) || lang}
+                        {getLanguageName(lang)}
                       </option>
                     ))}
                   </select>
