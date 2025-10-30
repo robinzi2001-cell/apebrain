@@ -305,6 +305,35 @@ async def upload_product_image(product_id: str, file: UploadFile = File(...)):
         logging.error(f"Error uploading product image: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to upload product image")
 
+# Upload audio for blog
+@api_router.post("/blogs/{blog_id}/upload-audio")
+async def upload_blog_audio(blog_id: str, file: UploadFile = File(...)):
+    try:
+        # Read file content
+        contents = await file.read()
+        
+        # Convert to base64 for storage
+        audio_base64 = base64.b64encode(contents).decode('utf-8')
+        # Determine audio type
+        content_type = file.content_type or 'audio/mpeg'
+        audio_url = f"data:{content_type};base64,{audio_base64}"
+        
+        # Update blog with audio
+        result = await db.blogs.update_one(
+            {"id": blog_id},
+            {"$set": {"audio_url": audio_url}}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Blog not found")
+        
+        return {"success": True, "audio_url": audio_url}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error uploading audio: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to upload audio")
+
 # Create/Save blog post
 @api_router.post("/blogs", response_model=BlogPost)
 async def create_blog(blog: BlogPost):
