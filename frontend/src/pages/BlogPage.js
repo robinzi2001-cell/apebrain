@@ -159,6 +159,15 @@ const BlogPage = () => {
             <a href="/" data-testid="home-link"><Home size={20} /> Home</a>
             <a href="/blog" data-testid="blog-link">Blog</a>
             <a href="/shop" data-testid="shop-link">Shop</a>
+            <a 
+              href="https://www.instagram.com/apebrain.cloud" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              data-testid="instagram-link"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+            >
+              <Instagram size={20} />
+            </a>
           </div>
         </div>
       </nav>
