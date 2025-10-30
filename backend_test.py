@@ -432,6 +432,151 @@ class MushroomBlogAPITester:
         
         return False
 
+    def test_get_default_landing_settings(self):
+        """Test getting default landing page settings (first time)"""
+        success, response = self.run_test(
+            "Get Default Landing Settings",
+            "GET",
+            "landing-settings",
+            200
+        )
+        
+        if success:
+            # Verify default values
+            expected_defaults = {
+                "show_blog": True,
+                "show_shop": True,
+                "show_minigames": True
+            }
+            
+            for key, expected_value in expected_defaults.items():
+                if key not in response:
+                    print(f"❌ Missing required field: {key}")
+                    return False
+                if response[key] != expected_value:
+                    print(f"❌ Incorrect default value for {key}: expected {expected_value}, got {response[key]}")
+                    return False
+            
+            print("✅ Default landing settings returned correctly")
+            print(f"   show_blog: {response['show_blog']}")
+            print(f"   show_shop: {response['show_shop']}")
+            print(f"   show_minigames: {response['show_minigames']}")
+            return True
+        
+        return False
+
+    def test_save_landing_settings(self):
+        """Test saving landing page settings"""
+        settings_data = {
+            "show_blog": False,
+            "show_shop": True,
+            "show_minigames": False
+        }
+        
+        success, response = self.run_test(
+            "Save Landing Settings",
+            "POST",
+            "landing-settings",
+            200,
+            data=settings_data
+        )
+        
+        if success and response.get('success'):
+            print("✅ Landing settings saved successfully")
+            print(f"   Message: {response.get('message', 'No message')}")
+            return True
+        
+        return False
+
+    def test_get_saved_landing_settings(self):
+        """Test getting saved landing page settings"""
+        success, response = self.run_test(
+            "Get Saved Landing Settings",
+            "GET",
+            "landing-settings",
+            200
+        )
+        
+        if success:
+            # Verify saved values match what we posted
+            expected_values = {
+                "show_blog": False,
+                "show_shop": True,
+                "show_minigames": False
+            }
+            
+            for key, expected_value in expected_values.items():
+                if key not in response:
+                    print(f"❌ Missing required field: {key}")
+                    return False
+                if response[key] != expected_value:
+                    print(f"❌ Incorrect saved value for {key}: expected {expected_value}, got {response[key]}")
+                    return False
+            
+            print("✅ Saved landing settings returned correctly")
+            print(f"   show_blog: {response['show_blog']}")
+            print(f"   show_shop: {response['show_shop']}")
+            print(f"   show_minigames: {response['show_minigames']}")
+            return True
+        
+        return False
+
+    def test_update_landing_settings(self):
+        """Test updating landing page settings (all true)"""
+        settings_data = {
+            "show_blog": True,
+            "show_shop": True,
+            "show_minigames": True
+        }
+        
+        success, response = self.run_test(
+            "Update Landing Settings (All True)",
+            "POST",
+            "landing-settings",
+            200,
+            data=settings_data
+        )
+        
+        if success and response.get('success'):
+            print("✅ Landing settings updated successfully")
+            print(f"   Message: {response.get('message', 'No message')}")
+            return True
+        
+        return False
+
+    def test_verify_updated_landing_settings(self):
+        """Test verifying updated landing page settings"""
+        success, response = self.run_test(
+            "Verify Updated Landing Settings",
+            "GET",
+            "landing-settings",
+            200
+        )
+        
+        if success:
+            # Verify all values are now true
+            expected_values = {
+                "show_blog": True,
+                "show_shop": True,
+                "show_minigames": True
+            }
+            
+            for key, expected_value in expected_values.items():
+                if key not in response:
+                    print(f"❌ Missing required field: {key}")
+                    return False
+                if response[key] != expected_value:
+                    print(f"❌ Incorrect updated value for {key}: expected {expected_value}, got {response[key]}")
+                    return False
+            
+            print("✅ Updated landing settings verified correctly")
+            print(f"   show_blog: {response['show_blog']}")
+            print(f"   show_shop: {response['show_shop']}")
+            print(f"   show_minigames: {response['show_minigames']}")
+            return True
+        
+        return False
+
 def main():
     print("🍄 Starting Mushroom Blog API Tests")
     print("=" * 50)
