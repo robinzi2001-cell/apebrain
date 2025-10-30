@@ -149,8 +149,32 @@ const CheckoutPage = () => {
               ))}
             </div>
             <div className="order-total">
-              <strong>Total:</strong>
-              <strong>${total.toFixed(2)}</strong>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <span>Subtotal:</span>
+                <span>${subtotal.toFixed(2)}</span>
+              </div>
+              {appliedCoupon && (
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  color: '#4caf50',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.95rem'
+                }}>
+                  <span>Coupon ({appliedCoupon.code}):</span>
+                  <span>-${appliedCoupon.discount_amount.toFixed(2)}</span>
+                </div>
+              )}
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                paddingTop: '0.5rem',
+                borderTop: '2px solid #e8ebe0',
+                fontSize: '1.3rem'
+              }}>
+                <strong>Total:</strong>
+                <strong>${total.toFixed(2)}</strong>
+              </div>
             </div>
           </div>
 
