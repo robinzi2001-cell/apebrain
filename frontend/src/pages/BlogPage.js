@@ -203,6 +203,79 @@ const BlogPage = () => {
           Published on {formatDate(blog.published_at || blog.created_at)}
         </div>
 
+        {/* Text-to-Speech Controls */}
+        {features.enable_text_to_speech && (
+          <div style={{ margin: '2rem 0', padding: '1.5rem', background: 'rgba(122, 144, 83, 0.1)', borderRadius: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+              <Volume2 size={24} color="#7a9053" />
+              <h3 style={{ margin: 0, color: '#3a4520' }}>Listen to Article</h3>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <button
+                  onClick={handleTextToSpeech}
+                  className="btn btn-primary"
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                >
+                  {isSpeaking && !isPaused ? <Pause size={18} /> : <Play size={18} />}
+                  {isSpeaking && !isPaused ? 'Pause' : isPaused ? 'Resume' : 'Play'}
+                </button>
+                {isSpeaking && (
+                  <button
+                    onClick={handleStopSpeech}
+                    className="btn btn-secondary"
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                  >
+                    <Square size={18} />
+                    Stop
+                  </button>
+                )}
+              </div>
+              {voices.length > 0 && (
+                <select
+                  value={selectedVoice?.name || ''}
+                  onChange={(e) => setSelectedVoice(voices.find(v => v.name === e.target.value))}
+                  style={{ padding: '0.5rem', borderRadius: '8px', border: '2px solid #e8ebe0' }}
+                >
+                  {voices.map((voice) => (
+                    <option key={voice.name} value={voice.name}>
+                      {voice.name} ({voice.lang})
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Video Embed */}
+        {features.enable_video && blog.video_url && extractYouTubeId(blog.video_url) && (
+          <div style={{ margin: '2rem 0' }}>
+            <iframe
+              width="100%"
+              height="500"
+              src={`https://www.youtube.com/embed/${extractYouTubeId(blog.video_url)}`}
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              style={{ borderRadius: '12px' }}
+            ></iframe>
+          </div>
+        )}
+
+        {/* Audio Player */}
+        {features.enable_audio && blog.audio_url && (
+          <div style={{ margin: '2rem 0', padding: '1.5rem', background: 'rgba(122, 144, 83, 0.1)', borderRadius: '12px' }}>
+            <h3 style={{ marginBottom: '1rem', color: '#3a4520' }}>Audio</h3>
+            <audio
+              controls
+              style={{ width: '100%' }}
+              src={blog.audio_url}
+            >
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+        )}
+
         <div className="blog-detail-content" data-testid="blog-detail-content">
           <ReactMarkdown>{blog.content}</ReactMarkdown>
         </div>
