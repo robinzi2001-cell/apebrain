@@ -442,6 +442,13 @@ def main():
     tests = [
         ("Admin Login (Valid)", tester.test_admin_login_valid),
         ("Admin Login (Invalid)", tester.test_admin_login_invalid),
+        ("Get All Products", tester.test_get_products),
+        ("Create Product", tester.test_create_product),
+        ("Upload Product Image", tester.test_upload_product_image),
+        ("Get Products with Images", tester.test_get_products_with_images),
+        ("Update Product", tester.test_update_product),
+        ("Upload Image to Non-existent Product", tester.test_upload_image_to_nonexistent_product),
+        ("Delete Product", tester.test_delete_product),
         ("AI Blog Generation", tester.test_generate_blog),
         ("Create Blog Post", tester.test_create_blog),
         ("Get All Blogs", tester.test_get_blogs),
