@@ -325,6 +325,140 @@ async def delete_blog(blog_id: str):
         logging.error(f"Error deleting blog: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to delete blog")
 
+# ============= SHOP & PAYPAL ENDPOINTS =============
+
+# Create PayPal order
+@api_router.post("/shop/create-order")
+async def create_shop_order(order: CreateOrder):
+    try:
+        if not os.environ.get('PAYPAL_CLIENT_ID'):
+            raise HTTPException(status_code=500, detail="PayPal not configured. Please add PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET to .env file")
+        
+        # Create PayPal payment
+        payment = paypalrestsdk.Payment({
+            "intent": "sale",
+            "payer": {
+                "payment_method": "paypal"
+            },
+            "redirect_urls": {
+                "return_url": f"{os.environ.get('FRONTEND_URL', 'http://localhost:3000')}/payment/success",
+                "cancel_url": f"{os.environ.get('FRONTEND_URL', 'http://localhost:3000')}/payment/cancel"
+            },
+            "transactions": [{
+                "item_list": {
+                    "items": [
+                        {
+                            "name": item.name,
+                            "sku": item.product_id,
+                            "price": f"{item.price:.2f}",
+                            "currency": "USD",
+                            "quantity": item.quantity
+                        } for item in order.items
+                    ]
+                },
+                "amount": {
+                    "total": f"{order.total:.2f}",
+                    "currency": "USD"
+                },
+                "description": "ApeBrain.cloud Shop Purchase"
+            }]
+        })
+
+        if payment.create():
+            # Save order to database
+            order_doc = {
+                "id": str(uuid.uuid4()),
+                "payment_id": payment.id,
+                "items": [item.dict() for item in order.items],
+                "total": order.total,
+                "customer_email": order.customer_email,
+                "status": "pending",
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.orders.insert_one(order_doc)
+            
+            # Get approval URL
+            approval_url = None
+            for link in payment.links:
+                if link.rel == "approval_url":
+                    approval_url = link.href
+                    break
+            
+            return {
+                "success": True,
+                "approval_url": approval_url,
+                "order_id": order_doc["id"],
+                "payment_id": payment.id
+            }
+        else:
+            logging.error(f"PayPal payment creation failed: {payment.error}")
+            raise HTTPException(status_code=400, detail=f"Payment creation failed: {payment.error}")
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating order: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to create order: {str(e)}")
+
+# Execute PayPal payment
+@api_router.post("/shop/execute-payment")
+async def execute_payment(payment_id: str, payer_id: str):
+    try:
+        payment = paypalrestsdk.Payment.find(payment_id)
+        
+        if payment.execute({"payer_id": payer_id}):
+            # Update order status
+            result = await db.orders.update_one(
+                {"payment_id": payment_id},
+                {"$set": {
+                    "status": "completed",
+                    "payer_id": payer_id,
+                    "completed_at": datetime.now(timezone.utc).isoformat()
+                }}
+            )
+            
+            if result.matched_count == 0:
+                logging.warning(f"Order not found for payment_id: {payment_id}")
+            
+            return {
+                "success": True,
+                "message": "Payment completed successfully",
+                "payment_id": payment_id
+            }
+        else:
+            logging.error(f"Payment execution failed: {payment.error}")
+            raise HTTPException(status_code=400, detail=f"Payment execution failed: {payment.error}")
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error executing payment: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to execute payment: {str(e)}")
+
+# Get order details
+@api_router.get("/shop/orders/{order_id}")
+async def get_order(order_id: str):
+    try:
+        order = await db.orders.find_one({"id": order_id}, {"_id": 0})
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        return order
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error fetching order: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch order")
+
+# Get all orders (admin)
+@api_router.get("/shop/orders")
+async def get_all_orders():
+    try:
+        orders = await db.orders.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+        return orders
+    except Exception as e:
+        logging.error(f"Error fetching orders: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch orders")
+
 # Include the router in the main app
 app.include_router(api_router)
 
