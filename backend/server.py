@@ -66,9 +66,51 @@ class GenerateResponse(BaseModel):
 # Admin authentication
 @api_router.post("/admin/login")
 async def admin_login(login: AdminLogin):
-    if login.password == os.environ.get('ADMIN_PASSWORD', 'apebrain2024'):
+    stored_username = os.environ.get('ADMIN_USERNAME', 'admin')
+    stored_password = os.environ.get('ADMIN_PASSWORD', 'apebrain2024')
+    
+    if login.username == stored_username and login.password == stored_password:
         return {"success": True, "message": "Login successful"}
-    raise HTTPException(status_code=401, detail="Invalid password")
+    raise HTTPException(status_code=401, detail="Invalid credentials")
+
+# Get admin settings
+@api_router.get("/admin/settings")
+async def get_admin_settings():
+    return {
+        "admin_username": os.environ.get('ADMIN_USERNAME', 'admin')
+    }
+
+# Update admin settings
+@api_router.post("/admin/settings")
+async def update_admin_settings(settings: AdminSettingsUpdate):
+    # Verify current password
+    stored_password = os.environ.get('ADMIN_PASSWORD', 'apebrain2024')
+    if settings.current_password != stored_password:
+        raise HTTPException(status_code=401, detail="Current password is incorrect")
+    
+    # Update .env file
+    env_path = ROOT_DIR / '.env'
+    env_content = env_path.read_text()
+    
+    # Update username
+    if 'ADMIN_USERNAME=' in env_content:
+        env_content = re.sub(r'ADMIN_USERNAME=.*', f'ADMIN_USERNAME=\"{settings.admin_username}\"', env_content)
+    else:
+        env_content += f'\nADMIN_USERNAME=\"{settings.admin_username}\"'
+    
+    # Update password if provided
+    if settings.new_password:
+        if 'ADMIN_PASSWORD=' in env_content:
+            env_content = re.sub(r'ADMIN_PASSWORD=.*', f'ADMIN_PASSWORD=\"{settings.new_password}\"', env_content)
+        else:
+            env_content += f'\nADMIN_PASSWORD=\"{settings.new_password}\"'
+    
+    env_path.write_text(env_content)
+    
+    # Reload environment variables
+    load_dotenv(ROOT_DIR / '.env', override=True)
+    
+    return {"success": True, "message": "Settings updated successfully"}
 
 # Generate blog post with AI
 @api_router.post("/blogs/generate", response_model=GenerateResponse)
