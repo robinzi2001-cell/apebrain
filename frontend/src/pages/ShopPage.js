@@ -257,6 +257,8 @@ const ShopPage = () => {
       )}
 
       {showCart && <div className="cart-overlay" onClick={() => setShowCart(false)}></div>}
+      
+      <FloatingCoupon />
     </div>
   );
 };
