@@ -3,6 +3,8 @@ import sys
 import json
 from datetime import datetime
 import time
+import base64
+import io
 
 class MushroomBlogAPITester:
     def __init__(self, base_url="https://blog-shop-combo.preview.emergentagent.com"):
