@@ -745,7 +745,8 @@ class MushroomBlogAPITester:
             "Upload Blog Audio",
             f"blogs/{self.test_video_blog_id}/upload-audio",
             200,
-            audio_data
+            audio_data,
+            file_type='audio'
         )
         
         if success and response.get('success') and response.get('audio_url'):
