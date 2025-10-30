@@ -296,6 +296,12 @@ const BlogPage = () => {
               )}
             </div>
             
+            {voices.length === 0 && (
+              <div style={{ marginTop: '1rem', color: '#7a9053', fontSize: '0.9rem' }}>
+                Loading voices...
+              </div>
+            )}
+            
             {voices.length > 0 && (
               <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
                 <div>
