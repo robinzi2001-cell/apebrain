@@ -260,10 +260,39 @@ const CreateBlog = () => {
                   style={{ display: 'none' }}
                   id="image-upload"
                   data-testid="image-upload-input"
+                  disabled={fetchImageFromWeb}
                 />
-                <label htmlFor="image-upload" className="btn btn-secondary" style={{ cursor: 'pointer', display: 'inline-block' }}>
+                <label 
+                  htmlFor="image-upload" 
+                  className="btn btn-secondary" 
+                  style={{ 
+                    cursor: fetchImageFromWeb ? 'not-allowed' : 'pointer', 
+                    display: 'inline-block',
+                    opacity: fetchImageFromWeb ? 0.5 : 1
+                  }}
+                >
                   <Upload size={18} /> Choose Image
                 </label>
+                
+                <div style={{ marginTop: '0.75rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={fetchImageFromWeb}
+                      onChange={(e) => {
+                        setFetchImageFromWeb(e.target.checked);
+                        if (e.target.checked) {
+                          setImageFile(null);
+                          setImagePreview('');
+                        }
+                      }}
+                      style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                    />
+                    <span style={{ color: '#7a9053', fontSize: '0.9rem' }}>
+                      Get matching image from web (based on blog topic)
+                    </span>
+                  </label>
+                </div>
               </div>
 
               {/* Video URL */}
