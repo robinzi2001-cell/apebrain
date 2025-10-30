@@ -52,6 +52,17 @@ const AdminSettings = () => {
     }
   };
 
+  const fetchBlogFeatures = async () => {
+    try {
+      const response = await axios.get(`${API}/blog-features`);
+      setEnableVideo(response.data.enable_video);
+      setEnableAudio(response.data.enable_audio);
+      setEnableTextToSpeech(response.data.enable_text_to_speech);
+    } catch (error) {
+      console.error('Error fetching blog features:', error);
+    }
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
     setError('');
