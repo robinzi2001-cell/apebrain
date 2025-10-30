@@ -794,7 +794,8 @@ class MushroomBlogAPITester:
             "Upload Audio to Non-existent Blog",
             f"blogs/{fake_blog_id}/upload-audio",
             404,
-            audio_data
+            audio_data,
+            file_type='audio'
         )
         
         if success:
