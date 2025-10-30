@@ -13,18 +13,64 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
+  const [subtotal, setSubtotal] = useState(0);
   const [email, setEmail] = useState('');
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponError, setCouponError] = useState('');
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [error, setError] = useState('');
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     if (location.state?.cart && location.state?.total) {
       setCart(location.state.cart);
-      setTotal(parseFloat(location.state.total));
+      const subtotalAmount = parseFloat(location.state.total);
+      setSubtotal(subtotalAmount);
+      setTotal(subtotalAmount);
     } else {
       navigate('/shop');
     }
   }, [location, navigate]);
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
+
+    setApplyingCoupon(true);
+    setCouponError('');
+
+    try {
+      const response = await axios.post(`${API}/coupons/validate`, null, {
+        params: {
+          code: couponCode.toUpperCase(),
+          subtotal: subtotal
+        }
+      });
+
+      if (response.data.valid) {
+        setAppliedCoupon(response.data);
+        const newTotal = subtotal - response.data.discount_amount;
+        setTotal(newTotal);
+        setCouponError('');
+      }
+    } catch (error) {
+      setCouponError(error.response?.data?.detail || 'Invalid coupon code');
+      setAppliedCoupon(null);
+      setTotal(subtotal);
+    } finally {
+      setApplyingCoupon(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+    setTotal(subtotal);
+    setCouponError('');
+  };
 
   const createOrder = async () => {
     if (!email) {
