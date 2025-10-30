@@ -1,65 +1,116 @@
 import React, { useState } from 'react';
-import { Leaf, Home, Package, Download } from 'lucide-react';
+import { Leaf, Home, Package, Download, ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const ShopPage = () => {
   const [activeTab, setActiveTab] = useState('physical');
+  const [cart, setCart] = useState([]);
+  const [showCart, setShowCart] = useState(false);
+  const navigate = useNavigate();
 
   const physicalProducts = [
     {
-      id: 1,
+      id: 'phys-1',
       name: 'Lion\'s Mane Extract',
-      price: '$29.99',
+      price: 29.99,
       description: 'Premium quality Lion\'s Mane mushroom extract for cognitive support',
-      category: 'Supplements'
+      category: 'Supplements',
+      type: 'physical'
     },
     {
-      id: 2,
+      id: 'phys-2',
       name: 'Reishi Capsules',
-      price: '$24.99',
+      price: 24.99,
       description: 'Pure Reishi mushroom capsules for immune system support',
-      category: 'Supplements'
+      category: 'Supplements',
+      type: 'physical'
     },
     {
-      id: 3,
+      id: 'phys-3',
       name: 'Mushroom Growing Kit',
-      price: '$49.99',
+      price: 49.99,
       description: 'Complete kit to grow your own gourmet mushrooms at home',
-      category: 'Kits'
+      category: 'Kits',
+      type: 'physical'
     },
     {
-      id: 4,
+      id: 'phys-4',
       name: 'Cordyceps Powder',
-      price: '$34.99',
+      price: 34.99,
       description: 'Organic Cordyceps mushroom powder for energy and vitality',
-      category: 'Supplements'
+      category: 'Supplements',
+      type: 'physical'
     }
   ];
 
   const digitalProducts = [
     {
-      id: 1,
+      id: 'digi-1',
       name: 'Mushroom Identification Guide',
-      price: '$19.99',
+      price: 19.99,
       description: 'Comprehensive digital guide to identifying edible mushrooms',
-      category: 'eBooks'
+      category: 'eBooks',
+      type: 'digital'
     },
     {
-      id: 2,
+      id: 'digi-2',
       name: 'Holistic Health Course',
-      price: '$79.99',
+      price: 79.99,
       description: 'Complete online course on natural wellness and mushroom medicine',
-      category: 'Courses'
+      category: 'Courses',
+      type: 'digital'
     },
     {
-      id: 3,
+      id: 'digi-3',
       name: 'Meditation & Consciousness Pack',
-      price: '$29.99',
+      price: 29.99,
       description: 'Guided meditations and consciousness expansion exercises',
-      category: 'Audio'
+      category: 'Audio',
+      type: 'digital'
     }
   ];
 
   const products = activeTab === 'physical' ? physicalProducts : digitalProducts;
+
+  const addToCart = (product) => {
+    const existing = cart.find(item => item.id === product.id);
+    if (existing) {
+      setCart(cart.map(item => 
+        item.id === product.id 
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      ));
+    } else {
+      setCart([...cart, { ...product, quantity: 1 }]);
+    }
+    setShowCart(true);
+  };
+
+  const updateQuantity = (productId, change) => {
+    setCart(cart.map(item => {
+      if (item.id === productId) {
+        const newQuantity = item.quantity + change;
+        return newQuantity > 0 ? { ...item, quantity: newQuantity } : item;
+      }
+      return item;
+    }).filter(item => item.quantity > 0));
+  };
+
+  const removeFromCart = (productId) => {
+    setCart(cart.filter(item => item.id !== productId));
+  };
+
+  const getCartTotal = () => {
+    return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2);
+  };
+
+  const getCartCount = () => {
+    return cart.reduce((sum, item) => sum + item.quantity, 0);
+  };
+
+  const handleCheckout = () => {
+    navigate('/checkout', { state: { cart, total: getCartTotal() } });
+  };
 
   return (
     <div>
@@ -73,6 +124,16 @@ const ShopPage = () => {
             <a href="/" data-testid="home-link"><Home size={20} /> Home</a>
             <a href="/blog" data-testid="blog-link">Blog</a>
             <a href="/shop" data-testid="shop-link">Shop</a>
+            <button 
+              onClick={() => setShowCart(!showCart)}
+              className="btn btn-secondary cart-button"
+              data-testid="cart-button"
+            >
+              <ShoppingCart size={20} />
+              {getCartCount() > 0 && (
+                <span className="cart-badge">{getCartCount()}</span>
+              )}
+            </button>
           </div>
         </div>
       </nav>
@@ -113,20 +174,88 @@ const ShopPage = () => {
                 <h3 className="product-name">{product.name}</h3>
                 <p className="product-description">{product.description}</p>
                 <div className="product-footer">
-                  <span className="product-price">{product.price}</span>
-                  <button className="btn btn-primary" data-testid={`buy-button-${product.id}`}>
-                    {activeTab === 'physical' ? 'Add to Cart' : 'Purchase'}
+                  <span className="product-price">${product.price.toFixed(2)}</span>
+                  <button 
+                    className="btn btn-primary" 
+                    onClick={() => addToCart(product)}
+                    data-testid={`add-to-cart-${product.id}`}
+                  >
+                    Add to Cart
                   </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
-
-        <div className="shop-notice">
-          <p><strong>Note:</strong> Shop functionality coming soon! Products shown are examples.</p>
-        </div>
       </div>
+
+      {/* Shopping Cart Sidebar */}
+      {showCart && (
+        <div className="cart-sidebar" data-testid="cart-sidebar">
+          <div className="cart-header">
+            <h2><ShoppingCart size={24} /> Your Cart</h2>
+            <button onClick={() => setShowCart(false)} className="close-cart">×</button>
+          </div>
+          
+          {cart.length === 0 ? (
+            <div className="empty-cart" data-testid="empty-cart">
+              <p>Your cart is empty</p>
+            </div>
+          ) : (
+            <>
+              <div className="cart-items">
+                {cart.map(item => (
+                  <div key={item.id} className="cart-item" data-testid={`cart-item-${item.id}`}>
+                    <div className="cart-item-info">
+                      <h4>{item.name}</h4>
+                      <p>${item.price.toFixed(2)}</p>
+                    </div>
+                    <div className="cart-item-controls">
+                      <button 
+                        onClick={() => updateQuantity(item.id, -1)}
+                        className="qty-btn"
+                        data-testid={`decrease-qty-${item.id}`}
+                      >
+                        <Minus size={16} />
+                      </button>
+                      <span className="quantity">{item.quantity}</span>
+                      <button 
+                        onClick={() => updateQuantity(item.id, 1)}
+                        className="qty-btn"
+                        data-testid={`increase-qty-${item.id}`}
+                      >
+                        <Plus size={16} />
+                      </button>
+                      <button 
+                        onClick={() => removeFromCart(item.id)}
+                        className="remove-btn"
+                        data-testid={`remove-item-${item.id}`}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="cart-footer">
+                <div className="cart-total">
+                  <strong>Total:</strong>
+                  <strong>${getCartTotal()}</strong>
+                </div>
+                <button 
+                  onClick={handleCheckout}
+                  className="btn btn-primary checkout-btn"
+                  data-testid="checkout-button"
+                >
+                  Proceed to Checkout
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {showCart && <div className="cart-overlay" onClick={() => setShowCart(false)}></div>}
     </div>
   );
 };
