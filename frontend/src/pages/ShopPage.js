@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Leaf, Home, Package, Download, ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import FloatingCoupon from '@/components/FloatingCoupon';
 
 const ShopPage = () => {
   const [activeTab, setActiveTab] = useState('physical');
