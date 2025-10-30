@@ -223,7 +223,7 @@ class MushroomBlogAPITester:
         png_data = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\tpHYs\x00\x00\x0b\x13\x00\x00\x0b\x13\x01\x00\x9a\x9c\x18\x00\x00\x00\x0cIDATx\x9cc```\x00\x00\x00\x04\x00\x01\xdd\x8d\xb4\x1c\x00\x00\x00\x00IEND\xaeB`\x82'
         return png_data
 
-    def run_multipart_test(self, name, endpoint, expected_status, file_data, timeout=30):
+    def run_multipart_test(self, name, endpoint, expected_status, file_data, timeout=30, file_type='image'):
         """Run a multipart file upload test"""
         url = f"{self.api_url}/{endpoint}"
         
@@ -232,7 +232,11 @@ class MushroomBlogAPITester:
         print(f"   URL: {url}")
         
         try:
-            files = {'file': ('test_image.png', file_data, 'image/png')}
+            if file_type == 'audio':
+                files = {'file': ('test_audio.mp3', file_data, 'audio/mpeg')}
+            else:
+                files = {'file': ('test_image.png', file_data, 'image/png')}
+            
             response = requests.post(url, files=files, timeout=timeout)
 
             success = response.status_code == expected_status
