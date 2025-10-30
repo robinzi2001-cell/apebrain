@@ -383,11 +383,12 @@ h1, h2, h3, h4, h5, h6 {
 
 .landing-logo {
   animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(167, 139, 250, 0.6));
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+  0%, 100% { transform: translateY(0px) rotate(-5deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
 }
 
 .landing-title {
