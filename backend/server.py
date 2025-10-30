@@ -549,8 +549,9 @@ async def create_coupon(coupon: CouponCreate):
         if existing:
             raise HTTPException(status_code=400, detail="Coupon code already exists")
         
+        coupon_id = str(uuid.uuid4())
         doc = {
-            "id": str(uuid.uuid4()),
+            "id": coupon_id,
             "code": coupon.code.upper(),
             "discount_type": coupon.discount_type,
             "discount_value": coupon.discount_value,
@@ -560,12 +561,22 @@ async def create_coupon(coupon: CouponCreate):
         }
         
         await db.coupons.insert_one(doc)
-        return doc
+        
+        # Return without MongoDB _id
+        return {
+            "id": coupon_id,
+            "code": doc["code"],
+            "discount_type": doc["discount_type"],
+            "discount_value": doc["discount_value"],
+            "is_active": doc["is_active"],
+            "created_at": doc["created_at"],
+            "expires_at": doc["expires_at"]
+        }
     except HTTPException:
         raise
     except Exception as e:
         logging.error(f"Error creating coupon: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to create coupon")
+        raise HTTPException(status_code=500, detail=f"Failed to create coupon: {str(e)}")
 
 # Get all coupons (admin)
 @api_router.get("/coupons")
