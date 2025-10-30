@@ -77,6 +77,32 @@ const BlogPage = () => {
     return voices.filter(v => v.lang.startsWith(lang));
   };
 
+  const getLanguageName = (code) => {
+    const languageNames = {
+      'en': 'English',
+      'de': 'German',
+      'es': 'Spanish',
+      'fr': 'French',
+      'it': 'Italian',
+      'pt': 'Portuguese',
+      'ru': 'Russian',
+      'ja': 'Japanese',
+      'zh': 'Chinese',
+      'ko': 'Korean',
+      'ar': 'Arabic',
+      'hi': 'Hindi',
+      'nl': 'Dutch',
+      'pl': 'Polish',
+      'tr': 'Turkish',
+      'sv': 'Swedish',
+      'no': 'Norwegian',
+      'da': 'Danish',
+      'fi': 'Finnish',
+      'el': 'Greek'
+    };
+    return languageNames[code] || code.toUpperCase();
+  };
+
   const fetchBlog = async () => {
     try {
       const response = await axios.get(`${API}/blogs/${id}`);
