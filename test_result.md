@@ -101,3 +101,85 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Add product image upload functionality to the apebrain.cloud e-commerce shop. Allow admins to upload images when creating/editing products, display images in admin panel and shop page."
+
+backend:
+  - task: "Product image upload endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added POST /api/products/{product_id}/upload-image endpoint similar to blog image upload. Uses base64 encoding for MongoDB storage. Endpoint accepts multipart/form-data file upload."
+
+  - task: "Product CRUD endpoints with image support"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Existing product CRUD endpoints (GET, POST, PUT, DELETE) should now work with image_url field stored in products."
+
+frontend:
+  - task: "Admin product image upload form"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminProducts.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added image upload input field, file selection handler, image preview, and automatic upload after product creation/update. Updated handleSubmit to upload image separately after product is saved."
+
+  - task: "Display product images in admin panel"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminProducts.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Product list now displays thumbnail images (80x80px) next to product details if image_url exists."
+
+  - task: "Fetch products from backend and display images on shop page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/ShopPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Converted ShopPage from hardcoded products to fetch from backend API. Added useEffect to load products on mount. Display product images (200px height, cover fit) if available, fallback to icon placeholders."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Product image upload endpoint"
+    - "Product CRUD endpoints with image support"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Implemented product image upload feature. Backend has new upload endpoint at POST /api/products/{product_id}/upload-image. Frontend AdminProducts.js has image upload field with preview. ShopPage.js now fetches products from backend and displays images. Ready for backend testing. Note: Image upload happens AFTER product creation, not during."
