@@ -363,6 +363,23 @@ async def create_shop_order(order: CreateOrder):
         if not os.environ.get('PAYPAL_CLIENT_ID'):
             raise HTTPException(status_code=500, detail="PayPal not configured. Please add PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET to .env file")
         
+        # Validate and apply coupon if provided
+        discount_amount = 0.0
+        if order.coupon_code:
+            try:
+                coupon = await db.coupons.find_one({"code": order.coupon_code.upper(), "is_active": True}, {"_id": 0})
+                if coupon:
+                    subtotal = order.total
+                    if coupon['discount_type'] == 'percentage':
+                        discount_amount = (subtotal * coupon['discount_value']) / 100
+                    else:
+                        discount_amount = coupon['discount_value']
+                    
+                    # Apply discount
+                    order.total = max(0, order.total - discount_amount)
+            except Exception as e:
+                logging.warning(f"Could not apply coupon: {str(e)}")
+        
         # Create PayPal payment
         payment = paypalrestsdk.Payment({
             "intent": "sale",
@@ -401,6 +418,8 @@ async def create_shop_order(order: CreateOrder):
                 "items": [item.dict() for item in order.items],
                 "total": order.total,
                 "customer_email": order.customer_email,
+                "coupon_code": order.coupon_code,
+                "discount_amount": round(discount_amount, 2),
                 "status": "pending",
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
