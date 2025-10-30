@@ -104,6 +104,8 @@ const AdminProducts = () => {
   const handleEdit = (product) => {
     setEditingProduct(product);
     setFormData(product);
+    setImagePreview(product.image_url || '');
+    setImageFile(null);
     setShowForm(true);
   };
 
