@@ -15,6 +15,8 @@ const CreateBlog = () => {
   const [generatedBlog, setGeneratedBlog] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
+  const [audioFile, setAudioFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
