@@ -583,8 +583,13 @@ def main():
     
     tester = MushroomBlogAPITester()
     
-    # Test sequence
+    # Test sequence - Landing Settings Tests (High Priority)
     tests = [
+        ("Get Default Landing Settings", tester.test_get_default_landing_settings),
+        ("Save Landing Settings", tester.test_save_landing_settings),
+        ("Get Saved Landing Settings", tester.test_get_saved_landing_settings),
+        ("Update Landing Settings", tester.test_update_landing_settings),
+        ("Verify Updated Landing Settings", tester.test_verify_updated_landing_settings),
         ("Admin Login (Valid)", tester.test_admin_login_valid),
         ("Admin Login (Invalid)", tester.test_admin_login_invalid),
         ("Get All Products", tester.test_get_products),
