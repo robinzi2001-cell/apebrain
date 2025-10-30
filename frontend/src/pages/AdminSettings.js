@@ -223,6 +223,58 @@ const AdminSettings = () => {
           </button>
         </form>
 
+        {/* Landing Page Settings */}
+        <div style={{ marginTop: '3rem' }}>
+          <div className="form-divider"></div>
+          <h2 style={{ marginTop: '2rem', marginBottom: '1rem', color: '#3a4520' }}>Landing Page Settings</h2>
+          <p style={{ color: '#7a9053', marginBottom: '1.5rem' }}>Control which buttons are visible on the landing page</p>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={showBlog}
+                onChange={(e) => setShowBlog(e.target.checked)}
+                style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+                data-testid="show-blog-toggle"
+              />
+              <span style={{ fontSize: '1rem', color: '#3a4520' }}>Show Blog Button</span>
+            </label>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={showShop}
+                onChange={(e) => setShowShop(e.target.checked)}
+                style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+                data-testid="show-shop-toggle"
+              />
+              <span style={{ fontSize: '1rem', color: '#3a4520' }}>Show Shop Button</span>
+            </label>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={showMinigames}
+                onChange={(e) => setShowMinigames(e.target.checked)}
+                style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+                data-testid="show-minigames-toggle"
+              />
+              <span style={{ fontSize: '1rem', color: '#3a4520' }}>Show Minigames Button</span>
+            </label>
+          </div>
+
+          <button
+            onClick={handleLandingSettingsSave}
+            className="btn btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            data-testid="save-landing-settings-button"
+          >
+            <Save size={18} />
+            Save Landing Page Settings
+          </button>
+        </div>
+
         <div className="settings-info" style={{ marginTop: '3rem', padding: '1.5rem', background: 'rgba(122, 144, 83, 0.1)', borderRadius: '12px' }}>
           <h4 style={{ marginBottom: '0.5rem', color: '#3a4520' }}>Security Notes:</h4>
           <ul style={{ marginLeft: '1.5rem', color: '#5a6c3a' }}>
