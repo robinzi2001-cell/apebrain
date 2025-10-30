@@ -177,6 +177,4 @@ const CreateBlog = () => {
   );
 };
 
-import { useEffect } from 'react';
-
 export default CreateBlog;
