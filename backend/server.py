@@ -68,6 +68,31 @@ class AdminSettingsUpdate(BaseModel):
     admin_username: str
     new_password: Optional[str] = None
 
+# Shop Models
+class OrderItem(BaseModel):
+    product_id: str
+    name: str
+    price: float
+    quantity: int
+    product_type: str  # physical or digital
+
+class CreateOrder(BaseModel):
+    items: List[OrderItem]
+    total: float
+    customer_email: str
+
+class Order(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    payment_id: Optional[str] = None
+    items: List[dict]
+    total: float
+    customer_email: str
+    status: str = "pending"  # pending, completed, cancelled
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    completed_at: Optional[datetime] = None
+
 class GenerateResponse(BaseModel):
     title: str
     content: str
