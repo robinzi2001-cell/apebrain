@@ -51,7 +51,13 @@ class BlogPostUpdate(BaseModel):
     status: Optional[str] = None
 
 class AdminLogin(BaseModel):
+    username: str
     password: str
+
+class AdminSettingsUpdate(BaseModel):
+    current_password: str
+    admin_username: str
+    new_password: Optional[str] = None
 
 class GenerateResponse(BaseModel):
     title: str
