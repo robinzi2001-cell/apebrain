@@ -304,6 +304,58 @@ const AdminSettings = () => {
           </button>
         </div>
 
+        {/* Blog Features Settings */}
+        <div style={{ marginTop: '3rem' }}>
+          <div className="form-divider"></div>
+          <h2 style={{ marginTop: '2rem', marginBottom: '1rem', color: '#3a4520' }}>Blog Features</h2>
+          <p style={{ color: '#7a9053', marginBottom: '1.5rem' }}>Enable or disable multimedia features for blog posts</p>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={enableVideo}
+                onChange={(e) => setEnableVideo(e.target.checked)}
+                style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+                data-testid="enable-video-toggle"
+              />
+              <span style={{ fontSize: '1rem', color: '#3a4520' }}>Enable Video (YouTube) in Blogs</span>
+            </label>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={enableAudio}
+                onChange={(e) => setEnableAudio(e.target.checked)}
+                style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+                data-testid="enable-audio-toggle"
+              />
+              <span style={{ fontSize: '1rem', color: '#3a4520' }}>Enable Audio Upload in Blogs</span>
+            </label>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={enableTextToSpeech}
+                onChange={(e) => setEnableTextToSpeech(e.target.checked)}
+                style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+                data-testid="enable-tts-toggle"
+              />
+              <span style={{ fontSize: '1rem', color: '#3a4520' }}>Enable Text-to-Speech Reader</span>
+            </label>
+          </div>
+
+          <button
+            onClick={handleBlogFeaturesSave}
+            className="btn btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            data-testid="save-blog-features-button"
+          >
+            <Save size={18} />
+            Save Blog Features
+          </button>
+        </div>
+
         <div className="settings-info" style={{ marginTop: '3rem', padding: '1.5rem', background: 'rgba(122, 144, 83, 0.1)', borderRadius: '12px' }}>
           <h4 style={{ marginBottom: '0.5rem', color: '#3a4520' }}>Security Notes:</h4>
           <ul style={{ marginLeft: '1.5rem', color: '#5a6c3a' }}>
