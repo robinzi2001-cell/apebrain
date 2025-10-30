@@ -136,6 +136,7 @@ const BlogHomePage = () => {
         </div>
       )}
       <FloatingCoupon />
+      <Footer />
     </div>
   );
 };
