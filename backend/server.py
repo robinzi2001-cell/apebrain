@@ -91,16 +91,19 @@ async def generate_blog(input: BlogPostCreate):
         title = lines[0].replace('#', '').strip() if lines else input.keywords
         content = '\n'.join(lines[1:]).strip() if len(lines) > 1 else blog_content
         
-        # Generate image
-        image_gen = GeminiImageGeneration(api_key=gemini_api_key)
-        images = await image_gen.generate_images(
-            prompt=f"Beautiful, realistic photograph of {input.keywords}, natural lighting, high quality, detailed, nature photography",
-            model="imagen-3.0-generate-002",
-            number_of_images=1
-        )
-        
-        # Convert image to base64
-        image_base64 = base64.b64encode(images[0]).decode('utf-8') if images else ""
+        # Try to generate image, but continue if it fails
+        image_base64 = ""
+        try:
+            image_gen = GeminiImageGeneration(api_key=gemini_api_key)
+            images = await image_gen.generate_images(
+                prompt=f"Beautiful, realistic photograph of {input.keywords}, natural lighting, high quality, detailed, nature photography",
+                model="imagen-3.0-generate-002",
+                number_of_images=1
+            )
+            image_base64 = base64.b64encode(images[0]).decode('utf-8') if images else ""
+        except Exception as img_error:
+            logging.warning(f"Image generation failed, continuing without image: {str(img_error)}")
+            # Continue without image
         
         return GenerateResponse(
             title=title,
