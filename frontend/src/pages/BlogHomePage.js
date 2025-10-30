@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Leaf, Home } from 'lucide-react';
 import FloatingCoupon from '@/components/FloatingCoupon';
+import Footer from '@/components/Footer';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
