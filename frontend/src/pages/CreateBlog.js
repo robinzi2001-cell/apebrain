@@ -134,13 +134,27 @@ const CreateBlog = () => {
 
             {showPreview && (
               <div data-testid="preview-content">
-                {generatedBlog.image_base64 && (
+                {generatedBlog.image_base64 ? (
                   <img
                     src={`data:image/png;base64,${generatedBlog.image_base64}`}
                     alt={generatedBlog.title}
                     className="preview-image"
                     data-testid="preview-image"
                   />
+                ) : (
+                  <div 
+                    style={{
+                      padding: '2rem',
+                      background: '#f0f0f0',
+                      borderRadius: '8px',
+                      textAlign: 'center',
+                      marginBottom: '1rem',
+                      color: '#7a9053'
+                    }}
+                    data-testid="no-image-placeholder"
+                  >
+                    No image generated (Image generation requires API billing access)
+                  </div>
                 )}
 
                 <h1 style={{ marginTop: '1rem' }} data-testid="preview-blog-title">{generatedBlog.title}</h1>
