@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 import asyncio
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import base64
+import re
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
