@@ -13,6 +13,7 @@ import asyncio
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import base64
 import re
+import paypalrestsdk
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -21,6 +22,13 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
+
+# Configure PayPal
+paypalrestsdk.configure({
+    "mode": os.environ.get('PAYPAL_MODE', 'sandbox'),
+    "client_id": os.environ.get('PAYPAL_CLIENT_ID', ''),
+    "client_secret": os.environ.get('PAYPAL_CLIENT_SECRET', '')
+})
 
 # Create the main app without a prefix
 app = FastAPI()
