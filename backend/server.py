@@ -382,24 +382,31 @@ async def upload_blog_audio(blog_id: str, file: UploadFile = File(...)):
 @api_router.get("/fetch-image")
 async def fetch_image_from_web(keywords: str):
     try:
-        # Use Unsplash API (free, no API key needed for basic usage)
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
-                "https://source.unsplash.com/800x600/",
-                params={"query": keywords},
-                follow_redirects=True
-            )
+        # Use Unsplash Source API with proper format
+        search_query = keywords.replace(" ", ",")
+        image_url = f"https://source.unsplash.com/800x600/?{search_query}"
+        
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(image_url, follow_redirects=True)
             
             if response.status_code == 200:
                 # Convert image to base64
                 image_base64 = base64.b64encode(response.content).decode('utf-8')
-                image_url = f"data:image/jpeg;base64,{image_base64}"
-                return {"success": True, "image_url": image_url}
+                image_data_url = f"data:image/jpeg;base64,{image_base64}"
+                return {"success": True, "image_url": image_data_url}
             else:
-                raise HTTPException(status_code=404, detail="No image found for the given keywords")
+                # Fallback to a nature image
+                fallback_url = "https://source.unsplash.com/800x600/?nature,mushroom"
+                fallback_response = await client.get(fallback_url, follow_redirects=True)
+                if fallback_response.status_code == 200:
+                    image_base64 = base64.b64encode(fallback_response.content).decode('utf-8')
+                    image_data_url = f"data:image/jpeg;base64,{image_base64}"
+                    return {"success": True, "image_url": image_data_url}
+                else:
+                    raise HTTPException(status_code=404, detail="No image found")
     except Exception as e:
         logging.error(f"Error fetching image from web: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to fetch image from web")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch image from web: {str(e)}")
 
 # Create/Save blog post
 @api_router.post("/blogs", response_model=BlogPost)
