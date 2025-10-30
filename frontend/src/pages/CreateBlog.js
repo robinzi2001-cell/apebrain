@@ -17,6 +17,8 @@ const CreateBlog = () => {
   const [imagePreview, setImagePreview] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [audioFile, setAudioFile] = useState(null);
+  const [fetchImageFromWeb, setFetchImageFromWeb] = useState(false);
+  const [fetchingImage, setFetchingImage] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
