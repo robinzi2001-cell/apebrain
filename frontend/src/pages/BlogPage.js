@@ -40,32 +40,37 @@ const BlogPage = () => {
 
   const loadVoices = () => {
     const synth = window.speechSynthesis;
-    const loadedVoices = synth.getVoices();
-    if (loadedVoices.length > 0) {
-      // Sort voices: English first, then others
-      const sortedVoices = loadedVoices.sort((a, b) => {
-        if (a.lang.startsWith('en') && !b.lang.startsWith('en')) return -1;
-        if (!a.lang.startsWith('en') && b.lang.startsWith('en')) return 1;
-        return a.lang.localeCompare(b.lang);
-      });
-      setVoices(sortedVoices);
-      // Set default to first English voice
-      const defaultVoice = sortedVoices.find(v => v.lang.startsWith('en')) || sortedVoices[0];
-      setSelectedVoice(defaultVoice);
-    }
-    synth.onvoiceschanged = () => {
-      const newVoices = synth.getVoices();
-      const sortedVoices = newVoices.sort((a, b) => {
-        if (a.lang.startsWith('en') && !b.lang.startsWith('en')) return -1;
-        if (!a.lang.startsWith('en') && b.lang.startsWith('en')) return 1;
-        return a.lang.localeCompare(b.lang);
-      });
-      setVoices(sortedVoices);
-      if (!selectedVoice && sortedVoices.length > 0) {
+    
+    const setVoiceList = () => {
+      const loadedVoices = synth.getVoices();
+      if (loadedVoices.length > 0) {
+        // Sort voices: English first, then others
+        const sortedVoices = loadedVoices.sort((a, b) => {
+          if (a.lang.startsWith('en') && !b.lang.startsWith('en')) return -1;
+          if (!a.lang.startsWith('en') && b.lang.startsWith('en')) return 1;
+          return a.lang.localeCompare(b.lang);
+        });
+        setVoices(sortedVoices);
+        // Set default to first English voice
         const defaultVoice = sortedVoices.find(v => v.lang.startsWith('en')) || sortedVoices[0];
         setSelectedVoice(defaultVoice);
       }
     };
+    
+    // Try to load voices immediately
+    setVoiceList();
+    
+    // Also listen for voiceschanged event (needed in Chrome)
+    if (synth.onvoiceschanged !== undefined) {
+      synth.onvoiceschanged = setVoiceList;
+    }
+    
+    // Fallback: try loading voices after a short delay
+    setTimeout(() => {
+      if (voices.length === 0) {
+        setVoiceList();
+      }
+    }, 100);
   };
 
   const getAvailableLanguages = () => {
