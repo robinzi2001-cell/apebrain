@@ -232,6 +232,31 @@ async def upload_blog_image(blog_id: str, file: UploadFile = File(...)):
         logging.error(f"Error uploading image: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to upload image")
 
+# Upload image for product
+@api_router.post("/products/{product_id}/upload-image")
+async def upload_product_image(product_id: str, file: UploadFile = File(...)):
+    try:
+        # Read file content
+        contents = await file.read()
+        
+        # Convert to base64 for storage
+        image_base64 = base64.b64encode(contents).decode('utf-8')
+        image_url = f"data:image/{file.content_type.split('/')[-1]};base64,{image_base64}"
+        
+        # Update product with image
+        result = await db.products.update_one(
+            {"id": product_id},
+            {"$set": {"image_url": image_url}}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Product not found")
+        
+        return {"success": True, "image_url": image_url}
+    except Exception as e:
+        logging.error(f"Error uploading product image: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to upload product image")
+
 # Create/Save blog post
 @api_router.post("/blogs", response_model=BlogPost)
 async def create_blog(blog: BlogPost):
