@@ -79,13 +79,28 @@ const BlogPage = () => {
           Back to Blogs
         </button>
 
-        {blog.image_base64 && (
+        {blog.image_base64 ? (
           <img
             src={`data:image/png;base64,${blog.image_base64}`}
             alt={blog.title}
             className="blog-detail-image"
             data-testid="blog-detail-image"
           />
+        ) : (
+          <div 
+            className="blog-detail-image"
+            style={{ 
+              background: 'linear-gradient(135deg, #7a9053 0%, #5a6c3a 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '3rem'
+            }}
+            data-testid="blog-detail-placeholder"
+          >
+            <Leaf size={128} />
+          </div>
         )}
 
         <h1 data-testid="blog-detail-title">{blog.title}</h1>
