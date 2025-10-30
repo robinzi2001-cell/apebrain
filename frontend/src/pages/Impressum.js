@@ -1,5 +1,5 @@
 import React from 'react';
-import { Leaf, Home } from 'lucide-react';
+import { Leaf, Home, Instagram } from 'lucide-react';
 import Footer from '@/components/Footer';
 
 const Impressum = () => {
