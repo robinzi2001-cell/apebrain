@@ -150,6 +150,42 @@ backend:
         agent: "testing"
         comment: "✅ PASSED - Landing page settings endpoints working perfectly. Successfully tested: 1) GET /api/landing-settings returns correct defaults (show_blog=true, show_shop=true, show_minigames=true), 2) POST /api/landing-settings saves settings correctly with success message, 3) GET /api/landing-settings returns saved values (show_blog=false, show_shop=true, show_minigames=false), 4) POST /api/landing-settings updates settings to all true, 5) GET /api/landing-settings verifies updated values. All CRUD operations working correctly with proper MongoDB storage and retrieval."
 
+  - task: "Blog feature settings endpoints"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added GET /api/blog-features and POST /api/blog-features endpoints. Settings stored in MongoDB 'settings' collection with type 'blog_features'. Fields: enable_video, enable_audio, enable_text_to_speech (all boolean). Returns defaults (all true) if no settings exist."
+
+  - task: "Blog audio upload endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added POST /api/blogs/{blog_id}/upload-audio endpoint. Uses base64 encoding for MongoDB storage similar to image upload. Accepts audio/* files (MP3, WAV, etc.)."
+
+  - task: "Blog model with video and audio fields"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Updated BlogPost model to include video_url (YouTube URL) and audio_url (base64 or URL) fields, both optional."
+
 frontend:
   - task: "Admin product image upload form"
     implemented: true
