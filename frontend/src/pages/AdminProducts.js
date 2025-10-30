@@ -45,23 +45,56 @@ const AdminProducts = () => {
     }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
     try {
+      let productId = formData.id;
+      
       if (editingProduct) {
         await axios.put(`${API}/products/${editingProduct.id}`, formData);
         setSuccess('Product updated successfully!');
       } else {
-        await axios.post(`${API}/products`, formData);
+        const response = await axios.post(`${API}/products`, formData);
+        productId = response.data.id || formData.id;
         setSuccess('Product created successfully!');
+      }
+
+      // Upload image if provided
+      if (imageFile) {
+        const imageFormData = new FormData();
+        imageFormData.append('file', imageFile);
+        
+        try {
+          await axios.post(`${API}/products/${productId}/upload-image`, imageFormData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          setSuccess(prev => prev + ' Image uploaded!');
+        } catch (imgError) {
+          console.error('Image upload error:', imgError);
+          setError('Product saved but image upload failed');
+        }
       }
       
       setShowForm(false);
       setEditingProduct(null);
-      setFormData({ id: '', name: '', price: 0, description: '', category: '', type: 'physical' });
+      setFormData({ id: '', name: '', price: 0, description: '', category: '', type: 'physical', image_url: '' });
+      setImageFile(null);
+      setImagePreview('');
       fetchProducts();
     } catch (error) {
       setError(error.response?.data?.detail || 'Failed to save product');
