@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Add product image upload functionality, Instagram icon on navigation, and button toggle feature for landing page."
+user_problem_statement: "Add blog multimedia features: YouTube video embed, audio file upload/playback, and text-to-speech reader with browser API. Include admin toggles for each feature. Remove coupon box from blog pages."
 
 backend:
   - task: "Product image upload endpoint"
