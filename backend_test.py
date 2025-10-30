@@ -217,6 +217,221 @@ class MushroomBlogAPITester:
         
         return False
 
+    def create_test_image_data(self):
+        """Create a small test image in base64 format"""
+        # Create a simple 1x1 pixel PNG image
+        png_data = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\tpHYs\x00\x00\x0b\x13\x00\x00\x0b\x13\x01\x00\x9a\x9c\x18\x00\x00\x00\x0cIDATx\x9cc```\x00\x00\x00\x04\x00\x01\xdd\x8d\xb4\x1c\x00\x00\x00\x00IEND\xaeB`\x82'
+        return png_data
+
+    def run_multipart_test(self, name, endpoint, expected_status, file_data, timeout=30):
+        """Run a multipart file upload test"""
+        url = f"{self.api_url}/{endpoint}"
+        
+        self.tests_run += 1
+        print(f"\n🔍 Testing {name}...")
+        print(f"   URL: {url}")
+        
+        try:
+            files = {'file': ('test_image.png', file_data, 'image/png')}
+            response = requests.post(url, files=files, timeout=timeout)
+
+            success = response.status_code == expected_status
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                try:
+                    response_data = response.json()
+                    print(f"   Response: {json.dumps(response_data, indent=2)[:200]}...")
+                    return True, response_data
+                except:
+                    return True, {}
+            else:
+                print(f"❌ Failed - Expected {expected_status}, got {response.status_code}")
+                try:
+                    error_data = response.json()
+                    print(f"   Error: {error_data}")
+                except:
+                    print(f"   Error: {response.text}")
+                return False, {}
+
+        except requests.exceptions.Timeout:
+            print(f"❌ Failed - Request timed out after {timeout} seconds")
+            return False, {}
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            return False, {}
+
+    def test_get_products(self):
+        """Test fetching all products"""
+        success, response = self.run_test(
+            "Get All Products",
+            "GET",
+            "products",
+            200
+        )
+        
+        if success:
+            print(f"✅ Found {len(response)} products")
+            # Check if products have expected structure
+            if response and len(response) > 0:
+                product = response[0]
+                required_fields = ['id', 'name', 'price', 'description', 'category', 'type']
+                for field in required_fields:
+                    if field not in product:
+                        print(f"❌ Missing required field in product: {field}")
+                        return False
+            return True
+        
+        return False
+
+    def test_create_product(self):
+        """Test creating a new product"""
+        product_data = {
+            "id": f"test-product-{int(time.time())}",
+            "name": "Test Lion's Mane Extract",
+            "price": 39.99,
+            "description": "Premium test Lion's Mane mushroom extract for cognitive enhancement",
+            "category": "Test Supplements",
+            "type": "physical"
+        }
+        
+        success, response = self.run_test(
+            "Create Product",
+            "POST",
+            "products",
+            200,
+            data=product_data
+        )
+        
+        if success and response.get('id'):
+            self.test_product_id = response['id']
+            print(f"✅ Created product with ID: {self.test_product_id}")
+            return True
+        
+        return False
+
+    def test_upload_product_image(self):
+        """Test uploading an image to a product"""
+        if not self.test_product_id:
+            print("❌ Cannot test product image upload - no product ID available")
+            return False
+            
+        # Create test image data
+        image_data = self.create_test_image_data()
+        
+        success, response = self.run_multipart_test(
+            "Upload Product Image",
+            f"products/{self.test_product_id}/upload-image",
+            200,
+            image_data
+        )
+        
+        if success and response.get('success') and response.get('image_url'):
+            print(f"✅ Image uploaded successfully")
+            # Verify image_url format
+            image_url = response['image_url']
+            if image_url.startswith('data:image/') and 'base64,' in image_url:
+                print(f"✅ Image URL format is correct: {image_url[:50]}...")
+                return True
+            else:
+                print(f"❌ Invalid image URL format: {image_url}")
+                return False
+        
+        return False
+
+    def test_get_products_with_images(self):
+        """Test fetching products and verify image URLs are included"""
+        success, response = self.run_test(
+            "Get Products with Images",
+            "GET",
+            "products",
+            200
+        )
+        
+        if success:
+            # Find our test product
+            test_product = None
+            for product in response:
+                if product.get('id') == self.test_product_id:
+                    test_product = product
+                    break
+            
+            if test_product:
+                if 'image_url' in test_product and test_product['image_url']:
+                    print(f"✅ Product has image_url: {test_product['image_url'][:50]}...")
+                    return True
+                else:
+                    print("❌ Product missing image_url field")
+                    return False
+            else:
+                print("❌ Test product not found in products list")
+                return False
+        
+        return False
+
+    def test_update_product(self):
+        """Test updating a product"""
+        if not self.test_product_id:
+            print("❌ Cannot test product update - no product ID available")
+            return False
+            
+        update_data = {
+            "name": "Updated Test Lion's Mane Extract",
+            "price": 44.99,
+            "description": "Updated premium test Lion's Mane mushroom extract"
+        }
+        
+        success, response = self.run_test(
+            "Update Product",
+            "PUT",
+            f"products/{self.test_product_id}",
+            200,
+            data=update_data
+        )
+        
+        if success:
+            print("✅ Product updated successfully")
+            return True
+        
+        return False
+
+    def test_upload_image_to_nonexistent_product(self):
+        """Test uploading image to non-existent product (error handling)"""
+        fake_product_id = "nonexistent-product-123"
+        image_data = self.create_test_image_data()
+        
+        success, response = self.run_multipart_test(
+            "Upload Image to Non-existent Product",
+            f"products/{fake_product_id}/upload-image",
+            404,
+            image_data
+        )
+        
+        if success:
+            print("✅ Correctly returned 404 for non-existent product")
+            return True
+        
+        return False
+
+    def test_delete_product(self):
+        """Test deleting a product"""
+        if not self.test_product_id:
+            print("❌ Cannot test product deletion - no product ID available")
+            return False
+            
+        success, response = self.run_test(
+            "Delete Product",
+            "DELETE",
+            f"products/{self.test_product_id}",
+            200
+        )
+        
+        if success and response.get('success'):
+            print("✅ Product deleted successfully")
+            return True
+        
+        return False
+
 def main():
     print("🍄 Starting Mushroom Blog API Tests")
     print("=" * 50)
