@@ -76,6 +76,15 @@ const AdminDashboard = () => {
           <div className="nav-links">
             <a href="/" data-testid="home-link">View Site</a>
             <button 
+              onClick={() => navigate('/shroomsadmin/products')} 
+              className="btn btn-secondary" 
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              data-testid="products-button"
+            >
+              <Package size={18} />
+              Products
+            </button>
+            <button 
               onClick={() => navigate('/shroomsadmin/coupons')} 
               className="btn btn-secondary" 
               style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
