@@ -996,6 +996,92 @@ h1, h2, h3, h4, h5, h6 {
   100% { transform: rotate(360deg); }
 }
 
+/* Floating Coupon Box */
+.floating-coupon {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: linear-gradient(135deg, #ffc439 0%, #ffb100 100%);
+  padding: 1rem 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(255, 196, 57, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  z-index: 999;
+  animation: floatCoupon 4s ease-in-out infinite;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 2px solid rgba(255, 177, 0, 0.5);
+}
+
+.floating-coupon:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 40px rgba(255, 196, 57, 0.6);
+}
+
+@keyframes floatCoupon {
+  0%, 100% { 
+    transform: translateY(0px) rotate(-1deg); 
+  }
+  50% { 
+    transform: translateY(-10px) rotate(1deg); 
+  }
+}
+
+.floating-coupon svg {
+  color: #003087;
+}
+
+.coupon-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.coupon-code {
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #003087;
+  letter-spacing: 1px;
+}
+
+.coupon-discount {
+  font-size: 0.85rem;
+  color: #003087;
+  font-weight: 600;
+}
+
+/* Coupon Form */
+.coupon-form-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  margin-bottom: 2rem;
+}
+
+.coupon-form-container h2 {
+  margin-bottom: 1.5rem;
+  color: #3a4520;
+}
+
+.coupon-form-container select {
+  width: 100%;
+  padding: 0.8rem;
+  border: 2px solid #e8ebe0;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.coupon-form-container select:focus {
+  outline: none;
+  border-color: #7a9053;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .blog-grid {
@@ -1030,5 +1116,15 @@ h1, h2, h3, h4, h5, h6 {
   
   .checkout-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .floating-coupon {
+    left: 10px;
+    top: 10px;
+    padding: 0.75rem 1rem;
+  }
+  
+  .coupon-code {
+    font-size: 1rem;
   }
 }
