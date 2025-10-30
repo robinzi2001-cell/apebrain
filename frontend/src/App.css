@@ -620,6 +620,31 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0 auto;
 }
 
+/* Admin Settings */
+.admin-settings-container {
+  max-width: 700px;
+  margin: 3rem auto;
+  padding: 3rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+}
+
+.settings-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.settings-form {
+  margin-top: 2rem;
+}
+
+.form-divider {
+  height: 2px;
+  background: linear-gradient(to right, transparent, #e8ebe0, transparent);
+  margin: 2rem 0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .blog-grid {
