@@ -301,3 +301,7 @@ agent_communication:
     message: "Phase 2 & 3 complete. Added Instagram icon to BlogHomePage, ShopPage, Impressum navigation. Implemented button toggle feature: backend endpoints for landing settings, admin UI for toggles, and conditional rendering on landing page. Ready for testing."
   - agent: "testing"
     message: "✅ LANDING SETTINGS TESTING COMPLETE - All landing page settings endpoints working perfectly. Tested complete CRUD cycle: GET defaults, POST save settings, GET saved values, POST update settings, GET verify updates. MongoDB storage and retrieval working correctly. Backend ready for frontend integration."
+  - agent: "main"
+    message: "Implemented blog multimedia features: GET/POST /api/blog-features endpoints for admin toggles, POST /api/blogs/{blog_id}/upload-audio for audio file upload, and updated BlogPost model with video_url and audio_url fields. All endpoints ready for testing."
+  - agent: "testing"
+    message: "✅ BLOG MULTIMEDIA FEATURES TESTING COMPLETE - All new endpoints working perfectly. Blog feature settings: GET returns defaults (all true), POST saves custom values correctly. Blog audio upload: accepts audio files, stores as base64, updates blog with audio_url. Blog model: video_url and audio_url fields working correctly for YouTube embeds and audio files. All test scenarios passed including error handling for non-existent blogs."
