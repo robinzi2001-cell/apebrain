@@ -20,7 +20,7 @@ const CreateBlog = () => {
     if (!localStorage.getItem('adminAuth')) {
       navigate('/admin');
     }
-  }, []);
+  }, [navigate]);
 
   const handleGenerate = async (e) => {
     e.preventDefault();
