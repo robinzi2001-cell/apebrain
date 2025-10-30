@@ -91,7 +91,8 @@ const CheckoutPage = () => {
           product_type: item.type
         })),
         total: total,
-        customer_email: email
+        customer_email: email,
+        coupon_code: appliedCoupon ? appliedCoupon.code : null
       };
 
       const response = await axios.post(`${API}/shop/create-order`, orderData);
