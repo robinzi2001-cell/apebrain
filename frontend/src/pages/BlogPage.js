@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Footer from '@/components/Footer';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Leaf, ArrowLeft, Home, Play, Pause, Square, Volume2 } from 'lucide-react';
+import { Leaf, ArrowLeft, Home, Play, Pause, Square, Volume2, Instagram } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
