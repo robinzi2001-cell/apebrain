@@ -534,7 +534,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .product-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 12px 40px rgba(251, 191, 36, 0.5);
+  border: 2px solid rgba(251, 191, 36, 0.7);
 }
 
 .product-image-placeholder {
