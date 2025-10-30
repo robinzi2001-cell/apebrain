@@ -76,6 +76,7 @@ const CreateBlog = () => {
         title: title,
         content: content,
         keywords: keywords || title,
+        video_url: videoUrl || null,
         status: status
       };
 
@@ -87,6 +88,15 @@ const CreateBlog = () => {
         const formData = new FormData();
         formData.append('file', imageFile);
         await axios.post(`${API}/blogs/${blogId}/upload-image`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      }
+
+      // Upload audio if selected
+      if (audioFile) {
+        const audioFormData = new FormData();
+        audioFormData.append('file', audioFile);
+        await axios.post(`${API}/blogs/${blogId}/upload-audio`, audioFormData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       }
