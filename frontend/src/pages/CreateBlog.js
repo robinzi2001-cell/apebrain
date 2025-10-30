@@ -18,7 +18,7 @@ const CreateBlog = () => {
 
   useEffect(() => {
     if (!localStorage.getItem('adminAuth')) {
-      navigate('/admin');
+      navigate('/blogadmin');
     }
   }, [navigate]);
 
@@ -49,12 +49,11 @@ const CreateBlog = () => {
         title: generatedBlog.title,
         content: generatedBlog.content,
         keywords: keywords,
-        image_base64: generatedBlog.image_base64,
         status: status
       };
 
       await axios.post(`${API}/blogs`, blogData);
-      navigate('/admin/dashboard');
+      navigate('/blogadmin/dashboard');
     } catch (error) {
       console.error('Error saving blog:', error);
       setError('Failed to save blog. Please try again.');
@@ -67,12 +66,12 @@ const CreateBlog = () => {
     <div>
       <nav className="navbar" data-testid="navbar">
         <div className="navbar-content">
-          <a href="/admin/dashboard" className="logo" data-testid="logo-link">
+          <a href="/blogadmin/dashboard" className="logo" data-testid="logo-link">
             <Leaf size={32} />
             ApeBrain.cloud - Create Blog
           </a>
           <div className="nav-links">
-            <a href="/admin/dashboard" data-testid="dashboard-link">Dashboard</a>
+            <a href="/blogadmin/dashboard" data-testid="dashboard-link">Dashboard</a>
           </div>
         </div>
       </nav>
@@ -89,13 +88,13 @@ const CreateBlog = () => {
               id="keywords"
               value={keywords}
               onChange={(e) => setKeywords(e.target.value)}
-              placeholder="e.g., Lion's Mane mushroom benefits for brain health"
+              placeholder="e.g., Forest bathing benefits, Ocean therapy, Meditation techniques for beginners"
               required
               data-testid="keywords-input"
               style={{ minHeight: '100px' }}
             />
             <small style={{ color: '#7a9053', marginTop: '0.5rem', display: 'block' }}>
-              Enter a mushroom name, topic, or specific keywords. The AI will generate a comprehensive blog post.
+              Enter any health, nature, or consciousness topic. The AI will generate a comprehensive blog post.
             </small>
           </div>
 
@@ -134,28 +133,19 @@ const CreateBlog = () => {
 
             {showPreview && (
               <div data-testid="preview-content">
-                {generatedBlog.image_base64 ? (
-                  <img
-                    src={`data:image/png;base64,${generatedBlog.image_base64}`}
-                    alt={generatedBlog.title}
-                    className="preview-image"
-                    data-testid="preview-image"
-                  />
-                ) : (
-                  <div 
-                    style={{
-                      padding: '2rem',
-                      background: '#f0f0f0',
-                      borderRadius: '8px',
-                      textAlign: 'center',
-                      marginBottom: '1rem',
-                      color: '#7a9053'
-                    }}
-                    data-testid="no-image-placeholder"
-                  >
-                    No image generated (Image generation requires API billing access)
-                  </div>
-                )}
+                <div 
+                  style={{
+                    padding: '2rem',
+                    background: '#f0f0f0',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    marginBottom: '1rem',
+                    color: '#7a9053'
+                  }}
+                  data-testid="no-image-placeholder"
+                >
+                  📷 No image yet - You can upload one after saving
+                </div>
 
                 <h1 style={{ marginTop: '1rem' }} data-testid="preview-blog-title">{generatedBlog.title}</h1>
                 <div style={{ marginTop: '1rem' }} data-testid="preview-blog-content">
@@ -173,7 +163,7 @@ const CreateBlog = () => {
                 data-testid="save-draft-button"
               >
                 <Save size={18} />
-                {saving ? 'Saving...' : 'Save as Draft'}
+                {saving ? 'Saving...' : 'Save as Draft (Add Image Later)'}
               </button>
               <button
                 onClick={() => handleSave('published')}

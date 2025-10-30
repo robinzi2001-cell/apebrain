@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Leaf, Plus, Trash2, Eye } from 'lucide-react';
+import { Leaf, Plus, Trash2, Eye, Edit } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -13,7 +13,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (!localStorage.getItem('adminAuth')) {
-      navigate('/admin');
+      navigate('/blogadmin');
       return;
     }
     fetchBlogs();
@@ -54,7 +54,7 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('adminAuth');
-    navigate('/admin');
+    navigate('/blogadmin');
   };
 
   const formatDate = (dateString) => {
@@ -86,7 +86,7 @@ const AdminDashboard = () => {
         <div className="dashboard-header">
           <h1 data-testid="dashboard-title">Blog Management</h1>
           <button
-            onClick={() => navigate('/admin/create')}
+            onClick={() => navigate('/blogadmin/create')}
             className="btn btn-primary"
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             data-testid="create-blog-button"
@@ -124,6 +124,7 @@ const AdminDashboard = () => {
                       <h3 style={{ marginBottom: '0.5rem' }} data-testid={`blog-item-title-${blog.id}`}>{blog.title}</h3>
                       <div style={{ fontSize: '0.9rem', color: '#7a9053' }} data-testid={`blog-item-meta-${blog.id}`}>
                         {formatDate(blog.created_at)} • Status: <strong>{blog.status}</strong>
+                        {!blog.image_url && <span style={{ color: '#f59e0b', marginLeft: '0.5rem' }}>⚠ No image</span>}
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: '1rem' }}>
@@ -136,6 +137,15 @@ const AdminDashboard = () => {
                           Publish
                         </button>
                       )}
+                      <button
+                        onClick={() => navigate(`/blogadmin/edit/${blog.id}`)}
+                        className="btn btn-secondary"
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                        data-testid={`edit-button-${blog.id}`}
+                      >
+                        <Edit size={18} />
+                        Edit
+                      </button>
                       <button
                         onClick={() => navigate(`/blog/${blog.id}`)}
                         className="btn btn-secondary"

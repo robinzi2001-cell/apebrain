@@ -21,7 +21,7 @@ const AdminLogin = () => {
       const response = await axios.post(`${API}/admin/login`, { password });
       if (response.data.success) {
         localStorage.setItem('adminAuth', 'true');
-        navigate('/admin/dashboard');
+        navigate('/blogadmin/dashboard');
       }
     } catch (error) {
       setError('Invalid password');

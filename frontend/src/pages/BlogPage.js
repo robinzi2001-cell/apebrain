@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Leaf, ArrowLeft } from 'lucide-react';
+import { Leaf, ArrowLeft, Home } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -38,6 +38,26 @@ const BlogPage = () => {
     });
   };
 
+  const getColorTheme = (keywords) => {
+    const kw = keywords.toLowerCase();
+    if (kw.includes('magic') || kw.includes('psychedelic') || kw.includes('psilocybin')) {
+      return { bg: 'linear-gradient(135deg, #a78bfa 0%, #ec4899 100%)', icon: '#a78bfa' };
+    }
+    if (kw.includes('forest') || kw.includes('nature') || kw.includes('wild')) {
+      return { bg: 'linear-gradient(135deg, #6b7c59 0%, #4a5942 100%)', icon: '#6b7c59' };
+    }
+    if (kw.includes('ocean') || kw.includes('sea') || kw.includes('water')) {
+      return { bg: 'linear-gradient(135deg, #7dd3c0 0%, #4a90a4 100%)', icon: '#7dd3c0' };
+    }
+    if (kw.includes('energy') || kw.includes('vitality') || kw.includes('boost')) {
+      return { bg: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)', icon: '#fbbf24' };
+    }
+    if (kw.includes('calm') || kw.includes('relax') || kw.includes('meditation')) {
+      return { bg: 'linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 100%)', icon: '#c7d2fe' };
+    }
+    return { bg: 'linear-gradient(135deg, #7a9053 0%, #5a6c3a 100%)', icon: '#7a9053' };
+  };
+
   if (loading) {
     return <div className="loading" data-testid="loading-indicator">Loading...</div>;
   }
@@ -46,12 +66,14 @@ const BlogPage = () => {
     return (
       <div className="error" style={{ margin: '2rem', textAlign: 'center' }} data-testid="error-message">
         <p>{error || 'Blog not found'}</p>
-        <button onClick={() => navigate('/')} className="btn btn-primary" style={{ marginTop: '1rem' }} data-testid="back-home-button">
-          Back to Home
+        <button onClick={() => navigate('/blog')} className="btn btn-primary" style={{ marginTop: '1rem' }} data-testid="back-home-button">
+          Back to Blog
         </button>
       </div>
     );
   }
+
+  const theme = getColorTheme(blog.keywords || '');
 
   return (
     <div>
@@ -62,15 +84,16 @@ const BlogPage = () => {
             ApeBrain.cloud
           </a>
           <div className="nav-links">
-            <a href="/" data-testid="home-link">Home</a>
-            <a href="/admin" data-testid="admin-link">Admin</a>
+            <a href="/" data-testid="home-link"><Home size={20} /> Home</a>
+            <a href="/blog" data-testid="blog-link">Blog</a>
+            <a href="/shop" data-testid="shop-link">Shop</a>
           </div>
         </div>
       </nav>
 
       <div className="blog-detail" data-testid="blog-detail">
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/blog')}
           className="btn btn-secondary"
           style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
           data-testid="back-button"
@@ -79,9 +102,9 @@ const BlogPage = () => {
           Back to Blogs
         </button>
 
-        {blog.image_base64 ? (
+        {blog.image_url ? (
           <img
-            src={`data:image/png;base64,${blog.image_base64}`}
+            src={blog.image_url}
             alt={blog.title}
             className="blog-detail-image"
             data-testid="blog-detail-image"
@@ -90,7 +113,7 @@ const BlogPage = () => {
           <div 
             className="blog-detail-image"
             style={{ 
-              background: 'linear-gradient(135deg, #7a9053 0%, #5a6c3a 100%)',
+              background: theme.bg,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
