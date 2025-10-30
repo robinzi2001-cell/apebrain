@@ -488,6 +488,152 @@ async def get_all_orders():
         logging.error(f"Error fetching orders: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch orders")
 
+# ============= COUPON ENDPOINTS =============
+
+# Get active coupon (public)
+@api_router.get("/coupons/active")
+async def get_active_coupon():
+    try:
+        coupon = await db.coupons.find_one({"is_active": True}, {"_id": 0})
+        if coupon:
+            if isinstance(coupon.get('created_at'), str):
+                coupon['created_at'] = datetime.fromisoformat(coupon['created_at'])
+            if coupon.get('expires_at') and isinstance(coupon['expires_at'], str):
+                coupon['expires_at'] = datetime.fromisoformat(coupon['expires_at'])
+        return coupon
+    except Exception as e:
+        logging.error(f"Error fetching active coupon: {str(e)}")
+        return None
+
+# Validate coupon
+@api_router.post("/coupons/validate")
+async def validate_coupon(code: str, subtotal: float):
+    try:
+        coupon = await db.coupons.find_one({"code": code.upper(), "is_active": True}, {"_id": 0})
+        
+        if not coupon:
+            raise HTTPException(status_code=404, detail="Invalid coupon code")
+        
+        # Check expiration
+        if coupon.get('expires_at'):
+            expires = datetime.fromisoformat(coupon['expires_at']) if isinstance(coupon['expires_at'], str) else coupon['expires_at']
+            if expires < datetime.now(timezone.utc):
+                raise HTTPException(status_code=400, detail="Coupon has expired")
+        
+        # Calculate discount
+        discount = 0
+        if coupon['discount_type'] == 'percentage':
+            discount = (subtotal * coupon['discount_value']) / 100
+        else:  # fixed
+            discount = coupon['discount_value']
+        
+        return {
+            "valid": True,
+            "discount_amount": round(discount, 2),
+            "discount_type": coupon['discount_type'],
+            "discount_value": coupon['discount_value'],
+            "code": coupon['code']
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error validating coupon: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to validate coupon")
+
+# Create coupon (admin)
+@api_router.post("/coupons")
+async def create_coupon(coupon: CouponCreate):
+    try:
+        # Check if code already exists
+        existing = await db.coupons.find_one({"code": coupon.code.upper()})
+        if existing:
+            raise HTTPException(status_code=400, detail="Coupon code already exists")
+        
+        doc = {
+            "id": str(uuid.uuid4()),
+            "code": coupon.code.upper(),
+            "discount_type": coupon.discount_type,
+            "discount_value": coupon.discount_value,
+            "is_active": coupon.is_active,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "expires_at": coupon.expires_at.isoformat() if coupon.expires_at else None
+        }
+        
+        await db.coupons.insert_one(doc)
+        return doc
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating coupon: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create coupon")
+
+# Get all coupons (admin)
+@api_router.get("/coupons")
+async def get_all_coupons():
+    try:
+        coupons = await db.coupons.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+        for coupon in coupons:
+            if isinstance(coupon.get('created_at'), str):
+                coupon['created_at'] = datetime.fromisoformat(coupon['created_at'])
+            if coupon.get('expires_at') and isinstance(coupon['expires_at'], str):
+                coupon['expires_at'] = datetime.fromisoformat(coupon['expires_at'])
+        return coupons
+    except Exception as e:
+        logging.error(f"Error fetching coupons: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch coupons")
+
+# Update coupon (admin)
+@api_router.put("/coupons/{coupon_id}")
+async def update_coupon(coupon_id: str, update: CouponUpdate):
+    try:
+        update_data = {k: v for k, v in update.model_dump().items() if v is not None}
+        
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No fields to update")
+        
+        # If code is being updated, check uniqueness
+        if 'code' in update_data:
+            update_data['code'] = update_data['code'].upper()
+            existing = await db.coupons.find_one({"code": update_data['code'], "id": {"$ne": coupon_id}})
+            if existing:
+                raise HTTPException(status_code=400, detail="Coupon code already exists")
+        
+        # Convert datetime to string if present
+        if 'expires_at' in update_data and update_data['expires_at']:
+            update_data['expires_at'] = update_data['expires_at'].isoformat()
+        
+        result = await db.coupons.update_one(
+            {"id": coupon_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Coupon not found")
+        
+        coupon = await db.coupons.find_one({"id": coupon_id}, {"_id": 0})
+        return coupon
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating coupon: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update coupon")
+
+# Delete coupon (admin)
+@api_router.delete("/coupons/{coupon_id}")
+async def delete_coupon(coupon_id: str):
+    try:
+        result = await db.coupons.delete_one({"id": coupon_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Coupon not found")
+        
+        return {"success": True, "message": "Coupon deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting coupon: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete coupon")
+
 # Include the router in the main app
 app.include_router(api_router)
 
