@@ -128,28 +128,47 @@ const ShopPage = () => {
         </div>
 
         <div className="products-grid" data-testid="products-grid">
-          {products.map(product => (
-            <div key={product.id} className="product-card" data-testid={`product-${product.id}`}>
-              <div className="product-image-placeholder">
-                {activeTab === 'physical' ? <Package size={64} /> : <Download size={64} />}
-              </div>
-              <div className="product-info">
-                <span className="product-category">{product.category}</span>
-                <h3 className="product-name">{product.name}</h3>
-                <p className="product-description">{product.description}</p>
-                <div className="product-footer">
-                  <span className="product-price">${product.price.toFixed(2)}</span>
-                  <button 
-                    className="btn btn-primary" 
-                    onClick={() => addToCart(product)}
-                    data-testid={`add-to-cart-${product.id}`}
-                  >
-                    Add to Cart
-                  </button>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '3rem' }}>Loading products...</div>
+          ) : products.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '3rem' }}>No products available</div>
+          ) : (
+            products.map(product => (
+              <div key={product.id} className="product-card" data-testid={`product-${product.id}`}>
+                {product.image_url ? (
+                  <img 
+                    src={product.image_url} 
+                    alt={product.name}
+                    style={{
+                      width: '100%',
+                      height: '200px',
+                      objectFit: 'cover',
+                      borderRadius: '12px 12px 0 0'
+                    }}
+                  />
+                ) : (
+                  <div className="product-image-placeholder">
+                    {activeTab === 'physical' ? <Package size={64} /> : <Download size={64} />}
+                  </div>
+                )}
+                <div className="product-info">
+                  <span className="product-category">{product.category}</span>
+                  <h3 className="product-name">{product.name}</h3>
+                  <p className="product-description">{product.description}</p>
+                  <div className="product-footer">
+                    <span className="product-price">${product.price.toFixed(2)}</span>
+                    <button 
+                      className="btn btn-primary" 
+                      onClick={() => addToCart(product)}
+                      data-testid={`add-to-cart-${product.id}`}
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
