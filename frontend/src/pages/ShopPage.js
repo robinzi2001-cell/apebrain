@@ -1,76 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Footer from '@/components/Footer';
 import { Leaf, Home, Package, Download, ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import FloatingCoupon from '@/components/FloatingCoupon';
 
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
 const ShopPage = () => {
   const [activeTab, setActiveTab] = useState('physical');
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
+  const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const physicalProducts = [
-    {
-      id: 'phys-1',
-      name: 'Lion\'s Mane Extract',
-      price: 29.99,
-      description: 'Premium quality Lion\'s Mane mushroom extract for cognitive support',
-      category: 'Supplements',
-      type: 'physical'
-    },
-    {
-      id: 'phys-2',
-      name: 'Reishi Capsules',
-      price: 24.99,
-      description: 'Pure Reishi mushroom capsules for immune system support',
-      category: 'Supplements',
-      type: 'physical'
-    },
-    {
-      id: 'phys-3',
-      name: 'Mushroom Growing Kit',
-      price: 49.99,
-      description: 'Complete kit to grow your own gourmet mushrooms at home',
-      category: 'Kits',
-      type: 'physical'
-    },
-    {
-      id: 'phys-4',
-      name: 'Cordyceps Powder',
-      price: 34.99,
-      description: 'Organic Cordyceps mushroom powder for energy and vitality',
-      category: 'Supplements',
-      type: 'physical'
-    }
-  ];
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
-  const digitalProducts = [
-    {
-      id: 'digi-1',
-      name: 'Mushroom Identification Guide',
-      price: 19.99,
-      description: 'Comprehensive digital guide to identifying edible mushrooms',
-      category: 'eBooks',
-      type: 'digital'
-    },
-    {
-      id: 'digi-2',
-      name: 'Holistic Health Course',
-      price: 79.99,
-      description: 'Complete online course on natural wellness and mushroom medicine',
-      category: 'Courses',
-      type: 'digital'
-    },
-    {
-      id: 'digi-3',
-      name: 'Meditation & Consciousness Pack',
-      price: 29.99,
-      description: 'Guided meditations and consciousness expansion exercises',
-      category: 'Audio',
-      type: 'digital'
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(`${API}/products`);
+      setAllProducts(response.data);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const physicalProducts = allProducts.filter(p => p.type === 'physical');
+  const digitalProducts = allProducts.filter(p => p.type === 'digital');
 
   const products = activeTab === 'physical' ? physicalProducts : digitalProducts;
 
