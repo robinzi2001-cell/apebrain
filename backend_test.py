@@ -1214,7 +1214,14 @@ def main():
     
     # Test sequence - Image Fetch Feature Tests (High Priority - Current Focus)
     tests = [
-        # Image Fetch from Web Tests (HIGH PRIORITY)
+        # NEW PEXELS MULTIPLE IMAGE FETCH TESTS (HIGHEST PRIORITY - CURRENT FOCUS)
+        ("Fetch Multiple Images with Good Keywords", tester.test_fetch_multiple_images_good_keywords),
+        ("Fetch Multiple Images with Different Keywords", tester.test_fetch_multiple_images_different_keywords),
+        ("Fetch Images with Count Parameter", tester.test_fetch_images_with_count_parameter),
+        ("Fetch Images Quality Check", tester.test_fetch_images_quality_check),
+        ("Fetch Images Error Handling", tester.test_fetch_images_error_handling),
+        
+        # Previous Image Fetch from Web Tests (for comparison)
         ("Fetch Image with Good Keywords", tester.test_fetch_image_good_keywords),
         ("Fetch Image with Different Keywords", tester.test_fetch_image_different_keywords),
         ("Fetch Image with Empty Keywords", tester.test_fetch_image_empty_keywords),
