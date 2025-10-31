@@ -114,6 +114,34 @@ const AdminDashboard = () => {
               Coupons
             </button>
             <button 
+              onClick={() => navigate('/shroomsadmin/orders')} 
+              className="btn btn-secondary" 
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', position: 'relative' }}
+              data-testid="orders-button"
+            >
+              <ShoppingBag size={18} />
+              Orders
+              {unviewedOrdersCount > 0 && (
+                <span style={{
+                  position: 'absolute',
+                  top: '-8px',
+                  right: '-8px',
+                  background: '#ef4444',
+                  color: 'white',
+                  borderRadius: '50%',
+                  width: '20px',
+                  height: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '0.75rem',
+                  fontWeight: 'bold'
+                }}>
+                  {unviewedOrdersCount}
+                </span>
+              )}
+            </button>
+            <button 
               onClick={() => navigate('/shroomsadmin/settings')} 
               className="btn btn-secondary" 
               style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
