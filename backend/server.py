@@ -22,6 +22,17 @@ from email.mime.multipart import MIMEMultipart
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+# Tracking URL generator
+def generate_tracking_url(carrier: str, tracking_number: str) -> str:
+    carrier_urls = {
+        "DHL": f"https://www.dhl.de/de/privatkunden/pakete-empfangen/verfolgen.html?piececode={tracking_number}",
+        "DPD": f"https://tracking.dpd.de/parcelstatus?query={tracking_number}&locale=de_DE",
+        "Hermes": f"https://www.myhermes.de/empfangen/sendungsverfolgung/sendungsinformation/#{tracking_number}",
+        "UPS": f"https://www.ups.com/track?tracknum={tracking_number}",
+        "GLS": f"https://gls-group.eu/DE/de/paketverfolgung?match={tracking_number}"
+    }
+    return carrier_urls.get(carrier, f"https://www.google.com/search?q={carrier}+tracking+{tracking_number}")
+
 # Email notification function
 async def send_order_notification(order_data):
     try:
