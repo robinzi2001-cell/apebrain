@@ -755,7 +755,7 @@ async def execute_payment(payment_id: str, payer_id: str):
         raise HTTPException(status_code=500, detail=f"Failed to execute payment: {str(e)}")
 
 # Get order details
-@api_router.get("/shop/orders/{order_id}")
+@api_router.get("/orders/{order_id}")
 async def get_order(order_id: str):
     try:
         order = await db.orders.find_one({"id": order_id}, {"_id": 0})
