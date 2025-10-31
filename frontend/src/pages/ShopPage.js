@@ -80,9 +80,11 @@ const ShopPage = () => {
           product_id: item.id,
           name: item.name,
           quantity: item.quantity,
-          price: item.price
+          price: item.price,
+          product_type: item.type || 'physical'
         })),
-        total: getCartTotal()
+        total: parseFloat(getCartTotal()),
+        customer_email: "customer@example.com"  // You can add email input field later
       };
 
       // Create PayPal order
