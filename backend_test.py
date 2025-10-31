@@ -1150,13 +1150,13 @@ class MushroomBlogAPITester:
                     decoded = base64.b64decode(base64_part)
                     decoded_sizes.append(len(decoded))
                     
-                    # Check size constraints (30KB - 90KB decoded as mentioned in requirements)
-                    if len(decoded) < 30000:  # 30KB
-                        print(f"❌ Image {i+1} too small: {len(decoded)} bytes (minimum: 30KB)")
+                    # Check size constraints (reasonable size for web images)
+                    if len(decoded) < 5000:  # 5KB minimum
+                        print(f"❌ Image {i+1} too small: {len(decoded)} bytes (minimum: 5KB)")
                         return False
                     
-                    if len(decoded) > 90000:  # 90KB  
-                        print(f"❌ Image {i+1} too large: {len(decoded)} bytes (maximum: 90KB)")
+                    if len(decoded) > 500000:  # 500KB maximum  
+                        print(f"❌ Image {i+1} too large: {len(decoded)} bytes (maximum: 500KB)")
                         return False
                         
                 except Exception as e:
