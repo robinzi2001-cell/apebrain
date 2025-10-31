@@ -159,6 +159,31 @@ const BlogPage = () => {
           Published on {formatDate(blog.published_at || blog.created_at)}
         </div>
 
+        {/* Image Gallery (Multiple Images) */}
+        {blog.image_urls && blog.image_urls.length > 0 && (
+          <div style={{ margin: '2rem 0' }}>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: blog.image_urls.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: '1rem'
+            }}>
+              {blog.image_urls.map((imgUrl, index) => (
+                <img 
+                  key={index}
+                  src={imgUrl} 
+                  alt={`${blog.title} - Image ${index + 1}`}
+                  style={{
+                    width: '100%',
+                    height: blog.image_urls.length === 1 ? '500px' : '300px',
+                    objectFit: 'cover',
+                    borderRadius: '12px'
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Video Embed */}
         {features.enable_video && blog.video_url && extractYouTubeId(blog.video_url) && (
           <div style={{ margin: '2rem 0' }}>
