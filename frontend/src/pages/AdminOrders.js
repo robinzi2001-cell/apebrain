@@ -43,6 +43,32 @@ const AdminOrders = () => {
     navigate('/shroomsadmin');
   };
 
+  const handleDeleteOrder = async (orderId) => {
+    if (!window.confirm('Bestellung wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) {
+      return;
+    }
+
+    try {
+      await axios.delete(`${API}/orders/${orderId}`);
+      setOrders(orders.filter(order => order.id !== orderId));
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      alert('Fehler beim Löschen der Bestellung');
+    }
+  };
+
+  const handleChangeStatus = async (orderId, newStatus) => {
+    try {
+      await axios.put(`${API}/orders/${orderId}/status?status=${newStatus}`);
+      setOrders(orders.map(order => 
+        order.id === orderId ? { ...order, status: newStatus } : order
+      ));
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      alert('Fehler beim Ändern des Status');
+    }
+  };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('de-DE', {
       year: 'numeric',
