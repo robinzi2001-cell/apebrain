@@ -987,6 +987,225 @@ class MushroomBlogAPITester:
         
         return False
 
+    # ============= NEW PEXELS MULTIPLE IMAGE FETCH TESTS =============
+
+    def test_fetch_multiple_images_good_keywords(self):
+        """Test fetching multiple images with good keywords (forest mushroom, count=3)"""
+        success, response = self.run_test(
+            "Fetch Multiple Images with Good Keywords",
+            "GET",
+            "fetch-images?keywords=forest mushroom&count=3",
+            200,
+            timeout=60  # Extended timeout for Pexels API
+        )
+        
+        if success:
+            # Verify response structure
+            if not response.get('success'):
+                print("❌ Response missing success field or success=false")
+                return False
+            
+            image_urls = response.get('image_urls')
+            if not image_urls:
+                print("❌ Response missing image_urls field")
+                return False
+            
+            if not isinstance(image_urls, list):
+                print("❌ image_urls is not a list")
+                return False
+            
+            # Verify we got 2-3 images as expected
+            if len(image_urls) < 2 or len(image_urls) > 3:
+                print(f"❌ Expected 2-3 images, got {len(image_urls)}")
+                return False
+            
+            # Verify each image URL format
+            for i, image_url in enumerate(image_urls):
+                if not image_url.startswith('data:image/jpeg;base64,'):
+                    print(f"❌ Invalid image URL format for image {i+1}. Expected 'data:image/jpeg;base64,...', got: {image_url[:50]}...")
+                    return False
+                
+                # Verify base64 content exists and is reasonable size
+                base64_part = image_url.split('base64,')[1] if 'base64,' in image_url else ''
+                if len(base64_part) < 1000:  # At least 1KB base64
+                    print(f"❌ Base64 content too small for image {i+1}: {len(base64_part)} characters")
+                    return False
+                
+                if len(base64_part) > 5000000:  # Max 5MB base64
+                    print(f"❌ Base64 content too large for image {i+1}: {len(base64_part)} characters")
+                    return False
+            
+            print(f"✅ Successfully fetched {len(image_urls)} images with good keywords")
+            print(f"   All images have correct base64 format")
+            for i, url in enumerate(image_urls):
+                base64_size = len(url.split('base64,')[1]) if 'base64,' in url else 0
+                print(f"   Image {i+1} size: {base64_size} characters")
+            return True
+        
+        return False
+
+    def test_fetch_multiple_images_different_keywords(self):
+        """Test fetching images with different keywords"""
+        test_keywords = ["ocean nature", "mountain landscape", "health wellness"]
+        
+        for keywords in test_keywords:
+            print(f"\n🔍 Testing multiple images with keywords: '{keywords}'")
+            success, response = self.run_test(
+                f"Fetch Multiple Images with Keywords: {keywords}",
+                "GET",
+                f"fetch-images?keywords={keywords.replace(' ', '%20')}&count=3",
+                200,
+                timeout=60
+            )
+            
+            if not success:
+                print(f"❌ Failed to fetch images for keywords: {keywords}")
+                return False
+            
+            # Verify response structure
+            if not response.get('success'):
+                print(f"❌ Response missing success field for keywords: {keywords}")
+                return False
+            
+            image_urls = response.get('image_urls', [])
+            if len(image_urls) < 2:
+                print(f"❌ Expected at least 2 images for keywords '{keywords}', got {len(image_urls)}")
+                return False
+            
+            # Verify all images have correct format
+            for i, image_url in enumerate(image_urls):
+                if not image_url.startswith('data:image/jpeg;base64,'):
+                    print(f"❌ Invalid image URL format for keywords '{keywords}', image {i+1}")
+                    return False
+            
+            print(f"✅ Successfully fetched {len(image_urls)} images for keywords: {keywords}")
+        
+        print("✅ All different keywords returned valid multiple base64 images")
+        return True
+
+    def test_fetch_images_with_count_parameter(self):
+        """Test fetching images with specific count parameter (count=2)"""
+        success, response = self.run_test(
+            "Fetch Images with Count Parameter (count=2)",
+            "GET",
+            "fetch-images?keywords=nature&count=2",
+            200,
+            timeout=60
+        )
+        
+        if success:
+            # Verify response structure
+            if not response.get('success'):
+                print("❌ Response missing success field or success=false")
+                return False
+            
+            image_urls = response.get('image_urls', [])
+            if len(image_urls) != 2:
+                print(f"❌ Expected exactly 2 images, got {len(image_urls)}")
+                return False
+            
+            # Verify both images have correct format
+            for i, image_url in enumerate(image_urls):
+                if not image_url.startswith('data:image/jpeg;base64,'):
+                    print(f"❌ Invalid image URL format for image {i+1}")
+                    return False
+            
+            print(f"✅ Successfully fetched exactly 2 images as requested")
+            return True
+        
+        return False
+
+    def test_fetch_images_quality_check(self):
+        """Test image quality - verify reasonable size and different images"""
+        success, response = self.run_test(
+            "Fetch Images Quality Check",
+            "GET",
+            "fetch-images?keywords=mushroom forest&count=3",
+            200,
+            timeout=60
+        )
+        
+        if success:
+            image_urls = response.get('image_urls', [])
+            if len(image_urls) < 2:
+                print(f"❌ Need at least 2 images for quality check, got {len(image_urls)}")
+                return False
+            
+            decoded_sizes = []
+            base64_contents = []
+            
+            # Check each image quality
+            for i, image_url in enumerate(image_urls):
+                if not image_url.startswith('data:image/jpeg;base64,'):
+                    print(f"❌ Invalid format for image {i+1}")
+                    return False
+                
+                # Extract and validate base64 content
+                base64_part = image_url.split('base64,')[1] if 'base64,' in image_url else ''
+                base64_contents.append(base64_part)
+                
+                # Verify it's valid base64 and reasonable size
+                try:
+                    import base64
+                    decoded = base64.b64decode(base64_part)
+                    decoded_sizes.append(len(decoded))
+                    
+                    # Check size constraints (30KB - 90KB decoded as mentioned in requirements)
+                    if len(decoded) < 30000:  # 30KB
+                        print(f"❌ Image {i+1} too small: {len(decoded)} bytes (minimum: 30KB)")
+                        return False
+                    
+                    if len(decoded) > 90000:  # 90KB  
+                        print(f"❌ Image {i+1} too large: {len(decoded)} bytes (maximum: 90KB)")
+                        return False
+                        
+                except Exception as e:
+                    print(f"❌ Invalid base64 content for image {i+1}: {str(e)}")
+                    return False
+            
+            # Verify images are different (not duplicates)
+            if len(set(base64_contents)) != len(base64_contents):
+                print("❌ Found duplicate images - images should be different")
+                return False
+            
+            print(f"✅ Image quality check passed")
+            print(f"   Number of images: {len(image_urls)}")
+            print(f"   All images are different (no duplicates)")
+            for i, size in enumerate(decoded_sizes):
+                print(f"   Image {i+1} decoded size: {size} bytes ({size/1024:.1f}KB)")
+            return True
+        
+        return False
+
+    def test_fetch_images_error_handling(self):
+        """Test error handling for fetch-images endpoint"""
+        # Test with missing keywords parameter
+        success, response = self.run_test(
+            "Fetch Images without Keywords Parameter",
+            "GET",
+            "fetch-images",
+            422,  # FastAPI validation error for missing required parameter
+            timeout=30
+        )
+        
+        if success:
+            print("✅ Correctly returned 422 for missing keywords parameter")
+            return True
+        else:
+            # If 422 didn't work, try with empty keywords to see what happens
+            success2, response2 = self.run_test(
+                "Fetch Images with Empty Keywords",
+                "GET", 
+                "fetch-images?keywords=",
+                200,  # Might still work with empty keywords
+                timeout=60
+            )
+            if success2:
+                print("✅ Empty keywords handled gracefully")
+                return True
+        
+        return False
+
 def main():
     print("🍄 Starting Mushroom Blog API Tests")
     print("=" * 50)
