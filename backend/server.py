@@ -22,6 +22,66 @@ from email.mime.multipart import MIMEMultipart
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+# Email notification function
+async def send_order_notification(order_data):
+    try:
+        smtp_host = os.environ.get('SMTP_HOST')
+        smtp_port = int(os.environ.get('SMTP_PORT', 587))
+        smtp_user = os.environ.get('SMTP_USER')
+        smtp_password = os.environ.get('SMTP_PASSWORD')
+        notification_email = os.environ.get('NOTIFICATION_EMAIL')
+        
+        if not all([smtp_host, smtp_user, smtp_password, notification_email]):
+            logging.warning("Email configuration incomplete, skipping notification")
+            return
+        
+        # Create email
+        message = MIMEMultipart()
+        message['From'] = smtp_user
+        message['To'] = notification_email
+        message['Subject'] = f"🛍️ Neue Bestellung - apebrain.cloud"
+        
+        # Email body
+        items_html = "<br>".join([
+            f"- {item['name']} x{item['quantity']} - €{item['price'] * item['quantity']:.2f}"
+            for item in order_data['items']
+        ])
+        
+        html_body = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif;">
+            <h2 style="color: #7a9053;">Neue Bestellung eingegangen!</h2>
+            <p><strong>Bestellnummer:</strong> {order_data['id']}</p>
+            <p><strong>Kunde Email:</strong> {order_data['customer_email']}</p>
+            <p><strong>Datum:</strong> {datetime.now(timezone.utc).strftime('%d.%m.%Y %H:%M:%S')} UTC</p>
+            <hr>
+            <h3>Bestellte Produkte:</h3>
+            <p>{items_html}</p>
+            <hr>
+            <p><strong>Gesamtbetrag:</strong> €{order_data['total']:.2f}</p>
+            <p><strong>PayPal Payment ID:</strong> {order_data.get('payment_id', 'N/A')}</p>
+            <p><strong>Status:</strong> {order_data['status']}</p>
+        </body>
+        </html>
+        """
+        
+        message.attach(MIMEText(html_body, 'html'))
+        
+        # Send email
+        await aiosmtplib.send(
+            message,
+            hostname=smtp_host,
+            port=smtp_port,
+            username=smtp_user,
+            password=smtp_password,
+            start_tls=True
+        )
+        
+        logging.info(f"Order notification email sent for order {order_data['id']}")
+    except Exception as e:
+        logging.error(f"Failed to send order notification: {str(e)}")
+
+
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
