@@ -40,6 +40,7 @@ function App() {
           <Route path="/shroomsadmin/settings" element={<AdminSettings />} />
           <Route path="/shroomsadmin/coupons" element={<AdminCoupons />} />
           <Route path="/shroomsadmin/products" element={<AdminProducts />} />
+          <Route path="/shroomsadmin/orders" element={<AdminOrders />} />
           <Route path="/shroomsadmin/create" element={<CreateBlog />} />
           <Route path="/shroomsadmin/edit/:id" element={<EditBlog />} />
         </Routes>
