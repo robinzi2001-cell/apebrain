@@ -69,36 +69,6 @@ const BlogPage = () => {
     }
     return { bg: 'linear-gradient(135deg, #7a9053 0%, #5a6c3a 100%)', icon: '#7a9053' };
   };
-  const handleTextToSpeech = () => {
-    const synth = window.speechSynthesis;
-    
-    if (isSpeaking && !isPaused) {
-      synth.pause();
-      setIsPaused(true);
-    } else if (isPaused) {
-      synth.resume();
-      setIsPaused(false);
-    } else {
-      const utterance = new SpeechSynthesisUtterance(blog.content);
-      if (selectedVoice) {
-        utterance.voice = selectedVoice;
-      }
-      utterance.onend = () => {
-        setIsSpeaking(false);
-        setIsPaused(false);
-      };
-      synth.speak(utterance);
-      setIsSpeaking(true);
-      setIsPaused(false);
-    }
-  };
-
-  const handleStopSpeech = () => {
-    const synth = window.speechSynthesis;
-    synth.cancel();
-    setIsSpeaking(false);
-    setIsPaused(false);
-  };
 
   const extractYouTubeId = (url) => {
     if (!url) return null;
