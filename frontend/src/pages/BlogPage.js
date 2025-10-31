@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Footer from '@/components/Footer';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Leaf, ArrowLeft, Home, Play, Pause, Square, Volume2, Instagram } from 'lucide-react';
+import { Leaf, ArrowLeft, Home, Instagram } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -14,19 +14,11 @@ const BlogPage = () => {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [features, setFeatures] = useState({ enable_video: true, enable_audio: true, enable_text_to_speech: true });
-  
-  // Text-to-speech state
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [voices, setVoices] = useState([]);
-  const [selectedVoice, setSelectedVoice] = useState(null);
-  const [selectedLanguage, setSelectedLanguage] = useState('en');
+  const [features, setFeatures] = useState({ enable_video: true, enable_audio: true });
 
   useEffect(() => {
     fetchBlog();
     fetchFeatures();
-    loadVoices();
   }, [id]);
 
   const fetchFeatures = async () => {
