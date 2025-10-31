@@ -312,7 +312,7 @@ const CreateBlog = () => {
                       style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                     />
                     <span style={{ color: '#7a9053', fontSize: '0.9rem' }}>
-                      Get matching image from web (based on blog topic)
+                      Get 2-3 matching images from web (Pexels - based on keywords)
                     </span>
                   </label>
                 </div>
