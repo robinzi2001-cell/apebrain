@@ -85,22 +85,25 @@ const CreateBlog = () => {
       const blogResponse = await axios.post(`${API}/blogs`, blogData);
       const blogId = blogResponse.data.id;
 
-      // Fetch image from web if checkbox is checked
+      // Fetch images from web if checkbox is checked
       if (fetchImageFromWeb) {
         try {
           setFetchingImage(true);
-          const imageResponse = await axios.get(`${API}/fetch-image`, {
-            params: { keywords: keywords || title }
+          const imageResponse = await axios.get(`${API}/fetch-images`, {
+            params: { 
+              keywords: keywords || title,
+              count: 3
+            }
           });
-          if (imageResponse.data.success && imageResponse.data.image_url) {
-            // Update blog with the fetched image URL
+          if (imageResponse.data.success && imageResponse.data.image_urls) {
+            // Update blog with the fetched image URLs
             await axios.put(`${API}/blogs/${blogId}`, {
-              image_url: imageResponse.data.image_url
+              image_urls: imageResponse.data.image_urls
             });
           }
         } catch (imgError) {
-          console.error('Error fetching image from web:', imgError);
-          // Continue without image
+          console.error('Error fetching images from web:', imgError);
+          // Continue without images
         } finally {
           setFetchingImage(false);
         }
