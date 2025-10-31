@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Leaf, CheckCircle } from 'lucide-react';
 import axios from 'axios';
@@ -11,14 +11,16 @@ const PaymentSuccess = () => {
   const navigate = useNavigate();
   const [processing, setProcessing] = useState(true);
   const [error, setError] = useState('');
+  const hasExecuted = useRef(false);
 
   useEffect(() => {
     const paymentId = searchParams.get('paymentId');
     const payerId = searchParams.get('PayerID');
 
-    if (paymentId && payerId) {
+    if (paymentId && payerId && !hasExecuted.current) {
+      hasExecuted.current = true;
       executePayment(paymentId, payerId);
-    } else {
+    } else if (!paymentId || !payerId) {
       setError('Payment information missing');
       setProcessing(false);
     }
