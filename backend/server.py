@@ -46,6 +46,7 @@ class BlogPost(BaseModel):
     content: str
     keywords: str
     image_url: Optional[str] = None
+    image_urls: Optional[List[str]] = None  # Multiple images from Pexels
     image_base64: Optional[str] = None
     video_url: Optional[str] = None  # YouTube URL
     audio_url: Optional[str] = None  # Audio file URL or base64
