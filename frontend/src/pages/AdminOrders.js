@@ -131,20 +131,8 @@ const AdminOrders = () => {
       <div className="admin-container" data-testid="admin-container">
         <h1 style={{ marginTop: '1rem' }} data-testid="page-title">Bestellungen</h1>
 
-        {/* Filter - Sticky */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '1rem', 
-          marginTop: '2rem', 
-          marginBottom: '2rem',
-          position: 'sticky',
-          top: '80px',
-          background: 'white',
-          zIndex: 10,
-          paddingTop: '1rem',
-          paddingBottom: '1rem',
-          borderBottom: '2px solid #e8ebe0'
-        }}>
+        {/* Filter */}
+        <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', marginBottom: '2rem' }}>
           <button
             onClick={() => setFilter('all')}
             className={filter === 'all' ? 'btn btn-primary' : 'btn btn-secondary'}
