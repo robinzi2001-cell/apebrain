@@ -39,7 +39,7 @@ async def send_order_notification(order_data):
         message = MIMEMultipart()
         message['From'] = smtp_user
         message['To'] = notification_email
-        message['Subject'] = f"🛍️ Neue Bestellung - apebrain.cloud"
+        message['Subject'] = "🛍️ Neue Bestellung - apebrain.cloud"
         
         # Email body
         items_html = "<br>".join([
