@@ -229,6 +229,42 @@ const AdminOrders = () => {
                     <strong>PayPal ID:</strong> {order.payment_id}
                   </div>
                 )}
+
+                {/* Action Buttons */}
+                <div style={{ 
+                  marginTop: '1rem', 
+                  paddingTop: '1rem', 
+                  borderTop: '1px solid #e8ebe0',
+                  display: 'flex',
+                  gap: '0.5rem',
+                  flexWrap: 'wrap'
+                }}>
+                  {order.status === 'completed' && (
+                    <button
+                      onClick={() => handleChangeStatus(order.id, 'cancelled')}
+                      className="btn btn-secondary"
+                      style={{ fontSize: '0.85rem', padding: '0.5rem 1rem' }}
+                    >
+                      Als Storniert markieren
+                    </button>
+                  )}
+                  {order.status === 'cancelled' && (
+                    <button
+                      onClick={() => handleChangeStatus(order.id, 'completed')}
+                      className="btn btn-secondary"
+                      style={{ fontSize: '0.85rem', padding: '0.5rem 1rem' }}
+                    >
+                      Als Abgeschlossen markieren
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleDeleteOrder(order.id)}
+                    className="btn btn-danger"
+                    style={{ fontSize: '0.85rem', padding: '0.5rem 1rem' }}
+                  >
+                    Bestellung löschen
+                  </button>
+                </div>
               </div>
             ))}
           </div>
