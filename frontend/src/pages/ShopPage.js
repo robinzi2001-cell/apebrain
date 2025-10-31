@@ -86,7 +86,7 @@ const ShopPage = () => {
       };
 
       // Create PayPal order
-      const response = await axios.post(`${API}/create-order`, orderData);
+      const response = await axios.post(`${API}/shop/create-order`, orderData);
       
       if (response.data.approval_url) {
         // Redirect to PayPal
