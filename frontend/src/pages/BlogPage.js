@@ -260,8 +260,9 @@ const BlogPage = () => {
           </div>
         )}
 
+        {/* Content with distributed images */}
         <div className="blog-detail-content" data-testid="blog-detail-content">
-          <ReactMarkdown>{blog.content}</ReactMarkdown>
+          {renderContentWithImages()}
         </div>
       </div>
       <Footer />
