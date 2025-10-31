@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Leaf, ShoppingBag, LogOut, LayoutDashboard, Package, Tag, Settings, CheckCircle, Clock, X } from 'lucide-react';
+import { Leaf, ShoppingBag, LogOut, LayoutDashboard, Package, Tag, Settings, CheckCircle, Clock, X, Trash2 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
