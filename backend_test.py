@@ -823,6 +823,170 @@ class MushroomBlogAPITester:
         
         return False
 
+    def test_fetch_image_good_keywords(self):
+        """Test fetching image with good keywords"""
+        success, response = self.run_test(
+            "Fetch Image with Good Keywords",
+            "GET",
+            "fetch-image?keywords=forest mushroom",
+            200,
+            timeout=60  # Extended timeout for image fetch
+        )
+        
+        if success:
+            # Verify response structure
+            if not response.get('success'):
+                print("❌ Response missing success field or success=false")
+                return False
+            
+            image_url = response.get('image_url')
+            if not image_url:
+                print("❌ Response missing image_url field")
+                return False
+            
+            # Verify base64 format
+            if not image_url.startswith('data:image/jpeg;base64,'):
+                print(f"❌ Invalid image URL format. Expected 'data:image/jpeg;base64,...', got: {image_url[:50]}...")
+                return False
+            
+            # Verify base64 content exists and is reasonable size
+            base64_part = image_url.split('base64,')[1] if 'base64,' in image_url else ''
+            if len(base64_part) < 100:  # Very small images would be suspicious
+                print(f"❌ Base64 content too small: {len(base64_part)} characters")
+                return False
+            
+            if len(base64_part) > 5000000:  # Very large images (>5MB base64) might be problematic
+                print(f"❌ Base64 content too large: {len(base64_part)} characters")
+                return False
+            
+            print(f"✅ Successfully fetched image with good keywords")
+            print(f"   Image URL format: {image_url[:50]}...")
+            print(f"   Base64 content size: {len(base64_part)} characters")
+            return True
+        
+        return False
+
+    def test_fetch_image_different_keywords(self):
+        """Test fetching images with different keywords"""
+        test_keywords = ["ocean nature", "mountain landscape", "abstract art"]
+        
+        for keywords in test_keywords:
+            print(f"\n🔍 Testing keywords: '{keywords}'")
+            success, response = self.run_test(
+                f"Fetch Image with Keywords: {keywords}",
+                "GET",
+                f"fetch-image?keywords={keywords.replace(' ', '%20')}",
+                200,
+                timeout=60
+            )
+            
+            if not success:
+                print(f"❌ Failed to fetch image for keywords: {keywords}")
+                return False
+            
+            # Verify response structure
+            if not response.get('success'):
+                print(f"❌ Response missing success field for keywords: {keywords}")
+                return False
+            
+            image_url = response.get('image_url')
+            if not image_url or not image_url.startswith('data:image/jpeg;base64,'):
+                print(f"❌ Invalid image URL format for keywords: {keywords}")
+                return False
+            
+            print(f"✅ Successfully fetched image for keywords: {keywords}")
+        
+        print("✅ All different keywords returned valid base64 images")
+        return True
+
+    def test_fetch_image_empty_keywords(self):
+        """Test fetching image with empty keywords (should use fallback)"""
+        success, response = self.run_test(
+            "Fetch Image with Empty Keywords",
+            "GET",
+            "fetch-image?keywords=",
+            200,
+            timeout=60
+        )
+        
+        if success:
+            # Verify response structure
+            if not response.get('success'):
+                print("❌ Response missing success field or success=false")
+                return False
+            
+            image_url = response.get('image_url')
+            if not image_url:
+                print("❌ Response missing image_url field")
+                return False
+            
+            # Verify base64 format
+            if not image_url.startswith('data:image/jpeg;base64,'):
+                print(f"❌ Invalid image URL format. Expected 'data:image/jpeg;base64,...', got: {image_url[:50]}...")
+                return False
+            
+            # Verify base64 content exists
+            base64_part = image_url.split('base64,')[1] if 'base64,' in image_url else ''
+            if len(base64_part) < 100:
+                print(f"❌ Base64 content too small: {len(base64_part)} characters")
+                return False
+            
+            print(f"✅ Successfully fetched fallback image with empty keywords")
+            print(f"   Image URL format: {image_url[:50]}...")
+            print(f"   Base64 content size: {len(base64_part)} characters")
+            return True
+        
+        return False
+
+    def test_fetch_image_size_validation(self):
+        """Test that returned base64 string is reasonable size"""
+        success, response = self.run_test(
+            "Fetch Image Size Validation",
+            "GET",
+            "fetch-image?keywords=nature test",
+            200,
+            timeout=60
+        )
+        
+        if success:
+            image_url = response.get('image_url', '')
+            if not image_url.startswith('data:image/jpeg;base64,'):
+                print("❌ Invalid image URL format")
+                return False
+            
+            # Extract base64 content
+            base64_part = image_url.split('base64,')[1] if 'base64,' in image_url else ''
+            
+            # Check size constraints
+            min_size = 1000  # At least 1KB base64 (roughly 750 bytes image)
+            max_size = 10000000  # At most 10MB base64 (roughly 7.5MB image)
+            
+            if len(base64_part) < min_size:
+                print(f"❌ Image too small: {len(base64_part)} characters (minimum: {min_size})")
+                return False
+            
+            if len(base64_part) > max_size:
+                print(f"❌ Image too large: {len(base64_part)} characters (maximum: {max_size})")
+                return False
+            
+            # Verify it's valid base64
+            try:
+                import base64
+                decoded = base64.b64decode(base64_part)
+                if len(decoded) < 500:  # At least 500 bytes for a real image
+                    print(f"❌ Decoded image too small: {len(decoded)} bytes")
+                    return False
+            except Exception as e:
+                print(f"❌ Invalid base64 content: {str(e)}")
+                return False
+            
+            print(f"✅ Image size validation passed")
+            print(f"   Base64 size: {len(base64_part)} characters")
+            print(f"   Decoded size: {len(decoded)} bytes")
+            return True
+        
+        return False
+
 def main():
     print("🍄 Starting Mushroom Blog API Tests")
     print("=" * 50)
