@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Leaf, Plus, Trash2, Eye, Edit, Settings, Tag, Package } from 'lucide-react';
+import { Leaf, Plus, Trash2, Eye, Edit, Settings, Tag, Package, ShoppingBag } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -9,6 +9,7 @@ const API = `${BACKEND_URL}/api`;
 const AdminDashboard = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [unviewedOrdersCount, setUnviewedOrdersCount] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,6 +18,11 @@ const AdminDashboard = () => {
       return;
     }
     fetchBlogs();
+    fetchUnviewedCount();
+    
+    // Poll for new orders every 30 seconds
+    const interval = setInterval(fetchUnviewedCount, 30000);
+    return () => clearInterval(interval);
   }, [navigate]);
 
   const fetchBlogs = async () => {
@@ -27,6 +33,15 @@ const AdminDashboard = () => {
       console.error('Error fetching blogs:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchUnviewedCount = async () => {
+    try {
+      const response = await axios.get(`${API}/orders/unviewed/count`);
+      setUnviewedOrdersCount(response.data.count);
+    } catch (error) {
+      console.error('Error fetching unviewed orders count:', error);
     }
   };
 
