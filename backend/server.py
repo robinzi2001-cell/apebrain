@@ -721,17 +721,23 @@ async def execute_payment(payment_id: str, payer_id: str):
         
         if payment.execute({"payer_id": payer_id}):
             # Update order status
+            completed_time = datetime.now(timezone.utc).isoformat()
             result = await db.orders.update_one(
                 {"payment_id": payment_id},
                 {"$set": {
                     "status": "completed",
                     "payer_id": payer_id,
-                    "completed_at": datetime.now(timezone.utc).isoformat()
+                    "completed_at": completed_time
                 }}
             )
             
             if result.matched_count == 0:
                 logging.warning(f"Order not found for payment_id: {payment_id}")
+            else:
+                # Get order data and send notification email
+                order = await db.orders.find_one({"payment_id": payment_id})
+                if order:
+                    await send_order_notification(order)
             
             return {
                 "success": True,
