@@ -993,8 +993,14 @@ def main():
     
     tester = MushroomBlogAPITester()
     
-    # Test sequence - Blog Multimedia Features Tests (High Priority)
+    # Test sequence - Image Fetch Feature Tests (High Priority - Current Focus)
     tests = [
+        # Image Fetch from Web Tests (HIGH PRIORITY)
+        ("Fetch Image with Good Keywords", tester.test_fetch_image_good_keywords),
+        ("Fetch Image with Different Keywords", tester.test_fetch_image_different_keywords),
+        ("Fetch Image with Empty Keywords", tester.test_fetch_image_empty_keywords),
+        ("Fetch Image Size Validation", tester.test_fetch_image_size_validation),
+        
         # Blog Feature Settings Tests
         ("Get Default Blog Features", tester.test_get_default_blog_features),
         ("Save Blog Features", tester.test_save_blog_features),
