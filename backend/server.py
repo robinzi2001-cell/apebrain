@@ -1023,6 +1023,34 @@ async def update_order_tracking(order_id: str, tracking_number: str, shipping_ca
         logging.error(f"Error updating tracking info: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to update tracking info")
 
+# Public order tracking
+@api_router.get("/track-order")
+async def track_order(order_id: str, email: str):
+    try:
+        order = await db.orders.find_one({"id": order_id, "customer_email": email})
+        
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found or email doesn't match")
+        
+        # Remove sensitive data
+        if '_id' in order:
+            del order['_id']
+        if isinstance(order.get('created_at'), datetime):
+            order['created_at'] = order['created_at'].isoformat()
+        if isinstance(order.get('completed_at'), datetime):
+            order['completed_at'] = order['completed_at'].isoformat()
+        if isinstance(order.get('shipped_at'), datetime):
+            order['shipped_at'] = order['shipped_at'].isoformat()
+        if isinstance(order.get('delivered_at'), datetime):
+            order['delivered_at'] = order['delivered_at'].isoformat()
+        
+        return order
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error tracking order: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to track order")
+
 # ============= COUPON ENDPOINTS =============
 
 # Get active coupon (public)
