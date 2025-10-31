@@ -77,6 +77,77 @@ const BlogPage = () => {
     return (match && match[2].length === 11) ? match[2] : null;
   };
 
+  const renderContentWithImages = () => {
+    if (!blog.image_urls || blog.image_urls.length === 0) {
+      return <ReactMarkdown>{blog.content}</ReactMarkdown>;
+    }
+
+    // Split content into paragraphs
+    const paragraphs = blog.content.split('\n\n').filter(p => p.trim());
+    
+    // Calculate how to distribute images
+    const totalParagraphs = paragraphs.length;
+    const imageCount = blog.image_urls.length;
+    const paragraphsPerImage = Math.floor(totalParagraphs / (imageCount + 1));
+    
+    const result = [];
+    let imageIndex = 0;
+    
+    paragraphs.forEach((paragraph, index) => {
+      // Add paragraph
+      result.push(
+        <div key={`p-${index}`} style={{ marginBottom: '1.5rem' }}>
+          <ReactMarkdown>{paragraph}</ReactMarkdown>
+        </div>
+      );
+      
+      // Add image after certain paragraphs
+      const shouldAddImage = 
+        imageIndex < imageCount && 
+        (index + 1) % paragraphsPerImage === 0 && 
+        index < totalParagraphs - 1;
+      
+      if (shouldAddImage) {
+        result.push(
+          <div key={`img-${imageIndex}`} style={{ margin: '2rem 0' }}>
+            <img 
+              src={blog.image_urls[imageIndex]} 
+              alt={`${blog.title} - Image ${imageIndex + 1}`}
+              style={{
+                width: '100%',
+                maxHeight: '500px',
+                objectFit: 'cover',
+                borderRadius: '12px'
+              }}
+            />
+          </div>
+        );
+        imageIndex++;
+      }
+    });
+    
+    // Add remaining images at the end if any
+    while (imageIndex < imageCount) {
+      result.push(
+        <div key={`img-end-${imageIndex}`} style={{ margin: '2rem 0' }}>
+          <img 
+            src={blog.image_urls[imageIndex]} 
+            alt={`${blog.title} - Image ${imageIndex + 1}`}
+            style={{
+              width: '100%',
+              maxHeight: '500px',
+              objectFit: 'cover',
+              borderRadius: '12px'
+            }}
+          />
+        </div>
+      );
+      imageIndex++;
+    }
+    
+    return result;
+  };
+
   if (loading) {
     return <div className="loading" data-testid="loading-indicator">Loading...</div>;
   }
