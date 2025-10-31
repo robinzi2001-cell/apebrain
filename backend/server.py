@@ -163,9 +163,15 @@ class Order(BaseModel):
     customer_email: str
     coupon_code: Optional[str] = None
     discount_amount: float = 0.0
-    status: str = "pending"  # pending, completed, cancelled
+    status: str = "pending"  # pending, paid, packed, shipped, in_transit, delivered, cancelled
+    tracking_number: Optional[str] = None
+    shipping_carrier: Optional[str] = None  # DHL, DPD, Hermes, UPS, etc.
+    tracking_url: Optional[str] = None
+    viewed: bool = False
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     completed_at: Optional[datetime] = None
+    shipped_at: Optional[datetime] = None
+    delivered_at: Optional[datetime] = None
 
 # Coupon Models
 class Coupon(BaseModel):
