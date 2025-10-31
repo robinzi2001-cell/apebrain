@@ -72,8 +72,32 @@ const ShopPage = () => {
     return cart.reduce((sum, item) => sum + item.quantity, 0);
   };
 
-  const handleCheckout = () => {
-    navigate('/checkout', { state: { cart, total: getCartTotal() } });
+  const handleCheckout = async () => {
+    try {
+      // Prepare order data
+      const orderData = {
+        items: cart.map(item => ({
+          product_id: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price
+        })),
+        total: getCartTotal()
+      };
+
+      // Create PayPal order
+      const response = await axios.post(`${API}/create-order`, orderData);
+      
+      if (response.data.approval_url) {
+        // Redirect to PayPal
+        window.location.href = response.data.approval_url;
+      } else {
+        alert('Failed to create PayPal order. Please try again.');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert(error.response?.data?.detail || 'Checkout failed. Please try again.');
+    }
   };
 
   return (
