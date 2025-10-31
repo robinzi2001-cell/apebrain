@@ -131,8 +131,20 @@ const AdminOrders = () => {
       <div className="admin-container" data-testid="admin-container">
         <h1 style={{ marginTop: '1rem' }} data-testid="page-title">Bestellungen</h1>
 
-        {/* Filter */}
-        <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', marginBottom: '2rem' }}>
+        {/* Filter - Sticky */}
+        <div style={{ 
+          display: 'flex', 
+          gap: '1rem', 
+          marginTop: '2rem', 
+          marginBottom: '2rem',
+          position: 'sticky',
+          top: '80px',
+          background: 'white',
+          zIndex: 10,
+          paddingTop: '1rem',
+          paddingBottom: '1rem',
+          borderBottom: '2px solid #e8ebe0'
+        }}>
           <button
             onClick={() => setFilter('all')}
             className={filter === 'all' ? 'btn btn-primary' : 'btn btn-secondary'}
@@ -143,7 +155,7 @@ const AdminOrders = () => {
             onClick={() => setFilter('completed')}
             className={filter === 'completed' ? 'btn btn-primary' : 'btn btn-secondary'}
           >
-            Abgeschlossen ({orders.filter(o => o.status === 'completed').length})
+            Abgeschlossen ({orders.filter(o => o.status === 'completed' || o.status === 'paid').length})
           </button>
           <button
             onClick={() => setFilter('pending')}
