@@ -958,16 +958,30 @@ async def delete_order(order_id: str):
 @api_router.put("/orders/{order_id}/status")
 async def update_order_status(order_id: str, status: str):
     try:
-        if status not in ["pending", "completed", "cancelled"]:
+        if status not in ["pending", "paid", "packed", "shipped", "in_transit", "delivered", "cancelled"]:
             raise HTTPException(status_code=400, detail="Invalid status")
+        
+        update_data = {"status": status}
+        
+        # Set timestamp based on status
+        if status == "shipped":
+            update_data["shipped_at"] = datetime.now(timezone.utc).isoformat()
+        elif status == "delivered":
+            update_data["delivered_at"] = datetime.now(timezone.utc).isoformat()
         
         result = await db.orders.update_one(
             {"id": order_id},
-            {"$set": {"status": status}}
+            {"$set": update_data}
         )
         
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Order not found")
+        
+        # Send customer notification for certain status changes
+        if status in ["shipped", "delivered"]:
+            order = await db.orders.find_one({"id": order_id})
+            if order:
+                await send_customer_notification(order, status)
         
         return {"success": True, "message": "Order status updated"}
     except HTTPException:
@@ -975,6 +989,39 @@ async def update_order_status(order_id: str, status: str):
     except Exception as e:
         logging.error(f"Error updating order status: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to update order status")
+
+# Update order tracking info (admin)
+@api_router.put("/orders/{order_id}/tracking")
+async def update_order_tracking(order_id: str, tracking_number: str, shipping_carrier: str = "DHL"):
+    try:
+        # Generate tracking URL
+        tracking_url = generate_tracking_url(shipping_carrier, tracking_number)
+        
+        result = await db.orders.update_one(
+            {"id": order_id},
+            {"$set": {
+                "tracking_number": tracking_number,
+                "shipping_carrier": shipping_carrier,
+                "tracking_url": tracking_url,
+                "status": "shipped",
+                "shipped_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        # Send shipping notification to customer
+        order = await db.orders.find_one({"id": order_id})
+        if order:
+            await send_customer_notification(order, 'shipped')
+        
+        return {"success": True, "tracking_url": tracking_url}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating tracking info: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update tracking info")
 
 # ============= COUPON ENDPOINTS =============
 
