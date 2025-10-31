@@ -769,14 +769,53 @@ async def get_order(order_id: str):
         raise HTTPException(status_code=500, detail="Failed to fetch order")
 
 # Get all orders (admin)
-@api_router.get("/shop/orders")
+@api_router.get("/orders")
 async def get_all_orders():
     try:
-        orders = await db.orders.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+        orders = await db.orders.find().sort("created_at", -1).to_list(length=None)
+        
+        # Convert datetime to ISO string for JSON serialization
+        for order in orders:
+            if '_id' in order:
+                del order['_id']
+            if isinstance(order.get('created_at'), datetime):
+                order['created_at'] = order['created_at'].isoformat()
+            if isinstance(order.get('completed_at'), datetime):
+                order['completed_at'] = order['completed_at'].isoformat()
+        
         return orders
     except Exception as e:
         logging.error(f"Error fetching orders: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch orders")
+
+# Mark order as viewed (admin)
+@api_router.post("/orders/{order_id}/mark-viewed")
+async def mark_order_viewed(order_id: str):
+    try:
+        result = await db.orders.update_one(
+            {"id": order_id},
+            {"$set": {"viewed": True}}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        return {"success": True}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error marking order as viewed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update order")
+
+# Get unviewed orders count (for notification badge)
+@api_router.get("/orders/unviewed/count")
+async def get_unviewed_count():
+    try:
+        count = await db.orders.count_documents({"viewed": {"$ne": True}, "status": "completed"})
+        return {"count": count}
+    except Exception as e:
+        logging.error(f"Error counting unviewed orders: {str(e)}")
+        return {"count": 0}
 
 # ============= COUPON ENDPOINTS =============
 
