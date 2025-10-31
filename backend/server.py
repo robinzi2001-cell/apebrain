@@ -385,9 +385,11 @@ async def upload_blog_audio(blog_id: str, file: UploadFile = File(...)):
 @api_router.get("/fetch-image")
 async def fetch_image_from_web(keywords: str):
     try:
-        # Use Unsplash Source API with proper format
-        search_query = keywords.replace(" ", ",")
-        image_url = f"https://source.unsplash.com/800x600/?{search_query}"
+        # Use Lorem Picsum API (replacement for deprecated Unsplash Source)
+        # Lorem Picsum provides random images without authentication
+        # We'll use a random seed based on keywords for some consistency
+        seed = hash(keywords) % 1000 if keywords.strip() else 42
+        image_url = f"https://picsum.photos/seed/{seed}/800/600"
         
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.get(image_url, follow_redirects=True)
@@ -398,8 +400,8 @@ async def fetch_image_from_web(keywords: str):
                 image_data_url = f"data:image/jpeg;base64,{image_base64}"
                 return {"success": True, "image_url": image_data_url}
             else:
-                # Fallback to a nature image
-                fallback_url = "https://source.unsplash.com/800x600/?nature,mushroom"
+                # Fallback to a default nature image
+                fallback_url = "https://picsum.photos/seed/nature42/800/600"
                 fallback_response = await client.get(fallback_url, follow_redirects=True)
                 if fallback_response.status_code == 200:
                     image_base64 = base64.b64encode(fallback_response.content).decode('utf-8')
