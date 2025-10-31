@@ -92,6 +92,107 @@ async def send_order_notification(order_data):
     except Exception as e:
         logging.error(f"Failed to send order notification: {str(e)}")
 
+# Customer order status notification
+async def send_customer_notification(order_data, status_type: str):
+    try:
+        smtp_host = os.environ.get('SMTP_HOST')
+        smtp_port = int(os.environ.get('SMTP_PORT', 587))
+        smtp_user = os.environ.get('SMTP_USER')
+        smtp_password = os.environ.get('SMTP_PASSWORD')
+        
+        if not all([smtp_host, smtp_user, smtp_password]):
+            logging.warning("Email configuration incomplete, skipping customer notification")
+            return
+        
+        customer_email = order_data.get('customer_email')
+        if not customer_email:
+            logging.warning("No customer email found")
+            return
+        
+        # Create email
+        message = MIMEMultipart()
+        message['From'] = smtp_user
+        message['To'] = customer_email
+        
+        # Different email content based on status
+        if status_type == 'paid':
+            subject = "✅ Bestellbestätigung - apebrain.cloud"
+            status_text = "Ihre Bestellung wurde erfolgreich bezahlt und wird bearbeitet."
+        elif status_type == 'shipped':
+            subject = "📦 Ihre Bestellung wurde versendet - apebrain.cloud"
+            tracking_html = ""
+            if order_data.get('tracking_number'):
+                tracking_url = order_data.get('tracking_url', '#')
+                tracking_html = f'<p><strong>Sendungsverfolgung:</strong> <a href="{tracking_url}">{order_data["tracking_number"]}</a></p>'
+            status_text = f"Ihre Bestellung ist unterwegs!<br>{tracking_html}"
+        elif status_type == 'delivered':
+            subject = "🏠 Ihre Bestellung wurde zugestellt - apebrain.cloud"
+            status_text = "Ihre Bestellung wurde erfolgreich zugestellt. Wir hoffen, Sie genießen Ihre Produkte!"
+        else:
+            subject = f"📬 Update zu Ihrer Bestellung - apebrain.cloud"
+            status_text = f"Status Ihrer Bestellung: {order_data.get('status', 'N/A')}"
+        
+        message['Subject'] = subject
+        
+        items_html = "<br>".join([
+            f"- {item['name']} x{item['quantity']} - €{item['price'] * item['quantity']:.2f}"
+            for item in order_data.get('items', [])
+        ])
+        
+        tracking_section = ""
+        if order_data.get('tracking_url') and order_data.get('tracking_number'):
+            tracking_section = f"""
+            <div style="margin-top: 1.5rem; padding: 1rem; background: #f3f4f6; border-radius: 8px;">
+                <h3 style="color: #7a9053; margin-top: 0;">Sendungsverfolgung</h3>
+                <p><strong>Tracking-Nummer:</strong> {order_data['tracking_number']}</p>
+                <p><strong>Versanddienstleister:</strong> {order_data.get('shipping_carrier', 'N/A')}</p>
+                <p><a href="{order_data['tracking_url']}" style="color: #7a9053; text-decoration: underline;">Sendung verfolgen →</a></p>
+            </div>
+            """
+        
+        html_body = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: #7a9053; color: white; padding: 2rem; text-align: center;">
+                <h1 style="margin: 0;">apebrain.cloud</h1>
+            </div>
+            <div style="padding: 2rem;">
+                <h2 style="color: #3a4520;">{subject.split(' - ')[0]}</h2>
+                <p>{status_text}</p>
+                <hr style="border: 1px solid #e8ebe0; margin: 1.5rem 0;">
+                <p><strong>Bestellnummer:</strong> {order_data.get('id', 'N/A')[:12]}...</p>
+                <p><strong>Datum:</strong> {datetime.now(timezone.utc).strftime('%d.%m.%Y')}</p>
+                <h3 style="color: #3a4520;">Bestellte Produkte:</h3>
+                <p style="margin-left: 1rem;">{items_html}</p>
+                <hr style="border: 1px solid #e8ebe0; margin: 1.5rem 0;">
+                <p><strong>Gesamtbetrag:</strong> €{order_data.get('total', 0):.2f}</p>
+                {tracking_section}
+                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e8ebe0; color: #7a9053; font-size: 0.9rem;">
+                    <p>Bei Fragen kontaktieren Sie uns: apebrain333@gmail.com</p>
+                    <p>Vielen Dank für Ihren Einkauf!</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        message.attach(MIMEText(html_body, 'html'))
+        
+        # Send email
+        await aiosmtplib.send(
+            message,
+            hostname=smtp_host,
+            port=smtp_port,
+            username=smtp_user,
+            password=smtp_password,
+            start_tls=True
+        )
+        
+        logging.info(f"Customer notification sent to {customer_email} for order {order_data.get('id')}")
+    except Exception as e:
+        logging.error(f"Failed to send customer notification: {str(e)}")
+
+
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
