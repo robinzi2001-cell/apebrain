@@ -817,6 +817,44 @@ async def get_unviewed_count():
         logging.error(f"Error counting unviewed orders: {str(e)}")
         return {"count": 0}
 
+# Delete order (admin)
+@api_router.delete("/orders/{order_id}")
+async def delete_order(order_id: str):
+    try:
+        result = await db.orders.delete_one({"id": order_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        return {"success": True, "message": "Order deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting order: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete order")
+
+# Update order status (admin)
+@api_router.put("/orders/{order_id}/status")
+async def update_order_status(order_id: str, status: str):
+    try:
+        if status not in ["pending", "completed", "cancelled"]:
+            raise HTTPException(status_code=400, detail="Invalid status")
+        
+        result = await db.orders.update_one(
+            {"id": order_id},
+            {"$set": {"status": status}}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        return {"success": True, "message": "Order status updated"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating order status: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update order status")
+
 # ============= COUPON ENDPOINTS =============
 
 # Get active coupon (public)
