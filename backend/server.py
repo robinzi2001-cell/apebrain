@@ -383,37 +383,56 @@ async def upload_blog_audio(blog_id: str, file: UploadFile = File(...)):
         logging.error(f"Error uploading audio: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to upload audio")
 
-# Fetch image from web based on keywords
-@api_router.get("/fetch-image")
-async def fetch_image_from_web(keywords: str):
+# Fetch images from web based on keywords
+@api_router.get("/fetch-images")
+async def fetch_images_from_web(keywords: str, count: int = 3):
     try:
-        # Use Lorem Picsum API (replacement for deprecated Unsplash Source)
-        # Lorem Picsum provides random images without authentication
-        # We'll use a random seed based on keywords for some consistency
-        seed = hash(keywords) % 1000 if keywords.strip() else 42
-        image_url = f"https://picsum.photos/seed/{seed}/800/600"
+        pexels_api_key = os.environ.get('PEXELS_API_KEY')
+        if not pexels_api_key:
+            raise HTTPException(status_code=500, detail="Pexels API key not configured")
+        
+        # Search Pexels for relevant images
+        search_url = "https://api.pexels.com/v1/search"
+        headers = {
+            "Authorization": pexels_api_key
+        }
+        params = {
+            "query": keywords,
+            "per_page": min(count, 5),  # Max 5 images
+            "orientation": "landscape"
+        }
         
         async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.get(image_url, follow_redirects=True)
+            response = await client.get(search_url, headers=headers, params=params)
             
             if response.status_code == 200:
-                # Convert image to base64
-                image_base64 = base64.b64encode(response.content).decode('utf-8')
-                image_data_url = f"data:image/jpeg;base64,{image_base64}"
-                return {"success": True, "image_url": image_data_url}
-            else:
-                # Fallback to a default nature image
-                fallback_url = "https://picsum.photos/seed/nature42/800/600"
-                fallback_response = await client.get(fallback_url, follow_redirects=True)
-                if fallback_response.status_code == 200:
-                    image_base64 = base64.b64encode(fallback_response.content).decode('utf-8')
-                    image_data_url = f"data:image/jpeg;base64,{image_base64}"
-                    return {"success": True, "image_url": image_data_url}
+                data = response.json()
+                image_urls = []
+                
+                # Download and convert each image to base64
+                for photo in data.get('photos', [])[:count]:
+                    try:
+                        # Use medium size image
+                        img_url = photo.get('src', {}).get('medium')
+                        if img_url:
+                            img_response = await client.get(img_url)
+                            if img_response.status_code == 200:
+                                image_base64 = base64.b64encode(img_response.content).decode('utf-8')
+                                image_data_url = f"data:image/jpeg;base64,{image_base64}"
+                                image_urls.append(image_data_url)
+                    except Exception as e:
+                        logging.error(f"Error downloading image: {str(e)}")
+                        continue
+                
+                if image_urls:
+                    return {"success": True, "image_urls": image_urls}
                 else:
-                    raise HTTPException(status_code=404, detail="No image found")
+                    raise HTTPException(status_code=404, detail="No images found")
+            else:
+                raise HTTPException(status_code=response.status_code, detail="Failed to fetch from Pexels")
     except Exception as e:
-        logging.error(f"Error fetching image from web: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to fetch image from web: {str(e)}")
+        logging.error(f"Error fetching images from web: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch images from web: {str(e)}")
 
 # Create/Save blog post
 @api_router.post("/blogs", response_model=BlogPost)
