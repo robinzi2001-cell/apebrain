@@ -838,12 +838,12 @@ async def execute_payment(payment_id: str, payer_id: str):
         payment = paypalrestsdk.Payment.find(payment_id)
         
         if payment.execute({"payer_id": payer_id}):
-            # Update order status
+            # Update order status to 'paid'
             completed_time = datetime.now(timezone.utc).isoformat()
             result = await db.orders.update_one(
                 {"payment_id": payment_id},
                 {"$set": {
-                    "status": "completed",
+                    "status": "paid",
                     "payer_id": payer_id,
                     "completed_at": completed_time
                 }}
@@ -852,10 +852,13 @@ async def execute_payment(payment_id: str, payer_id: str):
             if result.matched_count == 0:
                 logging.warning(f"Order not found for payment_id: {payment_id}")
             else:
-                # Get order data and send notification email
+                # Get order data and send notifications
                 order = await db.orders.find_one({"payment_id": payment_id})
                 if order:
+                    # Send admin notification
                     await send_order_notification(order)
+                    # Send customer confirmation
+                    await send_customer_notification(order, 'paid')
             
             return {
                 "success": True,
