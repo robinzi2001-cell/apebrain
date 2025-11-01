@@ -1398,7 +1398,7 @@ class MushroomBlogAPITester:
         success, response = self.run_test(
             "Mark Order as Viewed",
             "POST",
-            f"orders/{self.test_order_id}/viewed",
+            f"orders/{self.test_order_id}/mark-viewed",
             200
         )
         
