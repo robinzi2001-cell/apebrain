@@ -10,6 +10,8 @@ const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, completed, pending, cancelled
+  const [expandedOrder, setExpandedOrder] = useState(null); // For tracking input
+  const [trackingInput, setTrackingInput] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
