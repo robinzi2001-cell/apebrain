@@ -23,10 +23,21 @@ const AdminSettings = () => {
   const [shopGalleryImages, setShopGalleryImages] = useState([]);
   const [minigamesGalleryImages, setMinigamesGalleryImages] = useState([]);
   
-  // Background color settings
-  const [cardBgColorStart, setCardBgColorStart] = useState('rgba(167, 139, 250, 0.15)');
-  const [cardBgColorMiddle, setCardBgColorMiddle] = useState('rgba(139, 92, 246, 0.12)');
-  const [cardBgColorEnd, setCardBgColorEnd] = useState('rgba(124, 58, 237, 0.15)');
+  // Background color settings - RGB values
+  const [startR, setStartR] = useState(167);
+  const [startG, setStartG] = useState(139);
+  const [startB, setStartB] = useState(250);
+  const [startOpacity, setStartOpacity] = useState(0.15);
+  
+  const [middleR, setMiddleR] = useState(139);
+  const [middleG, setMiddleG] = useState(92);
+  const [middleB, setMiddleB] = useState(246);
+  const [middleOpacity, setMiddleOpacity] = useState(0.12);
+  
+  const [endR, setEndR] = useState(124);
+  const [endG, setEndG] = useState(58);
+  const [endB, setEndB] = useState(237);
+  const [endOpacity, setEndOpacity] = useState(0.15);
   
   const [enableVideo, setEnableVideo] = useState(true);
   const [enableAudio, setEnableAudio] = useState(true);
