@@ -59,6 +59,13 @@ const LandingPage = () => {
 
     const galleryMode = settings[`${section}_gallery_mode`];
     const galleryImages = settings[`${section}_gallery_images`] || [];
+    const imageCount = galleryImages.length;
+
+    // Dynamic grid layout based on image count
+    let gridTemplate = 'none';
+    if (imageCount === 1) gridTemplate = '1fr';
+    if (imageCount === 2) gridTemplate = '1fr 1fr';
+    if (imageCount >= 3) gridTemplate = 'repeat(3, 1fr)';
 
     return (
       <div 
@@ -69,21 +76,24 @@ const LandingPage = () => {
           opacity: route ? 1 : 0.7
         }}
       >
-        {/* Gallery Background */}
-        {galleryMode !== 'none' && galleryImages.length > 0 && (
-          <div className="gallery-background">
+        {/* Gallery Background or Purple fallback */}
+        {galleryMode !== 'none' && imageCount > 0 ? (
+          <div className="gallery-background" style={{ gridTemplateColumns: gridTemplate }}>
             {galleryImages.slice(0, 3).map((img, idx) => (
               <div
                 key={idx}
                 className="gallery-img"
                 style={{
                   backgroundImage: `url(${img})`,
-                  animationDelay: `${idx * 0.2}s`
+                  animationDelay: `${idx * 0.2}s`,
+                  gridColumn: imageCount === 1 ? '1 / -1' : 'auto'
                 }}
               />
             ))}
             <div className="gallery-overlay"></div>
           </div>
+        ) : (
+          <div className="purple-background"></div>
         )}
 
         {/* Card Content */}
