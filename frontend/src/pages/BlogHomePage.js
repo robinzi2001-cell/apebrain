@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Leaf, Home, Instagram } from 'lucide-react';
 import Footer from '@/components/Footer';
+import UserDropdown from '@/components/UserDropdown';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
