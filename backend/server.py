@@ -849,6 +849,26 @@ async def create_shop_order(order: CreateOrder):
                 logging.warning(f"Could not apply coupon: {str(e)}")
         
         # Create PayPal payment
+        items_list = [
+            {
+                "name": item.name,
+                "sku": item.product_id,
+                "price": f"{item.price:.2f}",
+                "currency": "USD",
+                "quantity": item.quantity
+            } for item in order.items
+        ]
+        
+        # Add discount as a separate item if coupon applied
+        if discount_amount > 0:
+            items_list.append({
+                "name": f"Discount ({order.coupon_code})",
+                "sku": "DISCOUNT",
+                "price": f"-{discount_amount:.2f}",
+                "currency": "USD",
+                "quantity": 1
+            })
+        
         payment = paypalrestsdk.Payment({
             "intent": "sale",
             "payer": {
@@ -860,15 +880,7 @@ async def create_shop_order(order: CreateOrder):
             },
             "transactions": [{
                 "item_list": {
-                    "items": [
-                        {
-                            "name": item.name,
-                            "sku": item.product_id,
-                            "price": f"{item.price:.2f}",
-                            "currency": "USD",
-                            "quantity": item.quantity
-                        } for item in order.items
-                    ]
+                    "items": items_list
                 },
                 "amount": {
                     "total": f"{order.total:.2f}",
