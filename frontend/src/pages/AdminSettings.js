@@ -78,9 +78,38 @@ const AdminSettings = () => {
       setBlogGalleryImages(response.data.blog_gallery_images || []);
       setShopGalleryImages(response.data.shop_gallery_images || []);
       setMinigamesGalleryImages(response.data.minigames_gallery_images || []);
-      setCardBgColorStart(response.data.card_bg_color_start || 'rgba(167, 139, 250, 0.15)');
-      setCardBgColorMiddle(response.data.card_bg_color_middle || 'rgba(139, 92, 246, 0.12)');
-      setCardBgColorEnd(response.data.card_bg_color_end || 'rgba(124, 58, 237, 0.15)');
+      
+      // Parse RGB values from rgba strings
+      const parseRgba = (rgbaStr) => {
+        const match = rgbaStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+),?\s*([\d.]+)?\)/);
+        if (match) {
+          return {
+            r: parseInt(match[1]),
+            g: parseInt(match[2]),
+            b: parseInt(match[3]),
+            a: parseFloat(match[4] || 1)
+          };
+        }
+        return { r: 167, g: 139, b: 250, a: 0.15 };
+      };
+      
+      const startColor = parseRgba(response.data.card_bg_color_start || 'rgba(167, 139, 250, 0.15)');
+      setStartR(startColor.r);
+      setStartG(startColor.g);
+      setStartB(startColor.b);
+      setStartOpacity(startColor.a);
+      
+      const middleColor = parseRgba(response.data.card_bg_color_middle || 'rgba(139, 92, 246, 0.12)');
+      setMiddleR(middleColor.r);
+      setMiddleG(middleColor.g);
+      setMiddleB(middleColor.b);
+      setMiddleOpacity(middleColor.a);
+      
+      const endColor = parseRgba(response.data.card_bg_color_end || 'rgba(124, 58, 237, 0.15)');
+      setEndR(endColor.r);
+      setEndG(endColor.g);
+      setEndB(endColor.b);
+      setEndOpacity(endColor.a);
     } catch (error) {
       console.error('Error fetching landing settings:', error);
     }
