@@ -317,6 +317,129 @@ const ShopPage = () => {
                 ))}
               </div>
               <div className="cart-footer">
+                {/* Coupon Input Section */}
+                <div className="coupon-section" style={{ 
+                  marginBottom: '1rem', 
+                  padding: '0.75rem', 
+                  backgroundColor: '#f8f9fa', 
+                  borderRadius: '8px' 
+                }}>
+                  {!appliedCoupon ? (
+                    <>
+                      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                        <input
+                          type="text"
+                          value={couponCode}
+                          onChange={(e) => {
+                            setCouponCode(e.target.value.toUpperCase());
+                            setCouponError('');
+                          }}
+                          placeholder="Enter coupon code"
+                          style={{
+                            flex: 1,
+                            padding: '0.5rem',
+                            border: couponError ? '2px solid #ef4444' : '1px solid #d1d5db',
+                            borderRadius: '6px',
+                            fontSize: '0.9rem'
+                          }}
+                          data-testid="coupon-input"
+                        />
+                        <button
+                          onClick={handleApplyCoupon}
+                          style={{
+                            padding: '0.5rem 1rem',
+                            backgroundColor: '#7a9053',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontSize: '0.9rem',
+                            fontWeight: '500'
+                          }}
+                          data-testid="apply-coupon-button"
+                        >
+                          Apply
+                        </button>
+                      </div>
+                      {couponError && (
+                        <p style={{ 
+                          color: '#ef4444', 
+                          fontSize: '0.85rem', 
+                          margin: '0' 
+                        }} data-testid="coupon-error">
+                          {couponError}
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center' 
+                    }}>
+                      <div>
+                        <p style={{ 
+                          margin: '0', 
+                          fontSize: '0.9rem', 
+                          fontWeight: '600', 
+                          color: '#059669' 
+                        }} data-testid="applied-coupon">
+                          ✓ {appliedCoupon.code} Applied
+                        </p>
+                        <p style={{ 
+                          margin: '0', 
+                          fontSize: '0.8rem', 
+                          color: '#6b7280' 
+                        }}>
+                          {appliedCoupon.discount_type === 'percentage' 
+                            ? `${appliedCoupon.discount_value}% off` 
+                            : `$${appliedCoupon.discount_value} off`}
+                        </p>
+                      </div>
+                      <button
+                        onClick={handleRemoveCoupon}
+                        style={{
+                          padding: '0.4rem 0.8rem',
+                          backgroundColor: '#ef4444',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontSize: '0.85rem'
+                        }}
+                        data-testid="remove-coupon-button"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Price Breakdown */}
+                <div style={{ marginBottom: '1rem' }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    marginBottom: '0.5rem',
+                    fontSize: '0.95rem'
+                  }}>
+                    <span>Subtotal:</span>
+                    <span>${getSubtotal()}</span>
+                  </div>
+                  {appliedCoupon && (
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      marginBottom: '0.5rem',
+                      fontSize: '0.95rem',
+                      color: '#059669'
+                    }}>
+                      <span>Discount:</span>
+                      <span>-${getDiscount()}</span>
+                    </div>
+                  )}
+                </div>
+
                 <div className="cart-total">
                   <strong>Total:</strong>
                   <strong>${getCartTotal()}</strong>
