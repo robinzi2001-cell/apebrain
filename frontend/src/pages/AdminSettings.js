@@ -227,6 +227,76 @@ const AdminSettings = () => {
     }
   };
 
+  const fetchColorProfiles = async () => {
+    try {
+      const response = await axios.get(`${API}/color-profiles`);
+      setColorProfiles(response.data || []);
+    } catch (error) {
+      console.error('Error fetching color profiles:', error);
+    }
+  };
+
+  const saveColorProfile = async () => {
+    if (!newProfileName.trim()) {
+      setError('Please enter a profile name');
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/color-profiles`, {
+        name: newProfileName,
+        startR, startG, startB, startOpacity,
+        middleR, middleG, middleB, middleOpacity,
+        endR, endG, endB, endOpacity
+      });
+      
+      setSuccess(`Profile "${newProfileName}" saved!`);
+      setNewProfileName('');
+      await fetchColorProfiles();
+    } catch (error) {
+      console.error('Error saving color profile:', error);
+      setError('Failed to save color profile');
+    }
+  };
+
+  const loadColorProfile = async (profileId) => {
+    try {
+      const profile = colorProfiles.find(p => p.id === profileId);
+      if (profile) {
+        setStartR(profile.startR);
+        setStartG(profile.startG);
+        setStartB(profile.startB);
+        setStartOpacity(profile.startOpacity);
+        setMiddleR(profile.middleR);
+        setMiddleG(profile.middleG);
+        setMiddleB(profile.middleB);
+        setMiddleOpacity(profile.middleOpacity);
+        setEndR(profile.endR);
+        setEndG(profile.endG);
+        setEndB(profile.endB);
+        setEndOpacity(profile.endOpacity);
+        setSuccess(`Loaded profile: ${profile.name}`);
+      }
+    } catch (error) {
+      console.error('Error loading color profile:', error);
+      setError('Failed to load color profile');
+    }
+  };
+
+  const deleteColorProfile = async (profileId) => {
+    if (!window.confirm('Delete this color profile?')) return;
+
+    try {
+      await axios.delete(`${API}/color-profiles/${profileId}`);
+      setSuccess('Profile deleted!');
+      setSelectedProfile('');
+      await fetchColorProfiles();
+    } catch (error) {
+      console.error('Error deleting color profile:', error);
+      setError('Failed to delete color profile');
+    }
+  };
+
   const handleBlogFeaturesSave = async () => {
     try {
       await axios.post(`${API}/blog-features`, {
