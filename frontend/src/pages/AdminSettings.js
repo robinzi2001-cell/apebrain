@@ -192,9 +192,9 @@ const AdminSettings = () => {
         blog_gallery_images: blogGalleryImages,
         shop_gallery_images: shopGalleryImages,
         minigames_gallery_images: minigamesGalleryImages,
-        card_bg_color_start: cardBgColorStart,
-        card_bg_color_middle: cardBgColorMiddle,
-        card_bg_color_end: cardBgColorEnd
+        card_bg_color_start: `rgba(${startR}, ${startG}, ${startB}, ${startOpacity})`,
+        card_bg_color_middle: `rgba(${middleR}, ${middleG}, ${middleB}, ${middleOpacity})`,
+        card_bg_color_end: `rgba(${endR}, ${endG}, ${endB}, ${endOpacity})`
       });
       setSuccess('Landing page settings updated successfully!');
     } catch (error) {
