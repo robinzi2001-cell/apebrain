@@ -982,6 +982,15 @@ async def update_order_status(order_id: str, status: str):
             order = await db.orders.find_one({"id": order_id})
             if order:
                 await send_customer_notification(order, status)
+                
+        # Send admin notification when delivered
+        if status == "delivered":
+            order = await db.orders.find_one({"id": order_id})
+            if order:
+                # Send admin notification about delivery completion
+                notification_email = os.environ.get('NOTIFICATION_EMAIL')
+                if notification_email:
+                    await send_admin_delivery_notification(order)
         
         return {"success": True, "message": "Order status updated"}
     except HTTPException:
