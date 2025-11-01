@@ -537,9 +537,32 @@ async def generate_blog(input: BlogPostCreate):
         title = lines[0].replace('#', '').strip() if lines else input.keywords
         content = '\n'.join(lines[1:]).strip() if len(lines) > 1 else blog_content
         
+        # Fetch image from Pexels based on keywords
+        image_base64 = None
+        try:
+            pexels_key = os.environ.get('PEXELS_API_KEY')
+            if pexels_key:
+                async with httpx.AsyncClient() as client:
+                    response = await client.get(
+                        f"https://api.pexels.com/v1/search?query={input.keywords}&per_page=1",
+                        headers={"Authorization": pexels_key},
+                        timeout=10.0
+                    )
+                    if response.status_code == 200:
+                        data = response.json()
+                        if data.get('photos') and len(data['photos']) > 0:
+                            image_url = data['photos'][0]['src']['medium']
+                            # Download image and convert to base64
+                            img_response = await client.get(image_url, timeout=10.0)
+                            if img_response.status_code == 200:
+                                image_base64 = f"data:image/jpeg;base64,{base64.b64encode(img_response.content).decode()}"
+        except Exception as img_error:
+            logging.warning(f"Failed to fetch image for blog generation: {str(img_error)}")
+        
         return GenerateResponse(
             title=title,
-            content=content
+            content=content,
+            image_base64=image_base64
         )
     except Exception as e:
         logging.error(f"Error generating blog: {str(e)}")
