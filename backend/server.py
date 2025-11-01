@@ -1180,9 +1180,9 @@ async def get_active_coupon():
 
 # Validate coupon
 @api_router.post("/coupons/validate")
-async def validate_coupon(code: str, subtotal: float):
+async def validate_coupon(request: CouponValidate):
     try:
-        coupon = await db.coupons.find_one({"code": code.upper(), "is_active": True}, {"_id": 0})
+        coupon = await db.coupons.find_one({"code": request.code.upper(), "is_active": True}, {"_id": 0})
         
         if not coupon:
             raise HTTPException(status_code=404, detail="Invalid coupon code")
@@ -1196,7 +1196,7 @@ async def validate_coupon(code: str, subtotal: float):
         # Calculate discount
         discount = 0
         if coupon['discount_type'] == 'percentage':
-            discount = (subtotal * coupon['discount_value']) / 100
+            discount = (request.order_total * coupon['discount_value']) / 100
         else:  # fixed
             discount = coupon['discount_value']
         
