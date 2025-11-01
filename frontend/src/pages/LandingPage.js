@@ -67,6 +67,11 @@ const LandingPage = () => {
     if (imageCount === 2) gridTemplate = '1fr 1fr';
     if (imageCount >= 3) gridTemplate = 'repeat(3, 1fr)';
 
+    // Get custom background colors
+    const bgColorStart = settings.card_bg_color_start || 'rgba(167, 139, 250, 0.15)';
+    const bgColorMiddle = settings.card_bg_color_middle || 'rgba(139, 92, 246, 0.12)';
+    const bgColorEnd = settings.card_bg_color_end || 'rgba(124, 58, 237, 0.15)';
+
     return (
       <div 
         className="landing-gallery-card"
@@ -76,7 +81,7 @@ const LandingPage = () => {
           opacity: route ? 1 : 0.7
         }}
       >
-        {/* Gallery Background or Purple fallback */}
+        {/* Gallery Background or Custom color fallback */}
         {galleryMode !== 'none' && imageCount > 0 ? (
           <div className="gallery-background" style={{ gridTemplateColumns: gridTemplate }}>
             {galleryImages.slice(0, 3).map((img, idx) => (
@@ -93,7 +98,12 @@ const LandingPage = () => {
             <div className="gallery-overlay"></div>
           </div>
         ) : (
-          <div className="purple-background"></div>
+          <div 
+            className="custom-background"
+            style={{
+              background: `linear-gradient(135deg, ${bgColorStart} 0%, ${bgColorMiddle} 50%, ${bgColorEnd} 100%)`
+            }}
+          ></div>
         )}
 
         {/* Card Content */}
