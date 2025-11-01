@@ -137,12 +137,36 @@ const AdminSettings = () => {
       await axios.post(`${API}/landing-settings`, {
         show_blog: showBlog,
         show_shop: showShop,
-        show_minigames: showMinigames
+        show_minigames: showMinigames,
+        blog_gallery_mode: blogGalleryMode,
+        shop_gallery_mode: shopGalleryMode,
+        minigames_gallery_mode: minigamesGalleryMode,
+        blog_gallery_images: blogGalleryImages,
+        shop_gallery_images: shopGalleryImages,
+        minigames_gallery_images: minigamesGalleryImages
       });
       setSuccess('Landing page settings updated successfully!');
     } catch (error) {
       console.error('Error updating landing settings:', error);
       setError('Failed to update landing page settings');
+    }
+  };
+
+  const handleGalleryImageUpload = async (section, file) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await axios.post(`${API}/landing-settings/upload-gallery-image/${section}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      // Refresh landing settings to get updated images
+      await fetchLandingSettings();
+      setSuccess(`Gallery image uploaded for ${section}!`);
+    } catch (error) {
+      console.error('Error uploading gallery image:', error);
+      setError(`Failed to upload gallery image for ${section}`);
     }
   };
 
