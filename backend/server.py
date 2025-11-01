@@ -565,6 +565,60 @@ async def upload_landing_gallery_image(section: str, file: UploadFile = File(...
         logging.error(f"Error uploading gallery image: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to upload gallery image: {str(e)}")
 
+# ============= COLOR PROFILE ENDPOINTS =============
+# Get all color profiles
+@api_router.get("/color-profiles")
+async def get_color_profiles():
+    try:
+        profiles = await db.color_profiles.find({}, {"_id": 0}).to_list(length=100)
+        return profiles
+    except Exception as e:
+        logging.error(f"Error fetching color profiles: {str(e)}")
+        return []
+
+# Save new color profile
+@api_router.post("/color-profiles")
+async def save_color_profile(profile: dict):
+    try:
+        profile_doc = {
+            "id": str(uuid.uuid4()),
+            "name": profile.get("name"),
+            "startR": profile.get("startR"),
+            "startG": profile.get("startG"),
+            "startB": profile.get("startB"),
+            "startOpacity": profile.get("startOpacity"),
+            "middleR": profile.get("middleR"),
+            "middleG": profile.get("middleG"),
+            "middleB": profile.get("middleB"),
+            "middleOpacity": profile.get("middleOpacity"),
+            "endR": profile.get("endR"),
+            "endG": profile.get("endG"),
+            "endB": profile.get("endB"),
+            "endOpacity": profile.get("endOpacity"),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.color_profiles.insert_one(profile_doc)
+        return {"success": True, "message": "Color profile saved successfully"}
+    except Exception as e:
+        logging.error(f"Error saving color profile: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to save color profile")
+
+# Delete color profile
+@api_router.delete("/color-profiles/{profile_id}")
+async def delete_color_profile(profile_id: str):
+    try:
+        result = await db.color_profiles.delete_one({"id": profile_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Color profile not found")
+        return {"success": True, "message": "Color profile deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting color profile: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete color profile")
+
+# ============= BLOG FEATURE SETTINGS =============
 # Get blog feature settings
 @api_router.get("/blog-features")
 async def get_blog_features():
