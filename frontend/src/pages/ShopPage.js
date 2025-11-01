@@ -98,6 +98,18 @@ const ShopPage = () => {
 
   const handleCheckout = async () => {
     try {
+      // Get logged-in user email if available
+      let customerEmail = "guest@apebrain.cloud";
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        try {
+          const user = JSON.parse(userData);
+          customerEmail = user.email;
+        } catch (e) {
+          console.error('Error parsing user data:', e);
+        }
+      }
+
       // Prepare order data
       const orderData = {
         items: cart.map(item => ({
@@ -108,7 +120,7 @@ const ShopPage = () => {
           product_type: item.type || 'physical'
         })),
         total: parseFloat(getCartTotal()),
-        customer_email: "customer@example.com"  // You can add email input field later
+        customer_email: customerEmail
       };
 
       // Add coupon code if applied
