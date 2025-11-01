@@ -389,15 +389,18 @@ backend:
 
   - task: "Order management - update tracking info"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "PUT /api/orders/{order_id}/tracking endpoint adds tracking number and carrier (DHL default), generates tracking URL, sends email to customer."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Update order tracking endpoint working correctly. Successfully updated tracking info with DHL tracking number, generated proper DHL tracking URL (https://www.dhl.de/de/privatkunden/pakete-empfangen/verfolgen.html?piececode=DHL123456789), and updated order status to 'shipped'. Tracking URL generation functional."
 
   - task: "Order management - unread orders count"
     implemented: true
