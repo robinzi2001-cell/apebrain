@@ -422,7 +422,11 @@ const AdminSettings = () => {
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => e.target.files[0] && handleGalleryImageUpload('minigames', e.target.files[0])}
+                    multiple
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files);
+                      files.forEach(file => handleGalleryImageUpload('minigames', file));
+                    }}
                     style={{ marginTop: '0.5rem' }}
                   />
                   <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
