@@ -747,15 +747,18 @@ frontend:
 
   - task: "Admin login page"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/AdminLogin.js"
     stuck_count: 0
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Admin login form that calls /api/admin/login and stores auth token."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Admin login working perfectly. Successfully authenticated with credentials (admin/apebrain2024) and redirected to dashboard. Login form functional, authentication flow working correctly. Admin access control operational."
 
   - task: "Coupon display on shop"
     implemented: true
