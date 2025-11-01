@@ -842,15 +842,16 @@ async def create_shop_order(order: CreateOrder):
             try:
                 coupon = await db.coupons.find_one({"code": order.coupon_code.upper(), "is_active": True}, {"_id": 0})
                 if coupon:
-                    subtotal = order.total
+                    # Calculate discount based on original item prices
+                    original_subtotal = sum(item.price * item.quantity for item in order.items)
                     if coupon['discount_type'] == 'percentage':
-                        discount_amount = (subtotal * coupon['discount_value']) / 100
+                        discount_amount = (original_subtotal * coupon['discount_value']) / 100
                         discount_percentage = coupon['discount_value'] / 100
                     else:
                         discount_amount = coupon['discount_value']
                     
-                    # Apply discount
-                    order.total = max(0, order.total - discount_amount)
+                    # The order.total should already be the discounted total from frontend
+                    # Don't apply discount again here - just store the discount info
             except Exception as e:
                 logging.warning(f"Could not apply coupon: {str(e)}")
         
