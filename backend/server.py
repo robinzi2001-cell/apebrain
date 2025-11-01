@@ -372,6 +372,10 @@ class CouponUpdate(BaseModel):
     is_active: Optional[bool] = None
     expires_at: Optional[datetime] = None
 
+class CouponValidate(BaseModel):
+    code: str
+    order_total: float
+
 class GenerateResponse(BaseModel):
     title: str
     content: str
