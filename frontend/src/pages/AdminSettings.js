@@ -570,6 +570,75 @@ const AdminSettings = () => {
           <div style={{ marginTop: '2rem', marginBottom: '1.5rem' }}>
             <h3 style={{ color: '#3a4520', marginBottom: '1rem' }}>🎨 Karten Hintergrundfarbe (ohne Bilder)</h3>
             
+            {/* Profile Management */}
+            <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#fff3cd', borderRadius: '8px', border: '1px solid #ffc107' }}>
+              <h4 style={{ color: '#856404', marginBottom: '0.75rem' }}>💾 Farbprofile</h4>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <select
+                  value={selectedProfile}
+                  onChange={(e) => {
+                    setSelectedProfile(e.target.value);
+                    if (e.target.value) loadColorProfile(e.target.value);
+                  }}
+                  style={{ 
+                    padding: '0.5rem', 
+                    borderRadius: '6px', 
+                    border: '1px solid #d1d5db',
+                    backgroundColor: '#fff'
+                  }}
+                >
+                  <option value="">-- Profil laden --</option>
+                  {colorProfiles.map(profile => (
+                    <option key={profile.id} value={profile.id}>{profile.name}</option>
+                  ))}
+                </select>
+                
+                {selectedProfile && (
+                  <button
+                    onClick={() => deleteColorProfile(selectedProfile)}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      borderRadius: '6px',
+                      border: 'none',
+                      backgroundColor: '#dc3545',
+                      color: '#fff',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    🗑️ Löschen
+                  </button>
+                )}
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.5rem' }}>
+                <input
+                  type="text"
+                  value={newProfileName}
+                  onChange={(e) => setNewProfileName(e.target.value)}
+                  placeholder="Neuer Profil-Name (z.B. 'Sunset Purple')"
+                  style={{
+                    padding: '0.5rem',
+                    borderRadius: '6px',
+                    border: '1px solid #d1d5db'
+                  }}
+                />
+                <button
+                  onClick={saveColorProfile}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    borderRadius: '6px',
+                    border: 'none',
+                    backgroundColor: '#28a745',
+                    color: '#fff',
+                    cursor: 'pointer'
+                  }}
+                >
+                  💾 Speichern
+                </button>
+              </div>
+            </div>
+
             {/* Start Color */}
             <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
               <h4 style={{ color: '#7a9053', marginBottom: '0.75rem' }}>Startfarbe (Oben)</h4>
