@@ -299,7 +299,7 @@ backend:
 
   - task: "PayPal order creation"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 1
     priority: "critical"
@@ -314,6 +314,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "❌ CRITICAL ISSUE - Comprehensive PayPal checkout testing revealed major issue with coupon integration. SCENARIO 1 (without coupon): ✅ SUCCESS - Order created ($69.00), PayPal sandbox URL generated, MongoDB storage working. SCENARIO 2 (with WELCOME10 coupon): ❌ FAILED - PayPal validation error 'Item amount must add up to specified amount subtotal'. Root cause: PayPal REST API rejects negative price items for discounts. Current implementation adds discount as separate item with negative price (-$6.90) which PayPal doesn't accept. Solution needed: Adjust item prices directly instead of adding separate discount item. Coupon validation works correctly (10% of $69 = $6.90), but PayPal payment creation fails."
+      - working: true
+        agent: "testing"
+        comment: "✅ FIXED & VERIFIED - PayPal coupon integration now working perfectly! Fixed critical double-discount bug where discount was applied both to order total AND item prices. Root cause: Backend was applying discount twice - once to order.total and again when adjusting item prices for PayPal. Solution: Removed duplicate discount application, now only adjusts item prices while preserving correct order total. COMPREHENSIVE RE-TEST RESULTS: 1) ✅ WELCOME10 coupon validation (10% of $69 = $6.90), 2) ✅ PayPal order creation WITH coupon (item price adjusted to $62.10, total $62.10, PayPal accepts), 3) ✅ PayPal order creation WITHOUT coupon (baseline $69.00), 4) ✅ MongoDB storage with coupon details, 5) ✅ All PayPal sandbox URLs generated correctly. PayPal coupon checkout flow fully functional - critical fix verified!"
 
   - task: "PayPal payment execution"
     implemented: true
