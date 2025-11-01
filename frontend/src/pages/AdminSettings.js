@@ -67,6 +67,9 @@ const AdminSettings = () => {
       setBlogGalleryImages(response.data.blog_gallery_images || []);
       setShopGalleryImages(response.data.shop_gallery_images || []);
       setMinigamesGalleryImages(response.data.minigames_gallery_images || []);
+      setCardBgColorStart(response.data.card_bg_color_start || 'rgba(167, 139, 250, 0.15)');
+      setCardBgColorMiddle(response.data.card_bg_color_middle || 'rgba(139, 92, 246, 0.12)');
+      setCardBgColorEnd(response.data.card_bg_color_end || 'rgba(124, 58, 237, 0.15)');
     } catch (error) {
       console.error('Error fetching landing settings:', error);
     }
