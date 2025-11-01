@@ -762,15 +762,18 @@ frontend:
 
   - task: "Coupon display on shop"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/components/FloatingCoupon.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Animated floating coupon display component shows active coupons on shop page. Removed from blog pages."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - FloatingCoupon component working correctly. Visible on shop page displaying 'WELCOME10 10% OFF' banner. Component properly shows active coupons to users. Coupon display functionality operational."
 
 metadata:
   created_by: "main_agent"
