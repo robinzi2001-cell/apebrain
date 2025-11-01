@@ -430,7 +430,7 @@ async def update_admin_settings(settings: AdminSettingsUpdate):
     
     return {"success": True, "message": "Settings updated successfully"}
 
-# Get landing page settings (button visibility)
+# Get landing page settings (button visibility + gallery)
 @api_router.get("/landing-settings")
 async def get_landing_settings():
     try:
@@ -440,8 +440,28 @@ async def get_landing_settings():
             return {
                 "show_blog": True,
                 "show_shop": True,
-                "show_minigames": True
+                "show_minigames": True,
+                "blog_gallery_mode": "none",
+                "shop_gallery_mode": "none",
+                "minigames_gallery_mode": "none",
+                "blog_gallery_images": [],
+                "shop_gallery_images": [],
+                "minigames_gallery_images": []
             }
+        
+        # If gallery mode is "auto", fetch images from database
+        if settings.get("blog_gallery_mode") == "auto":
+            blogs = await db.blogs.find({"status": "published"}, {"_id": 0, "image_urls": 1}).limit(3).to_list(length=3)
+            auto_images = []
+            for blog in blogs:
+                if blog.get("image_urls"):
+                    auto_images.extend(blog["image_urls"][:1])  # Take first image from each blog
+            settings["blog_gallery_images"] = auto_images[:3]  # Max 3 images
+        
+        if settings.get("shop_gallery_mode") == "auto":
+            products = await db.products.find({"image_url": {"$exists": True}}, {"_id": 0, "image_url": 1}).limit(3).to_list(length=3)
+            settings["shop_gallery_images"] = [p["image_url"] for p in products if p.get("image_url")][:3]
+        
         return settings
     except Exception as e:
         logging.error(f"Error fetching landing settings: {str(e)}")
@@ -449,10 +469,16 @@ async def get_landing_settings():
         return {
             "show_blog": True,
             "show_shop": True,
-            "show_minigames": True
+            "show_minigames": True,
+            "blog_gallery_mode": "none",
+            "shop_gallery_mode": "none",
+            "minigames_gallery_mode": "none",
+            "blog_gallery_images": [],
+            "shop_gallery_images": [],
+            "minigames_gallery_images": []
         }
 
-# Update landing page settings (button visibility)
+# Update landing page settings (button visibility + gallery)
 @api_router.post("/landing-settings")
 async def update_landing_settings(settings: dict):
     try:
@@ -460,7 +486,13 @@ async def update_landing_settings(settings: dict):
             "type": "landing_page",
             "show_blog": settings.get("show_blog", True),
             "show_shop": settings.get("show_shop", True),
-            "show_minigames": settings.get("show_minigames", True)
+            "show_minigames": settings.get("show_minigames", True),
+            "blog_gallery_mode": settings.get("blog_gallery_mode", "none"),
+            "shop_gallery_mode": settings.get("shop_gallery_mode", "none"),
+            "minigames_gallery_mode": settings.get("minigames_gallery_mode", "none"),
+            "blog_gallery_images": settings.get("blog_gallery_images", []),
+            "shop_gallery_images": settings.get("shop_gallery_images", []),
+            "minigames_gallery_images": settings.get("minigames_gallery_images", [])
         }
         
         await db.settings.update_one(
@@ -473,6 +505,56 @@ async def update_landing_settings(settings: dict):
     except Exception as e:
         logging.error(f"Error updating landing settings: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to update landing settings")
+
+# Upload gallery image for landing page button
+@api_router.post("/landing-settings/upload-gallery-image/{section}")
+async def upload_landing_gallery_image(section: str, file: UploadFile = File(...)):
+    try:
+        if section not in ["blog", "shop", "minigames"]:
+            raise HTTPException(status_code=400, detail="Invalid section. Must be 'blog', 'shop', or 'minigames'")
+        
+        # Read and encode image
+        contents = await file.read()
+        base64_image = base64.b64encode(contents).decode()
+        image_url = f"data:{file.content_type};base64,{base64_image}"
+        
+        # Get current settings
+        settings = await db.settings.find_one({"type": "landing_page"})
+        if not settings:
+            settings = {
+                "type": "landing_page",
+                "blog_gallery_images": [],
+                "shop_gallery_images": [],
+                "minigames_gallery_images": []
+            }
+        
+        # Add image to appropriate array
+        field_name = f"{section}_gallery_images"
+        if field_name not in settings:
+            settings[field_name] = []
+        
+        settings[field_name].append(image_url)
+        
+        # Limit to 3 images per section
+        settings[field_name] = settings[field_name][-3:]
+        
+        # Update database
+        await db.settings.update_one(
+            {"type": "landing_page"},
+            {"$set": {field_name: settings[field_name]}},
+            upsert=True
+        )
+        
+        return {
+            "success": True,
+            "image_url": image_url,
+            "message": f"Gallery image uploaded for {section}"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error uploading gallery image: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to upload gallery image: {str(e)}")
 
 # Get blog feature settings
 @api_router.get("/blog-features")
