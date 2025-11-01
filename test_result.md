@@ -663,15 +663,18 @@ frontend:
 
   - task: "Admin dashboard with unread badge"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/AdminDashboard.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Admin dashboard displays navigation cards. Orders card shows unread count badge fetched from /api/orders/unviewed/count."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Admin dashboard accessible after login. Successfully redirected to dashboard after authentication. Dashboard loads correctly with admin navigation interface. Unread badge functionality integrated with backend API."
 
   - task: "Admin products page"
     implemented: true
