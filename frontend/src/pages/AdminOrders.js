@@ -173,13 +173,19 @@ const AdminOrders = () => {
             onClick={() => setFilter('completed')}
             className={filter === 'completed' ? 'btn btn-primary' : 'btn btn-secondary'}
           >
-            Abgeschlossen ({orders.filter(o => o.status === 'completed' || o.status === 'paid').length})
+            Abgeschlossen ({orders.filter(o => o.status === 'delivered').length})
           </button>
           <button
             onClick={() => setFilter('pending')}
             className={filter === 'pending' ? 'btn btn-primary' : 'btn btn-secondary'}
           >
             Ausstehend ({orders.filter(o => o.status === 'pending').length})
+          </button>
+          <button
+            onClick={() => setFilter('active')}
+            className={filter === 'active' ? 'btn btn-primary' : 'btn btn-secondary'}
+          >
+            In Bearbeitung ({orders.filter(o => ['paid', 'packed', 'shipped', 'in_transit'].includes(o.status)).length})
           </button>
         </div>
 
