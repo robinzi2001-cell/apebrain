@@ -23,6 +23,11 @@ const AdminSettings = () => {
   const [shopGalleryImages, setShopGalleryImages] = useState([]);
   const [minigamesGalleryImages, setMinigamesGalleryImages] = useState([]);
   
+  // Background color settings
+  const [cardBgColorStart, setCardBgColorStart] = useState('rgba(167, 139, 250, 0.15)');
+  const [cardBgColorMiddle, setCardBgColorMiddle] = useState('rgba(139, 92, 246, 0.12)');
+  const [cardBgColorEnd, setCardBgColorEnd] = useState('rgba(124, 58, 237, 0.15)');
+  
   const [enableVideo, setEnableVideo] = useState(true);
   const [enableAudio, setEnableAudio] = useState(true);
   const [enableTextToSpeech, setEnableTextToSpeech] = useState(true);
