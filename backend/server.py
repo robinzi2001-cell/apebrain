@@ -498,7 +498,10 @@ async def update_landing_settings(settings: dict):
             "minigames_gallery_mode": settings.get("minigames_gallery_mode", "none"),
             "blog_gallery_images": settings.get("blog_gallery_images", []),
             "shop_gallery_images": settings.get("shop_gallery_images", []),
-            "minigames_gallery_images": settings.get("minigames_gallery_images", [])
+            "minigames_gallery_images": settings.get("minigames_gallery_images", []),
+            "card_bg_color_start": settings.get("card_bg_color_start", "rgba(167, 139, 250, 0.15)"),
+            "card_bg_color_middle": settings.get("card_bg_color_middle", "rgba(139, 92, 246, 0.12)"),
+            "card_bg_color_end": settings.get("card_bg_color_end", "rgba(124, 58, 237, 0.15)")
         }
         
         await db.settings.update_one(
