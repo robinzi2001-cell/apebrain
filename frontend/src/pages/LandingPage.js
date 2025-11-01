@@ -224,27 +224,19 @@ const LandingPage = () => {
           backdrop-filter: blur(2px);
         }
 
-        /* Purple background for cards without images - Subtiler & Schöner */
-        .purple-background {
+        /* Custom background for cards without images - Dynamic from settings */
+        .custom-background {
           position: absolute;
           top: 0;
           left: 0;
           right: 0;
           bottom: 0;
-          background: linear-gradient(135deg, 
-            rgba(167, 139, 250, 0.15) 0%,     /* Soft Violet - sanft */
-            rgba(139, 92, 246, 0.12) 50%,     /* Purple 500 - subtil */
-            rgba(124, 58, 237, 0.15) 100%     /* Purple 600 - elegant */
-          );
           z-index: 0;
+          transition: all 0.3s ease;
         }
 
-        .landing-gallery-card:hover .purple-background {
-          background: linear-gradient(135deg, 
-            rgba(167, 139, 250, 0.25) 0%,
-            rgba(139, 92, 246, 0.22) 50%,
-            rgba(124, 58, 237, 0.25) 100%
-          );
+        .landing-gallery-card:hover .custom-background {
+          filter: brightness(1.15);
         }
 
         .gallery-card-content {
