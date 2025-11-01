@@ -19,6 +19,9 @@ import AdminProducts from '@/pages/AdminProducts';
 import AdminOrders from '@/pages/AdminOrders';
 import CreateBlog from '@/pages/CreateBlog';
 import EditBlog from '@/pages/EditBlog';
+import Login from '@/pages/Login';
+import Register from '@/pages/Register';
+import Dashboard from '@/pages/Dashboard';
 
 function App() {
   return (
@@ -35,6 +38,9 @@ function App() {
           <Route path="/impressum" element={<Impressum />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/shroomsadmin" element={<AdminLogin />} />
           <Route path="/shroomsadmin/dashboard" element={<AdminDashboard />} />
           <Route path="/shroomsadmin/settings" element={<AdminSettings />} />
