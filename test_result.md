@@ -374,15 +374,18 @@ backend:
 
   - task: "Order management - update order status"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "PUT /api/orders/{order_id}/status endpoint updates order status (paid, packed, shipped, in_transit, delivered, cancelled) and sends email notification to customer."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Update order status endpoint working correctly. Successfully updated order status to 'paid' with proper success response. Status validation and database update functional. Email notifications triggered (SMTP config dependent)."
 
   - task: "Order management - update tracking info"
     implemented: true
