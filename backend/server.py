@@ -837,6 +837,7 @@ async def create_shop_order(order: CreateOrder):
         
         # Validate and apply coupon if provided
         discount_amount = 0.0
+        discount_percentage = 0.0
         if order.coupon_code:
             try:
                 coupon = await db.coupons.find_one({"code": order.coupon_code.upper(), "is_active": True}, {"_id": 0})
@@ -844,6 +845,7 @@ async def create_shop_order(order: CreateOrder):
                     subtotal = order.total
                     if coupon['discount_type'] == 'percentage':
                         discount_amount = (subtotal * coupon['discount_value']) / 100
+                        discount_percentage = coupon['discount_value'] / 100
                     else:
                         discount_amount = coupon['discount_value']
                     
@@ -852,25 +854,27 @@ async def create_shop_order(order: CreateOrder):
             except Exception as e:
                 logging.warning(f"Could not apply coupon: {str(e)}")
         
-        # Create PayPal payment
-        items_list = [
-            {
+        # Create PayPal payment with adjusted item prices if discount applied
+        items_list = []
+        for item in order.items:
+            # Calculate adjusted price per item if discount applied
+            item_price = item.price
+            if discount_percentage > 0:
+                # Apply percentage discount to each item
+                item_price = item.price * (1 - discount_percentage)
+            elif discount_amount > 0 and len(order.items) > 0:
+                # For fixed discount, distribute proportionally across items
+                item_total = sum(i.price * i.quantity for i in order.items)
+                item_discount_ratio = (item.price * item.quantity) / item_total
+                item_discount = discount_amount * item_discount_ratio
+                item_price = (item.price * item.quantity - item_discount) / item.quantity
+            
+            items_list.append({
                 "name": item.name,
                 "sku": item.product_id,
-                "price": f"{item.price:.2f}",
+                "price": f"{item_price:.2f}",
                 "currency": "USD",
                 "quantity": item.quantity
-            } for item in order.items
-        ]
-        
-        # Add discount as a separate item if coupon applied
-        if discount_amount > 0:
-            items_list.append({
-                "name": f"Discount ({order.coupon_code})",
-                "sku": "DISCOUNT",
-                "price": f"-{discount_amount:.2f}",
-                "currency": "USD",
-                "quantity": 1
             })
         
         payment = paypalrestsdk.Payment({
