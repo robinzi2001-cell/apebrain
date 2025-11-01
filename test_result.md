@@ -564,15 +564,18 @@ frontend:
 
   - task: "Landing page with conditional buttons"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/LandingPage.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Landing page fetches settings and conditionally displays Blog, Shop, and Minigames buttons based on admin configuration."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Landing page working perfectly. All conditional buttons (Blog, Shop, Minigames) are visible and functional. Navigation to shop page successful. Landing page loads correctly with proper conditional rendering based on backend settings."
 
   - task: "Blog homepage display"
     implemented: true
