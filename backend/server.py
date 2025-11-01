@@ -771,6 +771,134 @@ async def reset_password(reset_data: PasswordReset):
         logging.error(f"Error resetting password: {str(e)}")
         raise HTTPException(status_code=500, detail="Password reset failed")
 
+# Google OAuth Login (Emergent)
+@api_router.get("/auth/google/login")
+async def google_login():
+    try:
+        emergent_key = os.environ.get('EMERGENT_LLM_KEY')
+        if not emergent_key:
+            raise HTTPException(status_code=500, detail="Emergent key not configured")
+        
+        session = EmergentSession(emergent_key)
+        redirect_url = session.get_google_auth_url(
+            redirect_uri=f"{os.environ.get('FRONTEND_URL', 'http://localhost:3000')}/auth/google/callback"
+        )
+        
+        return {"auth_url": redirect_url}
+    except Exception as e:
+        logging.error(f"Error initiating Google OAuth: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to initiate Google login")
+
+# Google OAuth Callback
+@api_router.post("/auth/google/callback")
+async def google_callback(callback_data: dict):
+    try:
+        emergent_key = os.environ.get('EMERGENT_LLM_KEY')
+        code = callback_data.get('code')
+        
+        if not code:
+            raise HTTPException(status_code=400, detail="Authorization code missing")
+        
+        session = EmergentSession(emergent_key)
+        google_user = session.complete_google_auth(
+            code=code,
+            redirect_uri=f"{os.environ.get('FRONTEND_URL', 'http://localhost:3000')}/auth/google/callback"
+        )
+        
+        # Check if user exists
+        user = await db.users.find_one({"google_id": google_user['id']})
+        
+        if not user:
+            # Create new user with Google account
+            user_doc = {
+                "id": str(uuid.uuid4()),
+                "email": google_user['email'],
+                "hashed_password": "",  # No password for OAuth users
+                "first_name": google_user.get('given_name'),
+                "last_name": google_user.get('family_name'),
+                "auth_provider": "google",
+                "google_id": google_user['id'],
+                "is_member": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "last_login": datetime.now(timezone.utc).isoformat()
+            }
+            
+            await db.users.insert_one(user_doc)
+            
+            # Send registration notification to admin
+            try:
+                smtp_host = os.environ.get('SMTP_HOST')
+                smtp_port = int(os.environ.get('SMTP_PORT', 587))
+                smtp_user = os.environ.get('SMTP_USER')
+                smtp_password = os.environ.get('SMTP_PASSWORD')
+                admin_email = os.environ.get('SMTP_USER')
+                
+                message = MIMEMultipart("alternative")
+                message["Subject"] = "🎉 Neue Google-Registrierung - ApeBrain.cloud"
+                message["From"] = smtp_user
+                message["To"] = admin_email
+                
+                html_content = f"""
+                <html>
+                <body style="font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px;">
+                    <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; padding: 30px;">
+                        <h2 style="color: #7a9053;">🍄 Neue Google-Registrierung</h2>
+                        <p>Ein neuer Kunde hat sich über Google angemeldet!</p>
+                        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <p style="margin: 5px 0;"><strong>Email:</strong> {user_doc["email"]}</p>
+                            <p style="margin: 5px 0;"><strong>Name:</strong> {user_doc.get("first_name", "")} {user_doc.get("last_name", "")}</p>
+                            <p style="margin: 5px 0;"><strong>Auth Provider:</strong> Google</p>
+                            <p style="margin: 5px 0;"><strong>Registriert am:</strong> {datetime.now(timezone.utc).strftime("%d.%m.%Y %H:%M")} UTC</p>
+                        </div>
+                        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+                        <p style="color: #9ca3af; font-size: 0.8rem;">ApeBrain.cloud Admin Notification</p>
+                    </div>
+                </body>
+                </html>
+                """
+                
+                message.attach(MIMEText(html_content, "html"))
+                
+                await aiosmtplib.send(
+                    message,
+                    hostname=smtp_host,
+                    port=smtp_port,
+                    username=smtp_user,
+                    password=smtp_password,
+                    start_tls=True
+                )
+            except Exception as email_error:
+                logging.error(f"Failed to send Google registration notification: {str(email_error)}")
+            
+            user = user_doc
+        else:
+            # Update last login
+            await db.users.update_one(
+                {"id": user["id"]},
+                {"$set": {"last_login": datetime.now(timezone.utc).isoformat()}}
+            )
+        
+        # Create access token
+        access_token = create_access_token(data={"sub": user["id"]})
+        
+        return {
+            "success": True,
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": {
+                "id": user["id"],
+                "email": user["email"],
+                "first_name": user.get("first_name"),
+                "last_name": user.get("last_name"),
+                "is_member": user.get("is_member", True)
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error completing Google OAuth: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to complete Google login")
+
 # Get landing page settings (button visibility + gallery)
 @api_router.get("/landing-settings")
 async def get_landing_settings():
