@@ -120,6 +120,8 @@ const AdminOrders = () => {
     ? orders.filter(order => order.status === 'delivered')
     : filter === 'pending'
     ? orders.filter(order => order.status === 'pending')
+    : filter === 'active'
+    ? orders.filter(order => ['paid', 'packed', 'shipped', 'in_transit'].includes(order.status))
     : orders;
 
   // Prevent rendering if not authenticated
