@@ -61,13 +61,13 @@ class MushroomBlogAPITester:
             return False, {}
 
     def test_admin_login_valid(self):
-        """Test admin login with valid password"""
+        """Test admin login with valid credentials"""
         success, response = self.run_test(
-            "Admin Login (Valid Password)",
+            "Admin Login (Valid Credentials)",
             "POST",
             "admin/login",
             200,
-            data={"password": "apebrain2024"}
+            data={"username": "admin", "password": "apebrain2024"}
         )
         return success and response.get('success') == True
 
