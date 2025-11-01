@@ -1374,17 +1374,12 @@ class MushroomBlogAPITester:
             print("❌ Cannot test order tracking update - no order ID available")
             return False
         
-        tracking_data = {
-            "tracking_number": "DHL123456789",
-            "shipping_carrier": "DHL"
-        }
-        
+        # The endpoint expects tracking_number and shipping_carrier as query parameters
         success, response = self.run_test(
             "Update Order Tracking Info",
             "PUT",
-            f"orders/{self.test_order_id}/tracking",
-            200,
-            data=tracking_data
+            f"orders/{self.test_order_id}/tracking?tracking_number=DHL123456789&shipping_carrier=DHL",
+            200
         )
         
         if success and response.get('success'):
