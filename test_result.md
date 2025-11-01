@@ -511,6 +511,198 @@ frontend:
         agent: "main"
         comment: "Fixed security issue where admin pages could be accessed by pasting URL directly. Added authentication guard (return null) before render in all admin pages: AdminDashboard, AdminProducts, AdminCoupons, AdminSettings, CreateBlog, EditBlog. Pages now redirect to login and show no content if not authenticated."
 
+  - task: "Landing page with conditional buttons"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/LandingPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Landing page fetches settings and conditionally displays Blog, Shop, and Minigames buttons based on admin configuration."
+
+  - task: "Blog homepage display"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/BlogHomePage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Public blog homepage that lists all published blogs with Instagram icon in navigation."
+
+  - task: "Blog page with multimedia display"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/BlogPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Individual blog page displays content with YouTube video embed, audio player, and Pexels images distributed throughout content. Text-to-speech feature was removed."
+
+  - task: "Shop page with products and cart"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/ShopPage.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Shop page fetches products from backend, displays with images, shopping cart functionality, coupon input field, and PayPal checkout button."
+
+  - task: "PayPal checkout integration"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/ShopPage.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "handleCheckout function calls /api/shop/create-order and redirects to PayPal approval URL."
+
+  - task: "Payment success page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/PaymentSuccess.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Handles PayPal callback, executes payment via /api/shop/execute-payment. Fixed useEffect double-call issue with ref."
+
+  - task: "Payment cancel page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/PaymentCancel.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Displays cancellation message when user cancels PayPal payment."
+
+  - task: "Admin dashboard with unread badge"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Admin dashboard displays navigation cards. Orders card shows unread count badge fetched from /api/orders/unviewed/count."
+
+  - task: "Admin products page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminProducts.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Complete product management: create, edit, delete products with image upload functionality and preview."
+
+  - task: "Admin create blog page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/CreateBlog.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Blog creation form with AI generation option, video URL field, audio file upload, and 'Get picture from web' checkbox for Pexels integration."
+
+  - task: "Admin edit blog page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/EditBlog.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Blog editing page with all multimedia fields."
+
+  - task: "Admin orders page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminOrders.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Order management page: list all orders, view details, delete orders, update status with dropdown, add tracking info. Includes filter functionality."
+
+  - task: "Admin coupons page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminCoupons.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Coupon management: create, edit, delete coupons with code, discount, type, and active status."
+
+  - task: "Admin settings page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminSettings.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Admin settings for Instagram URL, landing page button toggles (Blog, Shop, Minigames), and blog feature toggles (Video, Audio)."
+
+  - task: "Admin login page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminLogin.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Admin login form that calls /api/admin/login and stores auth token."
+
+  - task: "Coupon display on shop"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/FloatingCoupon.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Animated floating coupon display component shows active coupons on shop page. Removed from blog pages."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
