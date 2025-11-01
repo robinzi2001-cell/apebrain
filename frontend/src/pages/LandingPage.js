@@ -214,7 +214,7 @@ const LandingPage = () => {
           backdrop-filter: blur(2px);
         }
 
-        /* Purple background for cards without images */
+        /* Purple background for cards without images - Subtiler & Schöner */
         .purple-background {
           position: absolute;
           top: 0;
@@ -222,18 +222,18 @@ const LandingPage = () => {
           right: 0;
           bottom: 0;
           background: linear-gradient(135deg, 
-            rgba(147, 112, 219, 0.25) 0%,    /* Medium Purple - Vertrauen */
-            rgba(138, 43, 226, 0.2) 50%,      /* Blue Violet - Interesse */
-            rgba(123, 104, 238, 0.25) 100%    /* Medium Slate Blue - Beruhigung */
+            rgba(167, 139, 250, 0.15) 0%,     /* Soft Violet - sanft */
+            rgba(139, 92, 246, 0.12) 50%,     /* Purple 500 - subtil */
+            rgba(124, 58, 237, 0.15) 100%     /* Purple 600 - elegant */
           );
           z-index: 0;
         }
 
         .landing-gallery-card:hover .purple-background {
           background: linear-gradient(135deg, 
-            rgba(147, 112, 219, 0.35) 0%,
-            rgba(138, 43, 226, 0.3) 50%,
-            rgba(123, 104, 238, 0.35) 100%
+            rgba(167, 139, 250, 0.25) 0%,
+            rgba(139, 92, 246, 0.22) 50%,
+            rgba(124, 58, 237, 0.25) 100%
           );
         }
 
