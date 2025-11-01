@@ -239,15 +239,18 @@ backend:
 
   - task: "AI blog generation"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "POST /api/blogs/generate endpoint using Gemini Flash Lite to generate blog content from keywords."
+      - working: false
+        agent: "testing"
+        comment: "❌ FAILED - AI blog generation endpoint returns 200 but response structure is incomplete. Missing 'image_base64' field in response. Generated title and content successfully but no image generation. This breaks the blog creation workflow as tests expect image_base64 field."
 
   - task: "Blog CRUD operations"
     implemented: true
