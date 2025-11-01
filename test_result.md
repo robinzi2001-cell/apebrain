@@ -483,6 +483,90 @@ backend:
         agent: "testing"
         comment: "✅ PASSED - Admin delivery notification implemented correctly. Dedicated function send_admin_delivery_notification() with proper HTML template and German language. Triggered correctly when order status changes to 'delivered' in update_order_status endpoint. Completion notification system functional."
 
+  - task: "Customer user registration"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Customer registration working perfectly. POST /api/auth/register accepts email, password, first_name, last_name. Returns success=true, access_token (JWT), token_type=bearer, and user object. Proper validation: duplicate email returns 400 error. Passwords are hashed with bcrypt. User saved in MongoDB with correct structure. JWT tokens are valid and properly formatted."
+
+  - task: "Customer user login"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Customer login working perfectly. POST /api/auth/login validates email/password, returns JWT access_token and user data. Proper error handling: invalid password returns 401, non-existent email returns 401. Updates last_login timestamp in MongoDB. Session persistence via JWT tokens working correctly."
+
+  - task: "Customer protected routes - get user info"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Protected route GET /api/auth/me working perfectly. Requires Bearer token in Authorization header. Returns user data without password fields (security verified). Invalid token returns 401, missing token returns 403. JWT validation working correctly with proper error handling."
+
+  - task: "Customer protected routes - get user orders"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Protected route GET /api/auth/orders working perfectly. Requires Bearer token, returns orders array filtered by customer_email matching user's email. Returns empty array for new users. Invalid token returns 401. User-specific order filtering working correctly."
+
+  - task: "Customer password reset flow"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Password reset flow working correctly. POST /api/auth/password-reset-request generates reset token, saves to database, sends email with reset link. Secure handling: returns same message for existing and non-existent emails (security feature). Reset tokens have 1-hour expiration. Email notifications configured and functional."
+
+  - task: "Customer registration email notifications"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Registration email notifications working. Admin receives notification email when new customer registers. SMTP configuration verified in backend logs. Email templates properly formatted with customer details. Email system functional for both registration and password reset notifications."
+
+  - task: "Customer authentication security measures"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - All security measures working correctly. Passwords hashed with bcrypt (never stored plain). JWT tokens properly signed and validated. Protected routes require authentication. Duplicate email registration blocked. Invalid credentials return proper 401 errors. Password reset tokens expire after 1 hour. User data excludes sensitive fields in responses."
+
 frontend:
   - task: "Admin product image upload form"
     implemented: true
