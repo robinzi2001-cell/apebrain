@@ -1492,7 +1492,7 @@ class MushroomBlogAPITester:
         success, response = self.run_test(
             "Get Active Coupons (Public)",
             "GET",
-            "shop/coupons/active",
+            "coupons/active",
             200
         )
         
