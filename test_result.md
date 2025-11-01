@@ -284,15 +284,18 @@ backend:
 
   - task: "Admin settings (Instagram link)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "GET /api/admin/settings and POST /api/admin/settings for managing Instagram URL and other admin settings."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Admin settings endpoints working correctly. Successfully tested: 1) GET /api/admin/settings returns admin_username='admin', 2) POST /api/admin/settings updates settings successfully with proper password validation. Settings management functional."
 
   - task: "PayPal order creation"
     implemented: true
