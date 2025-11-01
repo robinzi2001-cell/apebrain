@@ -2341,6 +2341,7 @@ def main():
         
         return passed_tests, total_tests
 
+
 def main():
     """Main function to run PayPal coupon fix tests"""
     tester = MushroomBlogAPITester()
