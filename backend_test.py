@@ -1660,46 +1660,56 @@ def main():
     
     tester = MushroomBlogAPITester()
     
-    # Test sequence - Image Fetch Feature Tests (High Priority - Current Focus)
+    # Test sequence - Comprehensive Backend Testing (Priority Order)
     tests = [
-        # NEW PEXELS MULTIPLE IMAGE FETCH TESTS (HIGHEST PRIORITY - CURRENT FOCUS)
-        ("Fetch Multiple Images with Good Keywords", tester.test_fetch_multiple_images_good_keywords),
-        ("Fetch Multiple Images with Different Keywords", tester.test_fetch_multiple_images_different_keywords),
-        ("Fetch Images with Count Parameter", tester.test_fetch_images_with_count_parameter),
-        ("Fetch Images Quality Check", tester.test_fetch_images_quality_check),
-        ("Fetch Images Error Handling", tester.test_fetch_images_error_handling),
+        # CRITICAL PRIORITY - Authentication & Security
+        ("Admin Login (Valid)", tester.test_admin_login_valid),
+        ("Admin Login (Invalid)", tester.test_admin_login_invalid),
         
-        # Previous Image Fetch from Web Tests (for comparison)
-        ("Fetch Image with Good Keywords", tester.test_fetch_image_good_keywords),
-        ("Fetch Image with Different Keywords", tester.test_fetch_image_different_keywords),
-        ("Fetch Image with Empty Keywords", tester.test_fetch_image_empty_keywords),
-        ("Fetch Image Size Validation", tester.test_fetch_image_size_validation),
+        # CRITICAL PRIORITY - PayPal Integration
+        ("Create PayPal Order", tester.test_create_paypal_order),
+        ("Create Order with Coupon", tester.test_create_order_with_coupon),
         
-        # Blog Feature Settings Tests
-        ("Get Default Blog Features", tester.test_get_default_blog_features),
-        ("Save Blog Features", tester.test_save_blog_features),
-        ("Get Saved Blog Features", tester.test_get_saved_blog_features),
+        # HIGH PRIORITY - Order Management System
+        ("Get All Orders (Admin)", tester.test_get_all_orders),
+        ("Public Order Tracking", tester.test_get_single_order_tracking),
+        ("Mark Order as Viewed", tester.test_mark_order_viewed),
+        ("Get Unviewed Orders Count", tester.test_get_unviewed_orders_count),
+        ("Update Order Status", tester.test_update_order_status),
+        ("Update Order Tracking Info", tester.test_update_order_tracking),
+        ("Delete Order", tester.test_delete_order),
         
-        # Blog with Video URL Tests
-        ("Create Blog with Video URL", tester.test_create_blog_with_video_url),
-        ("Get Blog with Video URL", tester.test_get_blog_with_video_url),
+        # HIGH PRIORITY - Blog System with AI Generation
+        ("AI Blog Generation", tester.test_generate_blog),
+        ("Create Blog Post", tester.test_create_blog),
+        ("Get All Blogs", tester.test_get_blogs),
+        ("Get Blogs with Status Filter", tester.test_get_blogs_with_status_filter),
+        ("Get Single Blog", tester.test_get_single_blog),
+        ("Update Blog Post", tester.test_update_blog),
+        ("Publish Blog", tester.test_publish_blog),
+        ("Delete Blog", tester.test_delete_blog),
         
-        # Blog Audio Upload Tests
-        ("Upload Blog Audio", tester.test_upload_blog_audio),
-        ("Get Blog with Audio URL", tester.test_get_blog_with_audio_url),
-        ("Upload Audio to Non-existent Blog", tester.test_upload_audio_to_nonexistent_blog),
+        # HIGH PRIORITY - Coupon System
+        ("Create Coupon", tester.test_create_coupon),
+        ("Get All Coupons", tester.test_get_all_coupons),
+        ("Get Active Coupons (Public)", tester.test_get_active_coupons_public),
+        ("Validate Coupon", tester.test_validate_coupon),
+        ("Update Coupon", tester.test_update_coupon),
+        ("Delete Coupon", tester.test_delete_coupon),
         
-        # Cleanup
-        ("Delete Test Video Blog", tester.test_cleanup_test_video_blog),
-        
-        # Previous Tests (for completeness)
+        # MEDIUM PRIORITY - Settings Endpoints (Already tested but re-verify)
+        ("Get Admin Settings", tester.test_get_admin_settings),
+        ("Update Admin Settings", tester.test_update_admin_settings),
         ("Get Default Landing Settings", tester.test_get_default_landing_settings),
         ("Save Landing Settings", tester.test_save_landing_settings),
         ("Get Saved Landing Settings", tester.test_get_saved_landing_settings),
         ("Update Landing Settings", tester.test_update_landing_settings),
         ("Verify Updated Landing Settings", tester.test_verify_updated_landing_settings),
-        ("Admin Login (Valid)", tester.test_admin_login_valid),
-        ("Admin Login (Invalid)", tester.test_admin_login_invalid),
+        ("Get Default Blog Features", tester.test_get_default_blog_features),
+        ("Save Blog Features", tester.test_save_blog_features),
+        ("Get Saved Blog Features", tester.test_get_saved_blog_features),
+        
+        # FEATURES ALREADY TESTED (Quick re-verification)
         ("Get All Products", tester.test_get_products),
         ("Create Product", tester.test_create_product),
         ("Upload Product Image", tester.test_upload_product_image),
@@ -1707,12 +1717,25 @@ def main():
         ("Update Product", tester.test_update_product),
         ("Upload Image to Non-existent Product", tester.test_upload_image_to_nonexistent_product),
         ("Delete Product", tester.test_delete_product),
-        ("AI Blog Generation", tester.test_generate_blog),
-        ("Create Blog Post", tester.test_create_blog),
-        ("Get All Blogs", tester.test_get_blogs),
-        ("Get Single Blog", tester.test_get_single_blog),
-        ("Publish Blog", tester.test_publish_blog),
-        ("Delete Blog", tester.test_delete_blog),
+        
+        # Blog Multimedia Features
+        ("Create Blog with Video URL", tester.test_create_blog_with_video_url),
+        ("Get Blog with Video URL", tester.test_get_blog_with_video_url),
+        ("Upload Blog Audio", tester.test_upload_blog_audio),
+        ("Get Blog with Audio URL", tester.test_get_blog_with_audio_url),
+        ("Upload Audio to Non-existent Blog", tester.test_upload_audio_to_nonexistent_blog),
+        ("Delete Test Video Blog", tester.test_cleanup_test_video_blog),
+        
+        # Image Fetch Features
+        ("Fetch Multiple Images with Good Keywords", tester.test_fetch_multiple_images_good_keywords),
+        ("Fetch Multiple Images with Different Keywords", tester.test_fetch_multiple_images_different_keywords),
+        ("Fetch Images with Count Parameter", tester.test_fetch_images_with_count_parameter),
+        ("Fetch Images Quality Check", tester.test_fetch_images_quality_check),
+        ("Fetch Images Error Handling", tester.test_fetch_images_error_handling),
+        ("Fetch Image with Good Keywords", tester.test_fetch_image_good_keywords),
+        ("Fetch Image with Different Keywords", tester.test_fetch_image_different_keywords),
+        ("Fetch Image with Empty Keywords", tester.test_fetch_image_empty_keywords),
+        ("Fetch Image Size Validation", tester.test_fetch_image_size_validation),
     ]
     
     results = []
