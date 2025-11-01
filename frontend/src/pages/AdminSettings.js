@@ -332,6 +332,101 @@ const AdminSettings = () => {
             </label>
           </div>
 
+          {/* Gallery Settings for each button */}
+          <div style={{ marginTop: '2rem', marginBottom: '1.5rem' }}>
+            <h3 style={{ color: '#3a4520', marginBottom: '1rem' }}>Button Gallery Settings</h3>
+            
+            {/* Blog Gallery */}
+            <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+              <h4 style={{ color: '#7a9053', marginBottom: '0.5rem' }}>Blog Button Gallery</h4>
+              <select
+                value={blogGalleryMode}
+                onChange={(e) => setBlogGalleryMode(e.target.value)}
+                style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #d1d5db', marginBottom: '0.5rem', width: '100%' }}
+              >
+                <option value="none">No Images</option>
+                <option value="auto">Automatic (Latest Blog Images)</option>
+                <option value="custom">Custom Upload</option>
+              </select>
+              
+              {blogGalleryMode === 'custom' && (
+                <div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => e.target.files[0] && handleGalleryImageUpload('blog', e.target.files[0])}
+                    style={{ marginTop: '0.5rem' }}
+                  />
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                    {blogGalleryImages.map((img, idx) => (
+                      <img key={idx} src={img} alt={`Blog ${idx}`} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px' }} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Shop Gallery */}
+            <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+              <h4 style={{ color: '#7a9053', marginBottom: '0.5rem' }}>Shop Button Gallery</h4>
+              <select
+                value={shopGalleryMode}
+                onChange={(e) => setShopGalleryMode(e.target.value)}
+                style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #d1d5db', marginBottom: '0.5rem', width: '100%' }}
+              >
+                <option value="none">No Images</option>
+                <option value="auto">Automatic (Product Images)</option>
+                <option value="custom">Custom Upload</option>
+              </select>
+              
+              {shopGalleryMode === 'custom' && (
+                <div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => e.target.files[0] && handleGalleryImageUpload('shop', e.target.files[0])}
+                    style={{ marginTop: '0.5rem' }}
+                  />
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                    {shopGalleryImages.map((img, idx) => (
+                      <img key={idx} src={img} alt={`Shop ${idx}`} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px' }} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Minigames Gallery */}
+            <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+              <h4 style={{ color: '#7a9053', marginBottom: '0.5rem' }}>Minigames Button Gallery</h4>
+              <select
+                value={minigamesGalleryMode}
+                onChange={(e) => setMinigamesGalleryMode(e.target.value)}
+                style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #d1d5db', marginBottom: '0.5rem', width: '100%' }}
+              >
+                <option value="none">No Images</option>
+                <option value="auto">Automatic</option>
+                <option value="custom">Custom Upload</option>
+              </select>
+              
+              {minigamesGalleryMode === 'custom' && (
+                <div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => e.target.files[0] && handleGalleryImageUpload('minigames', e.target.files[0])}
+                    style={{ marginTop: '0.5rem' }}
+                  />
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                    {minigamesGalleryImages.map((img, idx) => (
+                      <img key={idx} src={img} alt={`Minigames ${idx}`} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px' }} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           <button
             onClick={handleLandingSettingsSave}
             className="btn btn-primary"
