@@ -14,6 +14,15 @@ const AdminSettings = () => {
   const [showBlog, setShowBlog] = useState(true);
   const [showShop, setShowShop] = useState(true);
   const [showMinigames, setShowMinigames] = useState(true);
+  
+  // Gallery settings
+  const [blogGalleryMode, setBlogGalleryMode] = useState('none');
+  const [shopGalleryMode, setShopGalleryMode] = useState('none');
+  const [minigamesGalleryMode, setMinigamesGalleryMode] = useState('none');
+  const [blogGalleryImages, setBlogGalleryImages] = useState([]);
+  const [shopGalleryImages, setShopGalleryImages] = useState([]);
+  const [minigamesGalleryImages, setMinigamesGalleryImages] = useState([]);
+  
   const [enableVideo, setEnableVideo] = useState(true);
   const [enableAudio, setEnableAudio] = useState(true);
   const [enableTextToSpeech, setEnableTextToSpeech] = useState(true);
