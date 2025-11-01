@@ -1336,14 +1336,14 @@ class MushroomBlogAPITester:
             return False
         
         success, response = self.run_test(
-            "Public Order Tracking",
+            "Get Single Order",
             "GET",
-            f"orders/track/{self.test_order_id}",
+            f"orders/{self.test_order_id}",
             200
         )
         
         if success and response.get('id') == self.test_order_id:
-            print(f"✅ Successfully tracked order: {self.test_order_id}")
+            print(f"✅ Successfully retrieved order: {self.test_order_id}")
             return True
         
         return False
