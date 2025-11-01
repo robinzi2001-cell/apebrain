@@ -526,6 +526,50 @@ async def register_customer(user_data: UserCreate):
         
         await db.users.insert_one(user_doc)
         
+        # Send notification email to admin
+        try:
+            smtp_host = os.environ.get('SMTP_HOST')
+            smtp_port = int(os.environ.get('SMTP_PORT', 587))
+            smtp_user = os.environ.get('SMTP_USER')
+            smtp_password = os.environ.get('SMTP_PASSWORD')
+            admin_email = os.environ.get('SMTP_USER')  # Admin email
+            
+            message = MIMEMultipart("alternative")
+            message["Subject"] = "🎉 Neue Registrierung - ApeBrain.cloud"
+            message["From"] = smtp_user
+            message["To"] = admin_email
+            
+            html_content = f"""
+            <html>
+            <body style="font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px;">
+                <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; padding: 30px;">
+                    <h2 style="color: #7a9053;">🍄 Neue Mitgliederregistrierung</h2>
+                    <p>Ein neuer Kunde hat sich registriert!</p>
+                    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                        <p style="margin: 5px 0;"><strong>Email:</strong> {user_doc["email"]}</p>
+                        <p style="margin: 5px 0;"><strong>Name:</strong> {user_doc.get("first_name", "")} {user_doc.get("last_name", "")}</p>
+                        <p style="margin: 5px 0;"><strong>Registriert am:</strong> {datetime.now(timezone.utc).strftime("%d.%m.%Y %H:%M")} UTC</p>
+                    </div>
+                    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+                    <p style="color: #9ca3af; font-size: 0.8rem;">ApeBrain.cloud Admin Notification</p>
+                </div>
+            </body>
+            </html>
+            """
+            
+            message.attach(MIMEText(html_content, "html"))
+            
+            await aiosmtplib.send(
+                message,
+                hostname=smtp_host,
+                port=smtp_port,
+                username=smtp_user,
+                password=smtp_password,
+                start_tls=True
+            )
+        except Exception as email_error:
+            logging.error(f"Failed to send registration notification: {str(email_error)}")
+        
         # Create access token
         access_token = create_access_token(data={"sub": user_doc["id"]})
         
