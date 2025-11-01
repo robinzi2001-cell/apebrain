@@ -1206,6 +1206,454 @@ class MushroomBlogAPITester:
         
         return False
 
+    # ============= PAYPAL & ORDER MANAGEMENT TESTS =============
+    
+    def test_create_paypal_order(self):
+        """Test creating a PayPal order"""
+        order_data = {
+            "items": [
+                {
+                    "product_id": "test-product-1",
+                    "name": "Test Lion's Mane Extract",
+                    "price": 29.99,
+                    "quantity": 2,
+                    "product_type": "physical"
+                }
+            ],
+            "total": 59.98,
+            "customer_email": "customer@example.com"
+        }
+        
+        success, response = self.run_test(
+            "Create PayPal Order",
+            "POST",
+            "shop/create-order",
+            200,
+            data=order_data,
+            timeout=60
+        )
+        
+        if success:
+            # Verify response structure
+            required_fields = ['success', 'approval_url', 'order_id', 'payment_id']
+            for field in required_fields:
+                if field not in response:
+                    print(f"❌ Missing required field: {field}")
+                    return False
+            
+            if not response.get('success'):
+                print("❌ Order creation not successful")
+                return False
+            
+            # Store for later tests
+            self.test_order_id = response.get('order_id')
+            self.test_payment_id = response.get('payment_id')
+            
+            print(f"✅ PayPal order created successfully")
+            print(f"   Order ID: {self.test_order_id}")
+            print(f"   Payment ID: {self.test_payment_id}")
+            print(f"   Approval URL: {response.get('approval_url')[:50]}...")
+            return True
+        
+        return False
+
+    def test_create_order_with_coupon(self):
+        """Test creating order with coupon code"""
+        # First create a test coupon
+        coupon_data = {
+            "code": "TEST10",
+            "discount_type": "percentage",
+            "discount_value": 10.0,
+            "is_active": True
+        }
+        
+        coupon_success, coupon_response = self.run_test(
+            "Create Test Coupon for Order",
+            "POST",
+            "coupons",
+            200,
+            data=coupon_data
+        )
+        
+        if not coupon_success:
+            print("❌ Failed to create test coupon")
+            return False
+        
+        # Now create order with coupon
+        order_data = {
+            "items": [
+                {
+                    "product_id": "test-product-2",
+                    "name": "Test Reishi Capsules",
+                    "price": 24.99,
+                    "quantity": 1,
+                    "product_type": "physical"
+                }
+            ],
+            "total": 24.99,
+            "customer_email": "customer@example.com",
+            "coupon_code": "TEST10"
+        }
+        
+        success, response = self.run_test(
+            "Create Order with Coupon",
+            "POST",
+            "shop/create-order",
+            200,
+            data=order_data,
+            timeout=60
+        )
+        
+        if success and response.get('success'):
+            print(f"✅ Order with coupon created successfully")
+            return True
+        
+        return False
+
+    def test_get_all_orders(self):
+        """Test getting all orders (admin)"""
+        success, response = self.run_test(
+            "Get All Orders (Admin)",
+            "GET",
+            "orders",
+            200
+        )
+        
+        if success:
+            if isinstance(response, list):
+                print(f"✅ Successfully retrieved {len(response)} orders")
+                return True
+            else:
+                print("❌ Response is not a list")
+                return False
+        
+        return False
+
+    def test_get_single_order_tracking(self):
+        """Test public order tracking"""
+        if not hasattr(self, 'test_order_id'):
+            print("❌ Cannot test order tracking - no order ID available")
+            return False
+        
+        success, response = self.run_test(
+            "Public Order Tracking",
+            "GET",
+            f"orders/track/{self.test_order_id}",
+            200
+        )
+        
+        if success and response.get('id') == self.test_order_id:
+            print(f"✅ Successfully tracked order: {self.test_order_id}")
+            return True
+        
+        return False
+
+    def test_update_order_status(self):
+        """Test updating order status"""
+        if not hasattr(self, 'test_order_id'):
+            print("❌ Cannot test order status update - no order ID available")
+            return False
+        
+        success, response = self.run_test(
+            "Update Order Status to Paid",
+            "PUT",
+            f"orders/{self.test_order_id}/status",
+            200,
+            data={"status": "paid"}
+        )
+        
+        if success and response.get('success'):
+            print("✅ Order status updated successfully")
+            return True
+        
+        return False
+
+    def test_update_order_tracking(self):
+        """Test updating order tracking information"""
+        if not hasattr(self, 'test_order_id'):
+            print("❌ Cannot test order tracking update - no order ID available")
+            return False
+        
+        tracking_data = {
+            "tracking_number": "DHL123456789",
+            "shipping_carrier": "DHL"
+        }
+        
+        success, response = self.run_test(
+            "Update Order Tracking Info",
+            "PUT",
+            f"orders/{self.test_order_id}/tracking",
+            200,
+            data=tracking_data
+        )
+        
+        if success and response.get('success'):
+            print(f"✅ Order tracking updated successfully")
+            print(f"   Tracking URL: {response.get('tracking_url', 'N/A')}")
+            return True
+        
+        return False
+
+    def test_mark_order_viewed(self):
+        """Test marking order as viewed by admin"""
+        if not hasattr(self, 'test_order_id'):
+            print("❌ Cannot test mark order viewed - no order ID available")
+            return False
+        
+        success, response = self.run_test(
+            "Mark Order as Viewed",
+            "POST",
+            f"orders/{self.test_order_id}/viewed",
+            200
+        )
+        
+        if success and response.get('success'):
+            print("✅ Order marked as viewed successfully")
+            return True
+        
+        return False
+
+    def test_get_unviewed_orders_count(self):
+        """Test getting unviewed orders count"""
+        success, response = self.run_test(
+            "Get Unviewed Orders Count",
+            "GET",
+            "orders/unviewed/count",
+            200
+        )
+        
+        if success and 'count' in response:
+            print(f"✅ Unviewed orders count: {response['count']}")
+            return True
+        
+        return False
+
+    def test_delete_order(self):
+        """Test deleting an order"""
+        if not hasattr(self, 'test_order_id'):
+            print("❌ Cannot test order deletion - no order ID available")
+            return False
+        
+        success, response = self.run_test(
+            "Delete Order",
+            "DELETE",
+            f"orders/{self.test_order_id}",
+            200
+        )
+        
+        if success and response.get('success'):
+            print("✅ Order deleted successfully")
+            return True
+        
+        return False
+
+    # ============= COUPON MANAGEMENT TESTS =============
+    
+    def test_create_coupon(self):
+        """Test creating a coupon"""
+        coupon_data = {
+            "code": "SAVE20",
+            "discount_type": "percentage",
+            "discount_value": 20.0,
+            "is_active": True
+        }
+        
+        success, response = self.run_test(
+            "Create Coupon",
+            "POST",
+            "coupons",
+            200,
+            data=coupon_data
+        )
+        
+        if success and response.get('id'):
+            self.test_coupon_id = response['id']
+            print(f"✅ Coupon created successfully: {response['code']}")
+            return True
+        
+        return False
+
+    def test_get_all_coupons(self):
+        """Test getting all coupons (admin)"""
+        success, response = self.run_test(
+            "Get All Coupons",
+            "GET",
+            "coupons",
+            200
+        )
+        
+        if success:
+            if isinstance(response, list):
+                print(f"✅ Successfully retrieved {len(response)} coupons")
+                return True
+            else:
+                print("❌ Response is not a list")
+                return False
+        
+        return False
+
+    def test_get_active_coupons_public(self):
+        """Test getting active coupons (public endpoint)"""
+        success, response = self.run_test(
+            "Get Active Coupons (Public)",
+            "GET",
+            "shop/coupons/active",
+            200
+        )
+        
+        if success:
+            print("✅ Active coupons retrieved successfully")
+            return True
+        
+        return False
+
+    def test_validate_coupon(self):
+        """Test coupon validation"""
+        validation_data = {
+            "code": "SAVE20",
+            "subtotal": 100.0
+        }
+        
+        success, response = self.run_test(
+            "Validate Coupon",
+            "POST",
+            "coupons/validate",
+            200,
+            data=validation_data
+        )
+        
+        if success and response.get('valid'):
+            print(f"✅ Coupon validation successful")
+            print(f"   Discount amount: ${response.get('discount_amount', 0)}")
+            return True
+        
+        return False
+
+    def test_update_coupon(self):
+        """Test updating a coupon"""
+        if not hasattr(self, 'test_coupon_id'):
+            print("❌ Cannot test coupon update - no coupon ID available")
+            return False
+        
+        update_data = {
+            "discount_value": 25.0,
+            "is_active": True
+        }
+        
+        success, response = self.run_test(
+            "Update Coupon",
+            "PUT",
+            f"coupons/{self.test_coupon_id}",
+            200,
+            data=update_data
+        )
+        
+        if success:
+            print("✅ Coupon updated successfully")
+            return True
+        
+        return False
+
+    def test_delete_coupon(self):
+        """Test deleting a coupon"""
+        if not hasattr(self, 'test_coupon_id'):
+            print("❌ Cannot test coupon deletion - no coupon ID available")
+            return False
+        
+        success, response = self.run_test(
+            "Delete Coupon",
+            "DELETE",
+            f"coupons/{self.test_coupon_id}",
+            200
+        )
+        
+        if success and response.get('success'):
+            print("✅ Coupon deleted successfully")
+            return True
+        
+        return False
+
+    # ============= ADMIN SETTINGS TESTS =============
+    
+    def test_get_admin_settings(self):
+        """Test getting admin settings"""
+        success, response = self.run_test(
+            "Get Admin Settings",
+            "GET",
+            "admin/settings",
+            200
+        )
+        
+        if success and 'admin_username' in response:
+            print(f"✅ Admin settings retrieved: username = {response['admin_username']}")
+            return True
+        
+        return False
+
+    def test_update_admin_settings(self):
+        """Test updating admin settings"""
+        settings_data = {
+            "current_password": "apebrain2024",
+            "admin_username": "admin"
+        }
+        
+        success, response = self.run_test(
+            "Update Admin Settings",
+            "POST",
+            "admin/settings",
+            200,
+            data=settings_data
+        )
+        
+        if success and response.get('success'):
+            print("✅ Admin settings updated successfully")
+            return True
+        
+        return False
+
+    # ============= BLOG CRUD COMPREHENSIVE TESTS =============
+    
+    def test_update_blog(self):
+        """Test updating a blog post"""
+        if not self.test_blog_id:
+            print("❌ Cannot test blog update - no blog ID available")
+            return False
+        
+        update_data = {
+            "title": "Updated Test Blog Title",
+            "content": "This is updated content for the test blog post.",
+            "keywords": "updated test keywords"
+        }
+        
+        success, response = self.run_test(
+            "Update Blog Post",
+            "PUT",
+            f"blogs/{self.test_blog_id}",
+            200,
+            data=update_data
+        )
+        
+        if success and response.get('id') == self.test_blog_id:
+            print("✅ Blog updated successfully")
+            return True
+        
+        return False
+
+    def test_get_blogs_with_status_filter(self):
+        """Test getting blogs with status filter"""
+        success, response = self.run_test(
+            "Get Blogs with Status Filter (draft)",
+            "GET",
+            "blogs?status=draft",
+            200
+        )
+        
+        if success:
+            print(f"✅ Found {len(response)} draft blogs")
+            return True
+        
+        return False
+
 def main():
     print("🍄 Starting Mushroom Blog API Tests")
     print("=" * 50)
