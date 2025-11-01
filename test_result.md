@@ -329,15 +329,18 @@ backend:
 
   - task: "Order management - get all orders"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "GET /api/orders endpoint returns all orders for admin with sorting by date (newest first)."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Get all orders endpoint working correctly. Successfully retrieved 4 orders with proper JSON serialization and date formatting. Orders returned as array with all required fields."
 
   - task: "Order management - get single order"
     implemented: true
