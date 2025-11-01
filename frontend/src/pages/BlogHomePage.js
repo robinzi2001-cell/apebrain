@@ -77,6 +77,7 @@ const BlogHomePage = () => {
             >
               <Instagram size={20} />
             </a>
+            <UserDropdown />
           </div>
         </div>
       </nav>
