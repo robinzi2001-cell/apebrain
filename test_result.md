@@ -404,15 +404,18 @@ backend:
 
   - task: "Order management - unread orders count"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "GET /api/orders/unviewed/count endpoint returns count of orders not yet viewed by admin."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Unviewed orders count endpoint working correctly. Successfully returned count=0 after marking orders as viewed. Count calculation and response format correct."
 
   - task: "Order management - mark order as viewed"
     implemented: true
