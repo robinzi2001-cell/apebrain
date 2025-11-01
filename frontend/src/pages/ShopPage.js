@@ -207,6 +207,7 @@ const ShopPage = () => {
                 <span className="cart-badge">{getCartCount()}</span>
               )}
             </button>
+            <UserDropdown />
           </div>
         </div>
       </nav>
