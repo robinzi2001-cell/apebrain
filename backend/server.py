@@ -1198,10 +1198,12 @@ async def validate_coupon(code: str, subtotal: float):
         
         return {
             "valid": True,
-            "discount_amount": round(discount, 2),
-            "discount_type": coupon['discount_type'],
-            "discount_value": coupon['discount_value'],
-            "code": coupon['code']
+            "coupon": {
+                "code": coupon['code'],
+                "discount_type": coupon['discount_type'],
+                "discount_value": coupon['discount_value']
+            },
+            "discount_amount": round(discount, 2)
         }
     except HTTPException:
         raise
