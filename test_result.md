@@ -254,15 +254,18 @@ backend:
 
   - task: "Blog CRUD operations"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "POST /api/blogs (create), GET /api/blogs (list), GET /api/blogs/{id} (get single), PUT /api/blogs/{id} (update), POST /api/blogs/{id}/publish (publish), DELETE /api/blogs/{id} (delete)."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Blog CRUD operations working correctly. Successfully tested: 1) GET /api/blogs returns published blogs (found 2), 2) GET /api/blogs?status=draft returns draft blogs (found 0), 3) POST /api/blogs creates blogs with video_url field, 4) GET /api/blogs/{id} retrieves single blog, 5) PUT /api/blogs/{id} updates blogs, 6) POST /api/blogs/{id}/publish publishes blogs, 7) DELETE /api/blogs/{id} deletes blogs. All CRUD operations functional."
 
   - task: "Coupon CRUD operations"
     implemented: true
