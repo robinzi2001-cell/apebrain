@@ -60,6 +60,7 @@ const AdminSettings = () => {
     fetchSettings();
     fetchLandingSettings();
     fetchBlogFeatures();
+    fetchColorProfiles();
   }, [navigate]);
 
   const fetchSettings = async () => {
