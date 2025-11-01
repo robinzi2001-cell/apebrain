@@ -39,6 +39,11 @@ const AdminSettings = () => {
   const [endB, setEndB] = useState(237);
   const [endOpacity, setEndOpacity] = useState(0.15);
   
+  // Color profiles
+  const [colorProfiles, setColorProfiles] = useState([]);
+  const [selectedProfile, setSelectedProfile] = useState('');
+  const [newProfileName, setNewProfileName] = useState('');
+  
   const [enableVideo, setEnableVideo] = useState(true);
   const [enableAudio, setEnableAudio] = useState(true);
   const [enableTextToSpeech, setEnableTextToSpeech] = useState(true);
