@@ -33,7 +33,9 @@ const Login = () => {
       // Redirect to dashboard
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Login fehlgeschlagen');
+      console.error('Login error:', err);
+      const errorMessage = err.response?.data?.detail || err.message || 'Anmeldung fehlgeschlagen';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
