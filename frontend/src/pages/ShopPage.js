@@ -110,6 +110,11 @@ const ShopPage = () => {
         customer_email: "customer@example.com"  // You can add email input field later
       };
 
+      // Add coupon code if applied
+      if (appliedCoupon) {
+        orderData.coupon_code = appliedCoupon.code;
+      }
+
       // Create PayPal order
       const response = await axios.post(`${API}/shop/create-order`, orderData);
       
@@ -123,6 +128,39 @@ const ShopPage = () => {
       console.error('Checkout error:', error);
       alert(error.response?.data?.detail || 'Checkout failed. Please try again.');
     }
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
+
+    try {
+      const subtotal = parseFloat(getSubtotal());
+      const response = await axios.post(`${API}/coupons/validate`, {
+        code: couponCode.toUpperCase(),
+        order_total: subtotal
+      });
+
+      if (response.data.valid) {
+        setAppliedCoupon(response.data.coupon);
+        setCouponError('');
+      } else {
+        setCouponError(response.data.message || 'Invalid coupon code');
+        setAppliedCoupon(null);
+      }
+    } catch (error) {
+      console.error('Coupon validation error:', error);
+      setCouponError(error.response?.data?.detail || 'Failed to validate coupon');
+      setAppliedCoupon(null);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+    setCouponError('');
   };
 
   return (
