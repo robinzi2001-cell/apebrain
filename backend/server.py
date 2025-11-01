@@ -192,6 +192,67 @@ async def send_customer_notification(order_data, status_type: str):
     except Exception as e:
         logging.error(f"Failed to send customer notification: {str(e)}")
 
+# Admin delivery completion notification
+async def send_admin_delivery_notification(order_data):
+    try:
+        smtp_host = os.environ.get('SMTP_HOST')
+        smtp_port = int(os.environ.get('SMTP_PORT', 587))
+        smtp_user = os.environ.get('SMTP_USER')
+        smtp_password = os.environ.get('SMTP_PASSWORD')
+        notification_email = os.environ.get('NOTIFICATION_EMAIL')
+        
+        if not all([smtp_host, smtp_user, smtp_password, notification_email]):
+            logging.warning("Email configuration incomplete, skipping admin delivery notification")
+            return
+        
+        # Create email
+        message = MIMEMultipart()
+        message['From'] = smtp_user
+        message['To'] = notification_email
+        message['Subject'] = "✅ Bestellung zugestellt - apebrain.cloud"
+        
+        items_html = "<br>".join([
+            f"- {item['name']} x{item['quantity']} - €{item['price'] * item['quantity']:.2f}"
+            for item in order_data.get('items', [])
+        ])
+        
+        html_body = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif;">
+            <h2 style="color: #22c55e;">Bestellung erfolgreich zugestellt! ✅</h2>
+            <p>Die folgende Bestellung wurde erfolgreich an den Kunden zugestellt:</p>
+            <hr>
+            <p><strong>Bestellnummer:</strong> {order_data.get('id', 'N/A')}</p>
+            <p><strong>Kunde Email:</strong> {order_data.get('customer_email', 'N/A')}</p>
+            <p><strong>Zugestellt am:</strong> {datetime.now(timezone.utc).strftime('%d.%m.%Y %H:%M:%S')} UTC</p>
+            <hr>
+            <h3>Bestellte Produkte:</h3>
+            <p>{items_html}</p>
+            <hr>
+            <p><strong>Gesamtbetrag:</strong> €{order_data.get('total', 0):.2f}</p>
+            {f'<p><strong>Tracking-Nummer:</strong> {order_data.get("tracking_number", "N/A")}</p>' if order_data.get('tracking_number') else ''}
+            <p style="margin-top: 2rem; color: #7a9053;">Diese Bestellung ist nun abgeschlossen.</p>
+        </body>
+        </html>
+        """
+        
+        message.attach(MIMEText(html_body, 'html'))
+        
+        # Send email
+        await aiosmtplib.send(
+            message,
+            hostname=smtp_host,
+            port=smtp_port,
+            username=smtp_user,
+            password=smtp_password,
+            start_tls=True
+        )
+        
+        logging.info(f"Admin delivery notification sent for order {order_data.get('id')}")
+    except Exception as e:
+        logging.error(f"Failed to send admin delivery notification: {str(e)}")
+
+
 
 
 # MongoDB connection
