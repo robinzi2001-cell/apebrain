@@ -269,15 +269,18 @@ backend:
 
   - task: "Coupon CRUD operations"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Coupon management endpoints for admin: create, read, update, delete coupons. Also GET /api/shop/coupons/active for public display."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Coupon CRUD operations working perfectly. Successfully tested: 1) POST /api/coupons creates coupons with proper ID generation, 2) GET /api/coupons returns all coupons (found 4), 3) GET /api/coupons/active returns active coupon for public use, 4) POST /api/coupons/validate validates coupon codes and calculates discounts correctly (20% of $100 = $20), 5) PUT /api/coupons/{id} updates coupon values, 6) DELETE /api/coupons/{id} deletes coupons successfully. All coupon management features functional."
 
   - task: "Admin settings (Instagram link)"
     implemented: true
