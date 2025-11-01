@@ -56,6 +56,12 @@ const AdminSettings = () => {
       setShowBlog(response.data.show_blog);
       setShowShop(response.data.show_shop);
       setShowMinigames(response.data.show_minigames);
+      setBlogGalleryMode(response.data.blog_gallery_mode || 'none');
+      setShopGalleryMode(response.data.shop_gallery_mode || 'none');
+      setMinigamesGalleryMode(response.data.minigames_gallery_mode || 'none');
+      setBlogGalleryImages(response.data.blog_gallery_images || []);
+      setShopGalleryImages(response.data.shop_gallery_images || []);
+      setMinigamesGalleryImages(response.data.minigames_gallery_images || []);
     } catch (error) {
       console.error('Error fetching landing settings:', error);
     }
