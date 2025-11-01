@@ -434,15 +434,18 @@ backend:
 
   - task: "Email notifications - new order to admin"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Automated email sent to admin when new order is created. Triggered in execute_payment endpoint. Uses aiosmtplib."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Email notification functions implemented correctly. SMTP configuration found in .env (Gmail SMTP with app password). Email functions handle missing config gracefully with warnings. Email templates properly formatted with order details, HTML structure, and German language. Functions called correctly in execute_payment endpoint."
 
   - task: "Email notifications - status update to customer"
     implemented: true
