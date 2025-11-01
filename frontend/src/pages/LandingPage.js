@@ -181,14 +181,14 @@ const LandingPage = () => {
           min-height: 300px;
           transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           overflow: hidden;
-          border: 2px solid rgba(122, 144, 83, 0.2);
+          border: 2px solid rgba(255, 255, 255, 0.1);
           backdrop-filter: blur(10px);
         }
 
         .landing-gallery-card:hover {
           transform: translateY(-10px) scale(1.02);
-          box-shadow: 0 20px 60px rgba(122, 144, 83, 0.3);
-          border-color: #7a9053;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+          border-color: rgba(255, 255, 255, 0.2);
         }
 
         .gallery-background {
