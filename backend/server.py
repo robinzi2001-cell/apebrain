@@ -312,6 +312,39 @@ app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
 # Define Models
+# User Models
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class User(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    email: EmailStr
+    hashed_password: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    auth_provider: str = "email"  # email, google, paypal
+    google_id: Optional[str] = None
+    paypal_id: Optional[str] = None
+    is_member: bool = True  # All registered users are members
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    last_login: Optional[datetime] = None
+
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+class PasswordReset(BaseModel):
+    token: str
+    new_password: str
+
 class BlogPost(BaseModel):
     model_config = ConfigDict(extra="ignore")
     
