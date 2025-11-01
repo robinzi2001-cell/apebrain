@@ -69,6 +69,30 @@ const AdminOrders = () => {
     }
   };
 
+  const handleAddTracking = async (orderId, trackingNumber, carrier) => {
+    try {
+      const response = await axios.put(
+        `${API}/orders/${orderId}/tracking?tracking_number=${trackingNumber}&shipping_carrier=${carrier}`
+      );
+      
+      // Update order in state
+      setOrders(orders.map(order => 
+        order.id === orderId ? { 
+          ...order, 
+          tracking_number: trackingNumber,
+          shipping_carrier: carrier,
+          tracking_url: response.data.tracking_url,
+          status: 'shipped'
+        } : order
+      ));
+      
+      alert('Tracking-Info hinzugefügt und Kunde benachrichtigt!');
+    } catch (error) {
+      console.error('Error adding tracking:', error);
+      alert('Fehler beim Hinzufügen der Tracking-Info');
+    }
+  };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('de-DE', {
       year: 'numeric',
