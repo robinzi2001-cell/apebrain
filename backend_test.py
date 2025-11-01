@@ -1354,12 +1354,12 @@ class MushroomBlogAPITester:
             print("❌ Cannot test order status update - no order ID available")
             return False
         
+        # The endpoint expects status as a query parameter, not in body
         success, response = self.run_test(
             "Update Order Status to Paid",
             "PUT",
-            f"orders/{self.test_order_id}/status",
-            200,
-            data={"status": "paid"}
+            f"orders/{self.test_order_id}/status?status=paid",
+            200
         )
         
         if success and response.get('success'):
