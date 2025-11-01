@@ -450,6 +450,131 @@ const AdminSettings = () => {
             </div>
           </div>
 
+          {/* Card Background Color Settings */}
+          <div style={{ marginTop: '2rem', marginBottom: '1.5rem' }}>
+            <h3 style={{ color: '#3a4520', marginBottom: '1rem' }}>Karten Hintergrundfarbe (ohne Bilder)</h3>
+            <p style={{ color: '#7a9053', fontSize: '0.9rem', marginBottom: '1rem' }}>
+              Passe die Hintergrundfarbe der Karten an, wenn keine Bilder hochgeladen sind
+            </p>
+            
+            <div style={{ display: 'grid', gap: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#3a4520', fontWeight: '500' }}>
+                  Startfarbe (Oben):
+                </label>
+                <input
+                  type="text"
+                  value={cardBgColorStart}
+                  onChange={(e) => setCardBgColorStart(e.target.value)}
+                  placeholder="z.B. rgba(167, 139, 250, 0.15)"
+                  style={{ 
+                    width: '100%', 
+                    padding: '0.5rem', 
+                    borderRadius: '6px', 
+                    border: '1px solid #d1d5db',
+                    fontFamily: 'monospace'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#3a4520', fontWeight: '500' }}>
+                  Mittelfarbe:
+                </label>
+                <input
+                  type="text"
+                  value={cardBgColorMiddle}
+                  onChange={(e) => setCardBgColorMiddle(e.target.value)}
+                  placeholder="z.B. rgba(139, 92, 246, 0.12)"
+                  style={{ 
+                    width: '100%', 
+                    padding: '0.5rem', 
+                    borderRadius: '6px', 
+                    border: '1px solid #d1d5db',
+                    fontFamily: 'monospace'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#3a4520', fontWeight: '500' }}>
+                  Endfarbe (Unten):
+                </label>
+                <input
+                  type="text"
+                  value={cardBgColorEnd}
+                  onChange={(e) => setCardBgColorEnd(e.target.value)}
+                  placeholder="z.B. rgba(124, 58, 237, 0.15)"
+                  style={{ 
+                    width: '100%', 
+                    padding: '0.5rem', 
+                    borderRadius: '6px', 
+                    border: '1px solid #d1d5db',
+                    fontFamily: 'monospace'
+                  }}
+                />
+              </div>
+
+              {/* Color Preview */}
+              <div style={{ 
+                marginTop: '1rem',
+                padding: '2rem',
+                borderRadius: '12px',
+                background: `linear-gradient(135deg, ${cardBgColorStart} 0%, ${cardBgColorMiddle} 50%, ${cardBgColorEnd} 100%)`,
+                border: '2px solid #d1d5db',
+                textAlign: 'center',
+                color: '#fff',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
+              }}>
+                <strong>Vorschau</strong>
+              </div>
+
+              {/* Preset Buttons */}
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => {
+                    setCardBgColorStart('rgba(167, 139, 250, 0.15)');
+                    setCardBgColorMiddle('rgba(139, 92, 246, 0.12)');
+                    setCardBgColorEnd('rgba(124, 58, 237, 0.15)');
+                  }}
+                  style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: '1px solid #7a9053', background: 'linear-gradient(135deg, rgba(167, 139, 250, 0.3), rgba(124, 58, 237, 0.3))', cursor: 'pointer' }}
+                >
+                  Lila (Standard)
+                </button>
+                <button
+                  onClick={() => {
+                    setCardBgColorStart('rgba(96, 165, 250, 0.15)');
+                    setCardBgColorMiddle('rgba(59, 130, 246, 0.12)');
+                    setCardBgColorEnd('rgba(37, 99, 235, 0.15)');
+                  }}
+                  style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: '1px solid #7a9053', background: 'linear-gradient(135deg, rgba(96, 165, 250, 0.3), rgba(37, 99, 235, 0.3))', cursor: 'pointer' }}
+                >
+                  Blau
+                </button>
+                <button
+                  onClick={() => {
+                    setCardBgColorStart('rgba(253, 164, 175, 0.15)');
+                    setCardBgColorMiddle('rgba(244, 114, 182, 0.12)');
+                    setCardBgColorEnd('rgba(236, 72, 153, 0.15)');
+                  }}
+                  style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: '1px solid #7a9053', background: 'linear-gradient(135deg, rgba(253, 164, 175, 0.3), rgba(236, 72, 153, 0.3))', cursor: 'pointer' }}
+                >
+                  Pink
+                </button>
+                <button
+                  onClick={() => {
+                    setCardBgColorStart('rgba(134, 239, 172, 0.15)');
+                    setCardBgColorMiddle('rgba(74, 222, 128, 0.12)');
+                    setCardBgColorEnd('rgba(34, 197, 94, 0.15)');
+                  }}
+                  style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: '1px solid #7a9053', background: 'linear-gradient(135deg, rgba(134, 239, 172, 0.3), rgba(34, 197, 94, 0.3))', cursor: 'pointer' }}
+                >
+                  Grün
+                </button>
+              </div>
+            </div>
+          </div>
+
           <button
             onClick={handleLandingSettingsSave}
             className="btn btn-primary"
