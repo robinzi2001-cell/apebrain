@@ -1,0 +1,42 @@
+name: Deploy to Hostinger VPS
+
+on:
+  push:
+    branches:
+      - mainnew333
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🚀 Deploy to Hostinger
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/apebrain/apebrain.cloud
+            git pull origin mainnew333
+            
+            # Backend
+            cd backend
+            source venv/bin/activate
+            pip install -r requirements.txt
+            deactivate
+            
+            # Frontend
+            cd ../frontend
+            yarn install --frozen-lockfile
+            yarn build
+            
+            # Restart services
+            sudo systemctl restart apebrain-backend
+            sudo systemctl reload nginx
+            
+            echo "✅ Deployment successful to apebrain.cloud!"
+      
+      - name: ✅ Deployment Status
+        run: echo "Website live at https://apebrain.cloud"
