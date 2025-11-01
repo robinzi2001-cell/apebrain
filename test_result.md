@@ -775,6 +775,30 @@ frontend:
         agent: "testing"
         comment: "✅ PASSED - FloatingCoupon component working correctly. Visible on shop page displaying 'WELCOME10 10% OFF' banner. Component properly shows active coupons to users. Coupon display functionality operational."
 
+  - task: "Legal pages (Impressum, Privacy, Terms)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/Impressum.js, /app/frontend/src/pages/Privacy.js, /app/frontend/src/pages/Terms.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - All legal pages working perfectly. Impressum page loaded with 1 Instagram icon, Privacy page loaded with proper content, Terms page loaded with complete terms and conditions. All legal compliance pages functional and accessible."
+
+  - task: "Coupon input functionality in shop"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/pages/ShopPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUE - No coupon input field found in shop cart. Searched extensively for coupon input using multiple selectors but only found FloatingCoupon display component. Users cannot enter coupon codes like 'WELCOME20' as requested in testing requirements. Coupon functionality appears to be display-only, missing interactive input field for coupon code entry and application."
+
 metadata:
   created_by: "main_agent"
   version: "3.0"
