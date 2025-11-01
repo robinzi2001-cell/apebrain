@@ -323,6 +323,9 @@ backend:
       - working: "NA"
         agent: "main"
         comment: "POST /api/shop/execute-payment endpoint executes PayPal payment, saves order to MongoDB, sends email notification to admin."
+      - working: "NA"
+        agent: "testing"
+        comment: "⚠️ NOT TESTED - PayPal payment execution requires actual PayPal payment flow completion which cannot be automated in testing. Endpoint exists and is properly implemented but requires manual testing with real PayPal approval flow."
 
   - task: "Order management - get all orders"
     implemented: true
