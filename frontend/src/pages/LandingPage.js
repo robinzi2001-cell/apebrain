@@ -188,7 +188,6 @@ const LandingPage = () => {
           right: 0;
           bottom: 0;
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
           gap: 0;
           z-index: 0;
         }
@@ -197,12 +196,12 @@ const LandingPage = () => {
           background-size: cover;
           background-position: center;
           animation: galleryPulse 8s ease-in-out infinite;
-          opacity: 0.3;
+          opacity: 0.4;
           transition: opacity 0.3s ease;
         }
 
         .landing-gallery-card:hover .gallery-img {
-          opacity: 0.5;
+          opacity: 0.6;
         }
 
         .gallery-overlay {
@@ -211,8 +210,31 @@ const LandingPage = () => {
           left: 0;
           right: 0;
           bottom: 0;
-          background: linear-gradient(135deg, rgba(122, 144, 83, 0.8) 0%, rgba(58, 69, 32, 0.9) 100%);
+          background: linear-gradient(135deg, rgba(122, 144, 83, 0.75) 0%, rgba(58, 69, 32, 0.85) 100%);
           backdrop-filter: blur(2px);
+        }
+
+        /* Purple background for cards without images */
+        .purple-background {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, 
+            rgba(147, 112, 219, 0.25) 0%,    /* Medium Purple - Vertrauen */
+            rgba(138, 43, 226, 0.2) 50%,      /* Blue Violet - Interesse */
+            rgba(123, 104, 238, 0.25) 100%    /* Medium Slate Blue - Beruhigung */
+          );
+          z-index: 0;
+        }
+
+        .landing-gallery-card:hover .purple-background {
+          background: linear-gradient(135deg, 
+            rgba(147, 112, 219, 0.35) 0%,
+            rgba(138, 43, 226, 0.3) 50%,
+            rgba(123, 104, 238, 0.35) 100%
+          );
         }
 
         .gallery-card-content {
