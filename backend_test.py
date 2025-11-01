@@ -1975,7 +1975,14 @@ def main():
         ("Admin Login (Valid)", tester.test_admin_login_valid),
         ("Admin Login (Invalid)", tester.test_admin_login_invalid),
         
-        # CRITICAL PRIORITY - PayPal Integration
+        # CRITICAL PRIORITY - PayPal Integration (Comprehensive Checkout Testing)
+        ("PayPal Checkout WITHOUT Coupon (Scenario 1)", tester.test_paypal_checkout_without_coupon),
+        ("Validate WELCOME10 Coupon (Scenario 2.1)", tester.test_validate_welcome10_coupon),
+        ("PayPal Checkout WITH Coupon (Scenario 2.2)", tester.test_paypal_checkout_with_coupon),
+        ("Test Invalid Coupon Code", tester.test_invalid_coupon_code),
+        ("PayPal Checkout Summary", tester.test_comprehensive_paypal_checkout_summary),
+        
+        # ADDITIONAL PAYPAL TESTS (Original)
         ("Create PayPal Order", tester.test_create_paypal_order),
         ("Create Order with Coupon", tester.test_create_order_with_coupon),
         
