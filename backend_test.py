@@ -2725,13 +2725,72 @@ class MushroomBlogAPITester:
         
         return passed_tests, total_tests
 
+    def run_customer_auth_tests(self):
+        """Run comprehensive customer authentication system tests"""
+        print("🔐 Starting Customer Authentication System Testing...")
+        print("=" * 70)
+        
+        auth_tests = [
+            # Registration Tests
+            ("Customer Registration", self.test_customer_registration),
+            ("Registration Duplicate Email", self.test_customer_registration_duplicate_email),
+            ("Admin Registration Notification", self.test_admin_registration_notification),
+            
+            # Login Tests  
+            ("Customer Login Valid", self.test_customer_login_valid),
+            ("Customer Login Invalid Password", self.test_customer_login_invalid_password),
+            ("Customer Login Non-existent Email", self.test_customer_login_nonexistent_email),
+            
+            # Protected Route Tests
+            ("Get Current User Info", self.test_get_current_user_info),
+            ("Get User Info Invalid Token", self.test_get_user_info_invalid_token),
+            ("Get User Info No Token", self.test_get_user_info_no_token),
+            ("Get User Orders", self.test_get_user_orders),
+            ("Get User Orders Invalid Token", self.test_get_user_orders_invalid_token),
+            
+            # Password Reset Tests
+            ("Password Reset Request", self.test_password_reset_request),
+            ("Password Reset Non-existent Email", self.test_password_reset_request_nonexistent_email),
+            
+            # Database Verification
+            ("Verify User in Database", self.verify_user_in_database),
+        ]
+        
+        auth_passed = 0
+        auth_total = len(auth_tests)
+        
+        for test_name, test_func in auth_tests:
+            print(f"\n{'='*50}")
+            print(f"🧪 {test_name}")
+            print('='*50)
+            
+            try:
+                if test_func():
+                    auth_passed += 1
+                    print(f"✅ {test_name}: PASSED")
+                else:
+                    print(f"❌ {test_name}: FAILED")
+            except Exception as e:
+                print(f"❌ {test_name}: ERROR - {str(e)}")
+        
+        print("\n" + "=" * 70)
+        print(f"🔐 CUSTOMER AUTHENTICATION TESTING COMPLETE")
+        print(f"📊 Results: {auth_passed}/{auth_total} tests passed ({auth_passed/auth_total*100:.1f}%)")
+        
+        if auth_passed == auth_total:
+            print("🎉 ALL AUTHENTICATION TESTS PASSED!")
+        else:
+            print(f"⚠️  {auth_total - auth_passed} authentication tests failed")
+        
+        return auth_passed, auth_total
+
 def main():
-    """Main function to run PayPal coupon fix tests"""
+    """Main function to run customer authentication tests"""
     
     tester = MushroomBlogAPITester()
     
-    # Run the focused PayPal coupon fix tests
-    passed_tests, total_tests = tester.run_paypal_coupon_fix_tests()
+    # Run the customer authentication tests
+    passed_tests, total_tests = tester.run_customer_auth_tests()
     
     return 0 if passed_tests == total_tests else 1
 
