@@ -256,39 +256,139 @@ const AdminOrders = () => {
                   </div>
                 )}
 
-                {/* Action Buttons */}
+                {/* Tracking Info Display */}
+                {order.tracking_number && (
+                  <div style={{ 
+                    marginTop: '1rem', 
+                    paddingTop: '1rem', 
+                    borderTop: '1px solid #e8ebe0',
+                    background: 'rgba(122, 144, 83, 0.05)',
+                    padding: '1rem',
+                    borderRadius: '8px'
+                  }}>
+                    <strong style={{ color: '#3a4520', display: 'block', marginBottom: '0.5rem' }}>📦 Versandinformationen:</strong>
+                    <div style={{ fontSize: '0.9rem', color: '#7a9053' }}>
+                      <div><strong>Tracking-Nr:</strong> {order.tracking_number}</div>
+                      <div><strong>Carrier:</strong> {order.shipping_carrier || 'DHL'}</div>
+                      {order.tracking_url && (
+                        <div style={{ marginTop: '0.5rem' }}>
+                          <a href={order.tracking_url} target="_blank" rel="noopener noreferrer" style={{ color: '#7a9053', textDecoration: 'underline' }}>
+                            Sendung verfolgen →
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Admin Actions */}
                 <div style={{ 
                   marginTop: '1rem', 
                   paddingTop: '1rem', 
-                  borderTop: '1px solid #e8ebe0',
-                  display: 'flex',
-                  gap: '0.5rem',
-                  flexWrap: 'wrap'
+                  borderTop: '1px solid #e8ebe0'
                 }}>
-                  {order.status === 'completed' && (
-                    <button
-                      onClick={() => handleChangeStatus(order.id, 'cancelled')}
-                      className="btn btn-secondary"
-                      style={{ fontSize: '0.85rem', padding: '0.5rem 1rem' }}
+                  <strong style={{ display: 'block', marginBottom: '0.75rem', color: '#3a4520' }}>Aktionen:</strong>
+                  
+                  {/* Status Dropdown */}
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ fontSize: '0.85rem', color: '#7a9053', display: 'block', marginBottom: '0.25rem' }}>
+                      Status ändern:
+                    </label>
+                    <select
+                      value={order.status}
+                      onChange={(e) => handleChangeStatus(order.id, e.target.value)}
+                      style={{ 
+                        padding: '0.5rem', 
+                        borderRadius: '8px', 
+                        border: '2px solid #e8ebe0',
+                        minWidth: '200px',
+                        fontSize: '0.9rem'
+                      }}
                     >
-                      Als Storniert markieren
-                    </button>
+                      <option value="paid">💰 Bezahlt</option>
+                      <option value="packed">📦 Verpackt</option>
+                      <option value="shipped">🚚 Versendet</option>
+                      <option value="in_transit">✈️ Unterwegs</option>
+                      <option value="delivered">🏠 Zugestellt</option>
+                      <option value="cancelled">❌ Storniert</option>
+                    </select>
+                  </div>
+
+                  {/* Tracking Input - only show for paid/packed status */}
+                  {(order.status === 'paid' || order.status === 'packed') && !order.tracking_number && (
+                    <div style={{ 
+                      background: 'rgba(122, 144, 83, 0.05)', 
+                      padding: '1rem', 
+                      borderRadius: '8px',
+                      marginBottom: '1rem'
+                    }}>
+                      <strong style={{ display: 'block', marginBottom: '0.5rem', color: '#3a4520' }}>
+                        Versandinformationen hinzufügen:
+                      </strong>
+                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <input
+                          type="text"
+                          placeholder="Tracking-Nummer"
+                          value={trackingInput[order.id]?.trackingNumber || ''}
+                          onChange={(e) => setTrackingInput({
+                            ...trackingInput,
+                            [order.id]: { 
+                              ...trackingInput[order.id], 
+                              trackingNumber: e.target.value 
+                            }
+                          })}
+                          style={{ 
+                            padding: '0.5rem', 
+                            borderRadius: '8px', 
+                            border: '2px solid #e8ebe0',
+                            flex: '1',
+                            minWidth: '150px'
+                          }}
+                        />
+                        <select
+                          value={trackingInput[order.id]?.carrier || 'DHL'}
+                          onChange={(e) => setTrackingInput({
+                            ...trackingInput,
+                            [order.id]: { 
+                              ...trackingInput[order.id], 
+                              carrier: e.target.value 
+                            }
+                          })}
+                          style={{ 
+                            padding: '0.5rem', 
+                            borderRadius: '8px', 
+                            border: '2px solid #e8ebe0'
+                          }}
+                        >
+                          <option value="DHL">DHL</option>
+                          <option value="DPD">DPD</option>
+                          <option value="Hermes">Hermes</option>
+                          <option value="UPS">UPS</option>
+                          <option value="GLS">GLS</option>
+                        </select>
+                        <button
+                          onClick={() => handleAddTracking(
+                            order.id, 
+                            trackingInput[order.id]?.trackingNumber || '',
+                            trackingInput[order.id]?.carrier || 'DHL'
+                          )}
+                          className="btn btn-primary"
+                          style={{ fontSize: '0.85rem' }}
+                          disabled={!trackingInput[order.id]?.trackingNumber}
+                        >
+                          Versenden & Benachrichtigen
+                        </button>
+                      </div>
+                    </div>
                   )}
-                  {order.status === 'cancelled' && (
-                    <button
-                      onClick={() => handleChangeStatus(order.id, 'completed')}
-                      className="btn btn-secondary"
-                      style={{ fontSize: '0.85rem', padding: '0.5rem 1rem' }}
-                    >
-                      Als Abgeschlossen markieren
-                    </button>
-                  )}
+
+                  {/* Delete Button */}
                   <button
                     onClick={() => handleDeleteOrder(order.id)}
                     className="btn btn-danger"
                     style={{ fontSize: '0.85rem', padding: '0.5rem 1rem' }}
                   >
-                    Bestellung löschen
+                    <Trash2 size={16} /> Bestellung löschen
                   </button>
                 </div>
               </div>
