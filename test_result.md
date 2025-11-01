@@ -419,15 +419,18 @@ backend:
 
   - task: "Order management - mark order as viewed"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "POST /api/orders/{order_id}/viewed endpoint marks order as viewed by admin."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Mark order as viewed endpoint working correctly. Successfully marked order as viewed with proper success response. Database update confirmed by subsequent unviewed count check."
 
   - task: "Email notifications - new order to admin"
     implemented: true
