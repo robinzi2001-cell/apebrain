@@ -375,6 +375,7 @@ class CouponUpdate(BaseModel):
 class GenerateResponse(BaseModel):
     title: str
     content: str
+    image_base64: Optional[str] = None
 
 # Admin authentication
 @api_router.post("/admin/login")
