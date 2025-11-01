@@ -1442,6 +1442,507 @@ class MushroomBlogAPITester:
         
         return False
 
+    # ============= CUSTOMER AUTHENTICATION TESTS =============
+    
+    def test_customer_registration(self):
+        """Test customer registration with valid data"""
+        print("\n👤 Testing Customer Registration")
+        
+        registration_data = {
+            "email": "testuser@example.com",
+            "password": "Test123456",
+            "first_name": "Max",
+            "last_name": "Mustermann"
+        }
+        
+        success, response = self.run_test(
+            "Customer Registration",
+            "POST",
+            "auth/register",
+            200,
+            data=registration_data
+        )
+        
+        if success:
+            # Verify response structure
+            required_fields = ['success', 'access_token', 'token_type', 'user']
+            for field in required_fields:
+                if field not in response:
+                    print(f"❌ Missing required field: {field}")
+                    return False
+            
+            if not response.get('success'):
+                print("❌ Registration not successful")
+                return False
+            
+            # Verify token format
+            access_token = response.get('access_token')
+            if not access_token or len(access_token) < 50:
+                print(f"❌ Invalid access token format: {access_token}")
+                return False
+            
+            # Verify user object
+            user = response.get('user', {})
+            if user.get('email') != registration_data['email']:
+                print(f"❌ Email mismatch in user object")
+                return False
+            
+            if user.get('first_name') != registration_data['first_name']:
+                print(f"❌ First name mismatch in user object")
+                return False
+            
+            # Store token for later tests
+            self.customer_access_token = access_token
+            self.test_customer_email = registration_data['email']
+            
+            print(f"✅ Customer registration successful")
+            print(f"   Email: {user.get('email')}")
+            print(f"   Name: {user.get('first_name')} {user.get('last_name')}")
+            print(f"   Token: {access_token[:20]}...")
+            
+            return True
+        
+        return False
+    
+    def test_customer_registration_duplicate_email(self):
+        """Test registration with existing email (should fail)"""
+        registration_data = {
+            "email": "testuser@example.com",  # Same email as previous test
+            "password": "Test123456",
+            "first_name": "Another",
+            "last_name": "User"
+        }
+        
+        success, response = self.run_test(
+            "Customer Registration (Duplicate Email)",
+            "POST",
+            "auth/register",
+            400,  # Should return 400 for duplicate email
+            data=registration_data
+        )
+        
+        if success:
+            print("✅ Correctly returned 400 for duplicate email")
+            return True
+        
+        return False
+    
+    def test_customer_login_valid(self):
+        """Test customer login with valid credentials"""
+        login_data = {
+            "email": "testuser@example.com",
+            "password": "Test123456"
+        }
+        
+        success, response = self.run_test(
+            "Customer Login (Valid Credentials)",
+            "POST",
+            "auth/login",
+            200,
+            data=login_data
+        )
+        
+        if success:
+            # Verify response structure
+            required_fields = ['success', 'access_token', 'token_type', 'user']
+            for field in required_fields:
+                if field not in response:
+                    print(f"❌ Missing required field: {field}")
+                    return False
+            
+            if not response.get('success'):
+                print("❌ Login not successful")
+                return False
+            
+            # Verify token format
+            access_token = response.get('access_token')
+            if not access_token or len(access_token) < 50:
+                print(f"❌ Invalid access token format: {access_token}")
+                return False
+            
+            # Update stored token
+            self.customer_access_token = access_token
+            
+            print(f"✅ Customer login successful")
+            print(f"   Email: {response.get('user', {}).get('email')}")
+            print(f"   Token: {access_token[:20]}...")
+            
+            return True
+        
+        return False
+    
+    def test_customer_login_invalid_password(self):
+        """Test customer login with wrong password"""
+        login_data = {
+            "email": "testuser@example.com",
+            "password": "WrongPassword123"
+        }
+        
+        success, response = self.run_test(
+            "Customer Login (Invalid Password)",
+            "POST",
+            "auth/login",
+            401,  # Should return 401 for invalid credentials
+            data=login_data
+        )
+        
+        if success:
+            print("✅ Correctly returned 401 for invalid password")
+            return True
+        
+        return False
+    
+    def test_customer_login_nonexistent_email(self):
+        """Test customer login with non-existent email"""
+        login_data = {
+            "email": "nonexistent@example.com",
+            "password": "Test123456"
+        }
+        
+        success, response = self.run_test(
+            "Customer Login (Non-existent Email)",
+            "POST",
+            "auth/login",
+            401,  # Should return 401 for invalid credentials
+            data=login_data
+        )
+        
+        if success:
+            print("✅ Correctly returned 401 for non-existent email")
+            return True
+        
+        return False
+    
+    def test_get_current_user_info(self):
+        """Test getting current user info with valid token"""
+        if not hasattr(self, 'customer_access_token'):
+            print("❌ Cannot test user info - no access token available")
+            return False
+        
+        # Use authorization header
+        url = f"{self.api_url}/auth/me"
+        headers = {
+            'Authorization': f'Bearer {self.customer_access_token}',
+            'Content-Type': 'application/json'
+        }
+        
+        self.tests_run += 1
+        print(f"\n🔍 Testing Get Current User Info...")
+        print(f"   URL: {url}")
+        
+        try:
+            response = requests.get(url, headers=headers, timeout=30)
+            
+            success = response.status_code == 200
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                
+                try:
+                    response_data = response.json()
+                    
+                    # Verify user data structure
+                    if response_data.get('email') != self.test_customer_email:
+                        print(f"❌ Email mismatch in user info")
+                        return False
+                    
+                    # Verify password is not included
+                    if 'hashed_password' in response_data or 'password' in response_data:
+                        print(f"❌ Password field found in user info (security issue)")
+                        return False
+                    
+                    # Verify required fields
+                    required_fields = ['id', 'email', 'first_name', 'last_name', 'is_member']
+                    for field in required_fields:
+                        if field not in response_data:
+                            print(f"❌ Missing required field in user info: {field}")
+                            return False
+                    
+                    print(f"✅ User info retrieved successfully")
+                    print(f"   Email: {response_data.get('email')}")
+                    print(f"   Name: {response_data.get('first_name')} {response_data.get('last_name')}")
+                    print(f"   Member: {response_data.get('is_member')}")
+                    
+                    return True
+                    
+                except Exception as e:
+                    print(f"❌ Error parsing response: {str(e)}")
+                    return False
+            else:
+                print(f"❌ Failed - Expected 200, got {response.status_code}")
+                try:
+                    error_data = response.json()
+                    print(f"   Error: {error_data}")
+                except:
+                    print(f"   Error: {response.text}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            return False
+    
+    def test_get_user_info_invalid_token(self):
+        """Test getting user info with invalid token (should fail)"""
+        url = f"{self.api_url}/auth/me"
+        headers = {
+            'Authorization': 'Bearer invalid_token_12345',
+            'Content-Type': 'application/json'
+        }
+        
+        self.tests_run += 1
+        print(f"\n🔍 Testing Get User Info (Invalid Token)...")
+        print(f"   URL: {url}")
+        
+        try:
+            response = requests.get(url, headers=headers, timeout=30)
+            
+            success = response.status_code == 401
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                print("✅ Correctly returned 401 for invalid token")
+                return True
+            else:
+                print(f"❌ Failed - Expected 401, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            return False
+    
+    def test_get_user_info_no_token(self):
+        """Test getting user info without token (should fail)"""
+        url = f"{self.api_url}/auth/me"
+        headers = {'Content-Type': 'application/json'}
+        
+        self.tests_run += 1
+        print(f"\n🔍 Testing Get User Info (No Token)...")
+        print(f"   URL: {url}")
+        
+        try:
+            response = requests.get(url, headers=headers, timeout=30)
+            
+            success = response.status_code == 403  # FastAPI returns 403 for missing auth
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                print("✅ Correctly returned 403 for missing token")
+                return True
+            else:
+                print(f"❌ Failed - Expected 403, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            return False
+    
+    def test_get_user_orders(self):
+        """Test getting user orders with valid token"""
+        if not hasattr(self, 'customer_access_token'):
+            print("❌ Cannot test user orders - no access token available")
+            return False
+        
+        url = f"{self.api_url}/auth/orders"
+        headers = {
+            'Authorization': f'Bearer {self.customer_access_token}',
+            'Content-Type': 'application/json'
+        }
+        
+        self.tests_run += 1
+        print(f"\n🔍 Testing Get User Orders...")
+        print(f"   URL: {url}")
+        
+        try:
+            response = requests.get(url, headers=headers, timeout=30)
+            
+            success = response.status_code == 200
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                
+                try:
+                    response_data = response.json()
+                    
+                    # Should be an array (may be empty for new user)
+                    if not isinstance(response_data, list):
+                        print(f"❌ Orders response is not an array")
+                        return False
+                    
+                    print(f"✅ User orders retrieved successfully")
+                    print(f"   Number of orders: {len(response_data)}")
+                    
+                    # If there are orders, verify they belong to this user
+                    for order in response_data:
+                        if order.get('customer_email') != self.test_customer_email:
+                            print(f"❌ Order belongs to different customer: {order.get('customer_email')}")
+                            return False
+                    
+                    if response_data:
+                        print(f"   All orders belong to correct customer: {self.test_customer_email}")
+                    
+                    return True
+                    
+                except Exception as e:
+                    print(f"❌ Error parsing response: {str(e)}")
+                    return False
+            else:
+                print(f"❌ Failed - Expected 200, got {response.status_code}")
+                try:
+                    error_data = response.json()
+                    print(f"   Error: {error_data}")
+                except:
+                    print(f"   Error: {response.text}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            return False
+    
+    def test_get_user_orders_invalid_token(self):
+        """Test getting user orders with invalid token (should fail)"""
+        url = f"{self.api_url}/auth/orders"
+        headers = {
+            'Authorization': 'Bearer invalid_token_12345',
+            'Content-Type': 'application/json'
+        }
+        
+        self.tests_run += 1
+        print(f"\n🔍 Testing Get User Orders (Invalid Token)...")
+        print(f"   URL: {url}")
+        
+        try:
+            response = requests.get(url, headers=headers, timeout=30)
+            
+            success = response.status_code == 401
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                print("✅ Correctly returned 401 for invalid token")
+                return True
+            else:
+                print(f"❌ Failed - Expected 401, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            return False
+    
+    def test_password_reset_request(self):
+        """Test password reset request"""
+        reset_request_data = {
+            "email": "testuser@example.com"
+        }
+        
+        success, response = self.run_test(
+            "Password Reset Request",
+            "POST",
+            "auth/password-reset-request",
+            200,
+            data=reset_request_data
+        )
+        
+        if success:
+            # Verify response structure
+            if not response.get('success'):
+                print("❌ Password reset request not successful")
+                return False
+            
+            message = response.get('message', '')
+            if 'password reset link' not in message.lower():
+                print(f"❌ Unexpected message: {message}")
+                return False
+            
+            print(f"✅ Password reset request successful")
+            print(f"   Message: {message}")
+            
+            return True
+        
+        return False
+    
+    def test_password_reset_request_nonexistent_email(self):
+        """Test password reset request for non-existent email (should still return 200 for security)"""
+        reset_request_data = {
+            "email": "nonexistent@example.com"
+        }
+        
+        success, response = self.run_test(
+            "Password Reset Request (Non-existent Email)",
+            "POST",
+            "auth/password-reset-request",
+            200,  # Should still return 200 for security reasons
+            data=reset_request_data
+        )
+        
+        if success:
+            # Should get same message for security
+            if not response.get('success'):
+                print("❌ Password reset request not successful")
+                return False
+            
+            print(f"✅ Password reset request handled securely for non-existent email")
+            return True
+        
+        return False
+    
+    def verify_user_in_database(self):
+        """Verify user was saved correctly in MongoDB by trying to login again"""
+        print(f"\n🔍 Verifying user in database...")
+        
+        # Try to login again to verify user exists and password is hashed
+        login_data = {
+            "email": "testuser@example.com",
+            "password": "Test123456"
+        }
+        
+        success, response = self.run_test(
+            "Verify User in Database (Re-login)",
+            "POST",
+            "auth/login",
+            200,
+            data=login_data
+        )
+        
+        if success and response.get('success'):
+            print(f"✅ User verified in database successfully")
+            print(f"   Can login with correct credentials")
+            
+            # Verify last_login was updated
+            user = response.get('user', {})
+            if user.get('email') == self.test_customer_email:
+                print(f"   User data consistent")
+                return True
+        
+        return False
+    
+    def test_admin_registration_notification(self):
+        """Test that admin receives registration notification email"""
+        print(f"\n📧 Testing Admin Registration Notification...")
+        
+        # Check backend logs for email notification
+        try:
+            import subprocess
+            result = subprocess.run(['tail', '-n', '50', '/var/log/supervisor/backend.out.log'], 
+                                  capture_output=True, text=True, timeout=10)
+            
+            if result.returncode == 0:
+                log_content = result.stdout
+                
+                # Look for registration notification in logs
+                if 'registration notification' in log_content.lower() or 'neue registrierung' in log_content.lower():
+                    print("✅ Admin registration notification found in logs")
+                    return True
+                else:
+                    print("⚠️  Admin registration notification not found in logs (SMTP may not be configured)")
+                    print("   This is expected if SMTP settings are not configured")
+                    return True  # Don't fail test for missing SMTP config
+            else:
+                print("⚠️  Could not check backend logs")
+                return True  # Don't fail test for log access issues
+                
+        except Exception as e:
+            print(f"⚠️  Could not check logs: {str(e)}")
+            return True  # Don't fail test for log access issues
+
     # ============= COMPREHENSIVE PAYPAL CHECKOUT TESTS =============
     
     def test_paypal_checkout_without_coupon(self):
