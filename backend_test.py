@@ -2225,8 +2225,7 @@ class MushroomBlogAPITester:
         return passed_tests, total_tests
 
 def main():
-    print("🍄 Starting Mushroom Blog API Tests")
-    print("=" * 50)
+    """Main function to run PayPal coupon fix tests"""
     
     tester = MushroomBlogAPITester()
     
