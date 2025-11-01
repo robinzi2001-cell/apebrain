@@ -359,15 +359,18 @@ backend:
 
   - task: "Order management - delete order"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "DELETE /api/orders/{order_id} endpoint for admin to delete orders."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Delete order endpoint working correctly. Successfully deleted test order with proper success response. Order removal from database confirmed."
 
   - task: "Order management - update order status"
     implemented: true
