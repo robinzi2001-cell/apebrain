@@ -151,7 +151,10 @@ const AdminSettings = () => {
         minigames_gallery_mode: minigamesGalleryMode,
         blog_gallery_images: blogGalleryImages,
         shop_gallery_images: shopGalleryImages,
-        minigames_gallery_images: minigamesGalleryImages
+        minigames_gallery_images: minigamesGalleryImages,
+        card_bg_color_start: cardBgColorStart,
+        card_bg_color_middle: cardBgColorMiddle,
+        card_bg_color_end: cardBgColorEnd
       });
       setSuccess('Landing page settings updated successfully!');
     } catch (error) {
