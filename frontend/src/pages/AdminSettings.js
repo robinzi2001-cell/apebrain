@@ -492,126 +492,97 @@ const AdminSettings = () => {
 
           {/* Card Background Color Settings */}
           <div style={{ marginTop: '2rem', marginBottom: '1.5rem' }}>
-            <h3 style={{ color: '#3a4520', marginBottom: '1rem' }}>Karten Hintergrundfarbe (ohne Bilder)</h3>
-            <p style={{ color: '#7a9053', fontSize: '0.9rem', marginBottom: '1rem' }}>
-              Passe die Hintergrundfarbe der Karten an, wenn keine Bilder hochgeladen sind
-            </p>
+            <h3 style={{ color: '#3a4520', marginBottom: '1rem' }}>🎨 Karten Hintergrundfarbe (ohne Bilder)</h3>
             
-            <div style={{ display: 'grid', gap: '1rem' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#3a4520', fontWeight: '500' }}>
-                  Startfarbe (Oben):
-                </label>
-                <input
-                  type="text"
-                  value={cardBgColorStart}
-                  onChange={(e) => setCardBgColorStart(e.target.value)}
-                  placeholder="z.B. rgba(167, 139, 250, 0.15)"
-                  style={{ 
-                    width: '100%', 
-                    padding: '0.5rem', 
-                    borderRadius: '6px', 
-                    border: '1px solid #d1d5db',
-                    fontFamily: 'monospace'
-                  }}
-                />
+            {/* Start Color */}
+            <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+              <h4 style={{ color: '#7a9053', marginBottom: '0.75rem' }}>Startfarbe (Oben)</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div>
+                  <label style={{ fontSize: '0.85rem', color: '#6b7280' }}>🔴 Rot: {startR}</label>
+                  <input type="range" min="0" max="255" value={startR} onChange={(e) => setStartR(parseInt(e.target.value))} style={{ width: '100%' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.85rem', color: '#6b7280' }}>🟢 Grün: {startG}</label>
+                  <input type="range" min="0" max="255" value={startG} onChange={(e) => setStartG(parseInt(e.target.value))} style={{ width: '100%' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.85rem', color: '#6b7280' }}>🔵 Blau: {startB}</label>
+                  <input type="range" min="0" max="255" value={startB} onChange={(e) => setStartB(parseInt(e.target.value))} style={{ width: '100%' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.85rem', color: '#6b7280' }}>💧 Opacity: {startOpacity.toFixed(2)}</label>
+                  <input type="range" min="0" max="1" step="0.01" value={startOpacity} onChange={(e) => setStartOpacity(parseFloat(e.target.value))} style={{ width: '100%' }} />
+                </div>
               </div>
+            </div>
 
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#3a4520', fontWeight: '500' }}>
-                  Mittelfarbe:
-                </label>
-                <input
-                  type="text"
-                  value={cardBgColorMiddle}
-                  onChange={(e) => setCardBgColorMiddle(e.target.value)}
-                  placeholder="z.B. rgba(139, 92, 246, 0.12)"
-                  style={{ 
-                    width: '100%', 
-                    padding: '0.5rem', 
-                    borderRadius: '6px', 
-                    border: '1px solid #d1d5db',
-                    fontFamily: 'monospace'
-                  }}
-                />
+            {/* Middle Color */}
+            <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+              <h4 style={{ color: '#7a9053', marginBottom: '0.75rem' }}>Mittelfarbe</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div>
+                  <label style={{ fontSize: '0.85rem', color: '#6b7280' }}>🔴 Rot: {middleR}</label>
+                  <input type="range" min="0" max="255" value={middleR} onChange={(e) => setMiddleR(parseInt(e.target.value))} style={{ width: '100%' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.85rem', color: '#6b7280' }}>🟢 Grün: {middleG}</label>
+                  <input type="range" min="0" max="255" value={middleG} onChange={(e) => setMiddleG(parseInt(e.target.value))} style={{ width: '100%' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.85rem', color: '#6b7280' }}>🔵 Blau: {middleB}</label>
+                  <input type="range" min="0" max="255" value={middleB} onChange={(e) => setMiddleB(parseInt(e.target.value))} style={{ width: '100%' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.85rem', color: '#6b7280' }}>💧 Opacity: {middleOpacity.toFixed(2)}</label>
+                  <input type="range" min="0" max="1" step="0.01" value={middleOpacity} onChange={(e) => setMiddleOpacity(parseFloat(e.target.value))} style={{ width: '100%' }} />
+                </div>
               </div>
+            </div>
 
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#3a4520', fontWeight: '500' }}>
-                  Endfarbe (Unten):
-                </label>
-                <input
-                  type="text"
-                  value={cardBgColorEnd}
-                  onChange={(e) => setCardBgColorEnd(e.target.value)}
-                  placeholder="z.B. rgba(124, 58, 237, 0.15)"
-                  style={{ 
-                    width: '100%', 
-                    padding: '0.5rem', 
-                    borderRadius: '6px', 
-                    border: '1px solid #d1d5db',
-                    fontFamily: 'monospace'
-                  }}
-                />
+            {/* End Color */}
+            <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+              <h4 style={{ color: '#7a9053', marginBottom: '0.75rem' }}>Endfarbe (Unten)</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div>
+                  <label style={{ fontSize: '0.85rem', color: '#6b7280' }}>🔴 Rot: {endR}</label>
+                  <input type="range" min="0" max="255" value={endR} onChange={(e) => setEndR(parseInt(e.target.value))} style={{ width: '100%' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.85rem', color: '#6b7280' }}>🟢 Grün: {endG}</label>
+                  <input type="range" min="0" max="255" value={endG} onChange={(e) => setEndG(parseInt(e.target.value))} style={{ width: '100%' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.85rem', color: '#6b7280' }}>🔵 Blau: {endB}</label>
+                  <input type="range" min="0" max="255" value={endB} onChange={(e) => setEndB(parseInt(e.target.value))} style={{ width: '100%' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.85rem', color: '#6b7280' }}>💧 Opacity: {endOpacity.toFixed(2)}</label>
+                  <input type="range" min="0" max="1" step="0.01" value={endOpacity} onChange={(e) => setEndOpacity(parseFloat(e.target.value))} style={{ width: '100%' }} />
+                </div>
               </div>
+            </div>
 
-              {/* Color Preview */}
-              <div style={{ 
-                marginTop: '1rem',
-                padding: '2rem',
-                borderRadius: '12px',
-                background: `linear-gradient(135deg, ${cardBgColorStart} 0%, ${cardBgColorMiddle} 50%, ${cardBgColorEnd} 100%)`,
-                border: '2px solid #d1d5db',
-                textAlign: 'center',
-                color: '#fff',
-                textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
-              }}>
-                <strong>Vorschau</strong>
-              </div>
+            {/* Live Preview */}
+            <div style={{ 
+              padding: '3rem',
+              borderRadius: '12px',
+              background: `linear-gradient(135deg, rgba(${startR}, ${startG}, ${startB}, ${startOpacity}) 0%, rgba(${middleR}, ${middleG}, ${middleB}, ${middleOpacity}) 50%, rgba(${endR}, ${endG}, ${endB}, ${endOpacity}) 100%)`,
+              border: '2px solid rgba(255, 255, 255, 0.1)',
+              textAlign: 'center',
+              color: '#fff',
+              textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+              marginBottom: '1rem'
+            }}>
+              <strong style={{ fontSize: '1.2rem' }}>Live Vorschau</strong>
+            </div>
 
-              {/* Preset Buttons */}
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                <button
-                  onClick={() => {
-                    setCardBgColorStart('rgba(167, 139, 250, 0.15)');
-                    setCardBgColorMiddle('rgba(139, 92, 246, 0.12)');
-                    setCardBgColorEnd('rgba(124, 58, 237, 0.15)');
-                  }}
-                  style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: '1px solid #7a9053', background: 'linear-gradient(135deg, rgba(167, 139, 250, 0.3), rgba(124, 58, 237, 0.3))', cursor: 'pointer' }}
-                >
-                  Lila (Standard)
-                </button>
-                <button
-                  onClick={() => {
-                    setCardBgColorStart('rgba(96, 165, 250, 0.15)');
-                    setCardBgColorMiddle('rgba(59, 130, 246, 0.12)');
-                    setCardBgColorEnd('rgba(37, 99, 235, 0.15)');
-                  }}
-                  style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: '1px solid #7a9053', background: 'linear-gradient(135deg, rgba(96, 165, 250, 0.3), rgba(37, 99, 235, 0.3))', cursor: 'pointer' }}
-                >
-                  Blau
-                </button>
-                <button
-                  onClick={() => {
-                    setCardBgColorStart('rgba(253, 164, 175, 0.15)');
-                    setCardBgColorMiddle('rgba(244, 114, 182, 0.12)');
-                    setCardBgColorEnd('rgba(236, 72, 153, 0.15)');
-                  }}
-                  style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: '1px solid #7a9053', background: 'linear-gradient(135deg, rgba(253, 164, 175, 0.3), rgba(236, 72, 153, 0.3))', cursor: 'pointer' }}
-                >
-                  Pink
-                </button>
-                <button
-                  onClick={() => {
-                    setCardBgColorStart('rgba(134, 239, 172, 0.15)');
-                    setCardBgColorMiddle('rgba(74, 222, 128, 0.12)');
-                    setCardBgColorEnd('rgba(34, 197, 94, 0.15)');
-                  }}
-                  style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: '1px solid #7a9053', background: 'linear-gradient(135deg, rgba(134, 239, 172, 0.3), rgba(34, 197, 94, 0.3))', cursor: 'pointer' }}
-                >
-                  Grün
-                </button>
-              </div>
+            {/* Quick Presets */}
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <button onClick={() => { setStartR(167); setStartG(139); setStartB(250); setStartOpacity(0.15); setMiddleR(139); setMiddleG(92); setMiddleB(246); setMiddleOpacity(0.12); setEndR(124); setEndG(58); setEndB(237); setEndOpacity(0.15); }} style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: 'none', background: 'linear-gradient(135deg, rgba(167, 139, 250, 0.5), rgba(124, 58, 237, 0.5))', color: '#fff', cursor: 'pointer' }}>Lila</button>
+              <button onClick={() => { setStartR(96); setStartG(165); setStartB(250); setStartOpacity(0.15); setMiddleR(59); setMiddleG(130); setMiddleB(246); setMiddleOpacity(0.12); setEndR(37); setEndG(99); setEndB(235); setEndOpacity(0.15); }} style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: 'none', background: 'linear-gradient(135deg, rgba(96, 165, 250, 0.5), rgba(37, 99, 235, 0.5))', color: '#fff', cursor: 'pointer' }}>Blau</button>
+              <button onClick={() => { setStartR(253); setStartG(164); setStartB(175); setStartOpacity(0.15); setMiddleR(244); setMiddleG(114); setMiddleB(182); setMiddleOpacity(0.12); setEndR(236); setEndG(72); setEndB(153); setEndOpacity(0.15); }} style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: 'none', background: 'linear-gradient(135deg, rgba(253, 164, 175, 0.5), rgba(236, 72, 153, 0.5))', color: '#fff', cursor: 'pointer' }}>Pink</button>
+              <button onClick={() => { setStartR(134); setStartG(239); setStartB(172); setStartOpacity(0.15); setMiddleR(74); setMiddleG(222); setMiddleB(128); setMiddleOpacity(0.12); setEndR(34); setEndG(197); setEndB(94); setEndOpacity(0.15); }} style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: 'none', background: 'linear-gradient(135deg, rgba(134, 239, 172, 0.5), rgba(34, 197, 94, 0.5))', color: '#fff', cursor: 'pointer' }}>Grün</button>
             </div>
           </div>
 
