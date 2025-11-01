@@ -48,7 +48,9 @@ const Register = () => {
       // Redirect to dashboard
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Registration failed');
+      console.error('Registration error:', err);
+      const errorMessage = err.response?.data?.detail || err.message || 'Registrierung fehlgeschlagen';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
