@@ -344,15 +344,18 @@ backend:
 
   - task: "Order management - get single order"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "GET /api/orders/track/{order_id} public endpoint for customer order tracking."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Get single order endpoint working correctly. Successfully retrieved order by ID with all order details including items, customer info, and status. Endpoint returns proper JSON structure."
 
   - task: "Order management - delete order"
     implemented: true
