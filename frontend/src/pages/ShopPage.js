@@ -14,6 +14,9 @@ const ShopPage = () => {
   const [showCart, setShowCart] = useState(false);
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponError, setCouponError] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
