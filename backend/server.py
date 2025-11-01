@@ -12,7 +12,6 @@ import uuid
 from datetime import datetime, timezone, timedelta
 import asyncio
 from emergentintegrations.llm.chat import LlmChat, UserMessage
-from emergentintegrations.auth_session import EmergentSession
 import base64
 import re
 import paypalrestsdk
