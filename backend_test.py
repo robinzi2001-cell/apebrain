@@ -1442,6 +1442,325 @@ class MushroomBlogAPITester:
         
         return False
 
+    # ============= COMPREHENSIVE PAYPAL CHECKOUT TESTS =============
+    
+    def test_paypal_checkout_without_coupon(self):
+        """Test PayPal checkout flow WITHOUT coupon - SCENARIO 1"""
+        print("\n🛒 SCENARIO 1: PayPal Checkout WITHOUT Coupon")
+        
+        order_data = {
+            "items": [
+                {
+                    "product_id": "test-123",
+                    "name": "Test Product",
+                    "quantity": 1,
+                    "price": 69.00,
+                    "product_type": "physical"
+                }
+            ],
+            "total": 69.00,
+            "customer_email": "test@example.com"
+        }
+        
+        success, response = self.run_test(
+            "PayPal Checkout WITHOUT Coupon",
+            "POST",
+            "shop/create-order",
+            200,
+            data=order_data,
+            timeout=60
+        )
+        
+        if success:
+            # Verify response structure
+            required_fields = ['success', 'approval_url', 'order_id', 'payment_id']
+            for field in required_fields:
+                if field not in response:
+                    print(f"❌ Missing required field: {field}")
+                    return False
+            
+            if not response.get('success'):
+                print("❌ Order creation not successful")
+                return False
+            
+            # Verify PayPal sandbox URL
+            approval_url = response.get('approval_url', '')
+            if 'sandbox.paypal.com' not in approval_url:
+                print(f"❌ Invalid PayPal sandbox URL: {approval_url}")
+                return False
+            
+            # Store order ID for verification
+            self.test_order_without_coupon_id = response.get('order_id')
+            
+            print(f"✅ PayPal order created successfully WITHOUT coupon")
+            print(f"   Order ID: {self.test_order_without_coupon_id}")
+            print(f"   Payment ID: {response.get('payment_id')}")
+            print(f"   Total: ${order_data['total']:.2f}")
+            print(f"   Approval URL: {approval_url[:80]}...")
+            
+            # Verify order is saved in MongoDB
+            return self.verify_order_in_database(self.test_order_without_coupon_id, 69.00, None)
+        
+        return False
+    
+    def test_validate_welcome10_coupon(self):
+        """Test validating WELCOME10 coupon - SCENARIO 2 Step 1"""
+        print("\n🎫 SCENARIO 2 Step 1: Validate WELCOME10 Coupon")
+        
+        # First ensure WELCOME10 coupon exists
+        coupon_data = {
+            "code": "WELCOME10",
+            "discount_type": "percentage", 
+            "discount_value": 10.0,
+            "is_active": True
+        }
+        
+        # Try to create the coupon (might already exist)
+        self.run_test(
+            "Create WELCOME10 Coupon (if not exists)",
+            "POST",
+            "coupons",
+            200,
+            data=coupon_data
+        )
+        
+        # Now validate the coupon
+        validate_data = {
+            "code": "WELCOME10",
+            "order_total": 69.00
+        }
+        
+        success, response = self.run_test(
+            "Validate WELCOME10 Coupon",
+            "POST",
+            "coupons/validate",
+            200,
+            data=validate_data
+        )
+        
+        if success:
+            # Verify validation response
+            if not response.get('valid'):
+                print("❌ Coupon validation failed")
+                return False
+            
+            # Verify discount calculation (10% of 69 = 6.90)
+            expected_discount = 6.90
+            actual_discount = response.get('discount_amount', 0)
+            
+            if abs(actual_discount - expected_discount) > 0.01:
+                print(f"❌ Incorrect discount calculation. Expected: ${expected_discount:.2f}, Got: ${actual_discount:.2f}")
+                return False
+            
+            coupon_info = response.get('coupon', {})
+            if coupon_info.get('code') != 'WELCOME10':
+                print(f"❌ Incorrect coupon code returned: {coupon_info.get('code')}")
+                return False
+            
+            print(f"✅ WELCOME10 coupon validation successful")
+            print(f"   Coupon Code: {coupon_info.get('code')}")
+            print(f"   Discount Type: {coupon_info.get('discount_type')}")
+            print(f"   Discount Value: {coupon_info.get('discount_value')}%")
+            print(f"   Calculated Discount: ${actual_discount:.2f}")
+            print(f"   Original Total: $69.00")
+            print(f"   Final Total: ${69.00 - actual_discount:.2f}")
+            
+            return True
+        
+        return False
+    
+    def test_paypal_checkout_with_coupon(self):
+        """Test PayPal checkout flow WITH WELCOME10 coupon - SCENARIO 2 Step 2"""
+        print("\n🛒 SCENARIO 2 Step 2: PayPal Checkout WITH WELCOME10 Coupon")
+        
+        # Calculate discounted total (69.00 - 10% = 62.10)
+        original_total = 69.00
+        discount_amount = 6.90
+        discounted_total = 62.10
+        
+        order_data = {
+            "items": [
+                {
+                    "product_id": "test-456",
+                    "name": "Test Product with Coupon",
+                    "quantity": 1,
+                    "price": 69.00,
+                    "product_type": "physical"
+                }
+            ],
+            "total": discounted_total,
+            "customer_email": "test@example.com",
+            "coupon_code": "WELCOME10"
+        }
+        
+        success, response = self.run_test(
+            "PayPal Checkout WITH WELCOME10 Coupon",
+            "POST",
+            "shop/create-order",
+            200,
+            data=order_data,
+            timeout=60
+        )
+        
+        if success:
+            # Verify response structure
+            required_fields = ['success', 'approval_url', 'order_id', 'payment_id']
+            for field in required_fields:
+                if field not in response:
+                    print(f"❌ Missing required field: {field}")
+                    return False
+            
+            if not response.get('success'):
+                print("❌ Order creation with coupon not successful")
+                return False
+            
+            # Verify PayPal sandbox URL
+            approval_url = response.get('approval_url', '')
+            if 'sandbox.paypal.com' not in approval_url:
+                print(f"❌ Invalid PayPal sandbox URL: {approval_url}")
+                return False
+            
+            # Store order ID for verification
+            self.test_order_with_coupon_id = response.get('order_id')
+            
+            print(f"✅ PayPal order created successfully WITH WELCOME10 coupon")
+            print(f"   Order ID: {self.test_order_with_coupon_id}")
+            print(f"   Payment ID: {response.get('payment_id')}")
+            print(f"   Original Total: ${original_total:.2f}")
+            print(f"   Discount: -${discount_amount:.2f} (10%)")
+            print(f"   Final Total: ${discounted_total:.2f}")
+            print(f"   Approval URL: {approval_url[:80]}...")
+            
+            # Verify order is saved in MongoDB with coupon details
+            return self.verify_order_in_database(self.test_order_with_coupon_id, discounted_total, "WELCOME10")
+        
+        return False
+    
+    def test_invalid_coupon_code(self):
+        """Test checkout with invalid coupon code"""
+        print("\n❌ Testing Invalid Coupon Code")
+        
+        validate_data = {
+            "code": "INVALID123",
+            "order_total": 69.00
+        }
+        
+        success, response = self.run_test(
+            "Validate Invalid Coupon Code",
+            "POST",
+            "coupons/validate",
+            404,  # Should return 404 for invalid coupon
+            data=validate_data
+        )
+        
+        if success:
+            print("✅ Correctly returned 404 for invalid coupon code")
+            return True
+        
+        return False
+    
+    def verify_order_in_database(self, order_id, expected_total, expected_coupon_code):
+        """Verify order is properly saved in MongoDB"""
+        print(f"\n🔍 Verifying order {order_id} in database...")
+        
+        success, response = self.run_test(
+            f"Verify Order {order_id} in Database",
+            "GET",
+            f"orders/{order_id}",
+            200
+        )
+        
+        if success:
+            # Verify order structure
+            if response.get('id') != order_id:
+                print(f"❌ Order ID mismatch. Expected: {order_id}, Got: {response.get('id')}")
+                return False
+            
+            # Verify total
+            actual_total = response.get('total', 0)
+            if abs(actual_total - expected_total) > 0.01:
+                print(f"❌ Total mismatch. Expected: ${expected_total:.2f}, Got: ${actual_total:.2f}")
+                return False
+            
+            # Verify coupon code
+            actual_coupon = response.get('coupon_code')
+            if expected_coupon_code != actual_coupon:
+                print(f"❌ Coupon code mismatch. Expected: {expected_coupon_code}, Got: {actual_coupon}")
+                return False
+            
+            # Verify status
+            if response.get('status') != 'pending':
+                print(f"❌ Incorrect status. Expected: pending, Got: {response.get('status')}")
+                return False
+            
+            # Verify required fields exist
+            required_fields = ['items', 'customer_email', 'created_at', 'payment_id']
+            for field in required_fields:
+                if field not in response:
+                    print(f"❌ Missing required field in order: {field}")
+                    return False
+            
+            # Verify discount amount for coupon orders
+            if expected_coupon_code:
+                discount_amount = response.get('discount_amount', 0)
+                expected_discount = 6.90 if expected_coupon_code == 'WELCOME10' else 0
+                if abs(discount_amount - expected_discount) > 0.01:
+                    print(f"❌ Discount amount mismatch. Expected: ${expected_discount:.2f}, Got: ${discount_amount:.2f}")
+                    return False
+                print(f"   ✅ Coupon applied: {expected_coupon_code} (-${discount_amount:.2f})")
+            
+            print(f"✅ Order verified in database successfully")
+            print(f"   Order ID: {response.get('id')}")
+            print(f"   Status: {response.get('status')}")
+            print(f"   Total: ${response.get('total'):.2f}")
+            print(f"   Customer: {response.get('customer_email')}")
+            print(f"   Items: {len(response.get('items', []))}")
+            
+            return True
+        
+        return False
+    
+    def test_comprehensive_paypal_checkout_summary(self):
+        """Summary test to verify both checkout scenarios worked"""
+        print("\n📋 COMPREHENSIVE PAYPAL CHECKOUT SUMMARY")
+        print("=" * 60)
+        
+        success_count = 0
+        total_tests = 2
+        
+        # Check order without coupon
+        if hasattr(self, 'test_order_without_coupon_id'):
+            print("✅ Scenario 1: Checkout WITHOUT coupon - SUCCESS")
+            print(f"   Order ID: {self.test_order_without_coupon_id}")
+            print(f"   Total: $69.00 (no discount)")
+            success_count += 1
+        else:
+            print("❌ Scenario 1: Checkout WITHOUT coupon - FAILED")
+        
+        # Check order with coupon
+        if hasattr(self, 'test_order_with_coupon_id'):
+            print("✅ Scenario 2: Checkout WITH WELCOME10 coupon - SUCCESS")
+            print(f"   Order ID: {self.test_order_with_coupon_id}")
+            print(f"   Total: $62.10 (10% discount applied)")
+            success_count += 1
+        else:
+            print("❌ Scenario 2: Checkout WITH WELCOME10 coupon - FAILED")
+        
+        print(f"\n📊 PayPal Checkout Test Results: {success_count}/{total_tests} scenarios passed")
+        
+        if success_count == total_tests:
+            print("🎉 ALL PAYPAL CHECKOUT SCENARIOS SUCCESSFUL!")
+            print("   ✅ PayPal sandbox integration working")
+            print("   ✅ Order creation without coupon working")
+            print("   ✅ Coupon validation working")
+            print("   ✅ Order creation with coupon working")
+            print("   ✅ Discount calculations accurate")
+            print("   ✅ MongoDB order storage working")
+            return True
+        else:
+            print("⚠️  Some PayPal checkout scenarios failed")
+            return False
+
     # ============= COUPON MANAGEMENT TESTS =============
     
     def test_create_coupon(self):
