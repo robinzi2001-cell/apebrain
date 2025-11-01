@@ -449,15 +449,18 @@ backend:
 
   - task: "Email notifications - status update to customer"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Automated email sent to customer when order status changes. Includes tracking link when shipped. Triggered in update_order_status endpoint."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Customer status notification emails implemented correctly. Different email templates for different statuses (paid, shipped, delivered). Tracking information included in shipped emails. Professional HTML email design with apebrain.cloud branding. Functions triggered correctly in update_order_status and update_tracking endpoints."
 
   - task: "Email notifications - delivery notification to admin"
     implemented: true
