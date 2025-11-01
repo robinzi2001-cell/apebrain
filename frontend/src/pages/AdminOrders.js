@@ -116,7 +116,11 @@ const AdminOrders = () => {
 
   const filteredOrders = filter === 'all' 
     ? orders 
-    : orders.filter(order => order.status === filter);
+    : filter === 'completed'
+    ? orders.filter(order => order.status === 'delivered')
+    : filter === 'pending'
+    ? orders.filter(order => order.status === 'pending')
+    : orders;
 
   // Prevent rendering if not authenticated
   if (!localStorage.getItem('adminAuth')) {
