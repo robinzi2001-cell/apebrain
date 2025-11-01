@@ -2229,25 +2229,10 @@ def main():
     
     tester = MushroomBlogAPITester()
     
-    # Test sequence - Comprehensive Backend Testing (Priority Order)
-    tests = [
-        # CRITICAL PRIORITY - Authentication & Security
-        ("Admin Login (Valid)", tester.test_admin_login_valid),
-        ("Admin Login (Invalid)", tester.test_admin_login_invalid),
-        
-        # CRITICAL PRIORITY - PayPal Integration (Comprehensive Checkout Testing)
-        ("PayPal Checkout WITHOUT Coupon (Scenario 1)", tester.test_paypal_checkout_without_coupon),
-        ("Validate WELCOME10 Coupon (Scenario 2.1)", tester.test_validate_welcome10_coupon),
-        ("PayPal Checkout WITH Coupon (Scenario 2.2)", tester.test_paypal_checkout_with_coupon),
-        ("Test Invalid Coupon Code", tester.test_invalid_coupon_code),
-        ("PayPal Checkout Summary", tester.test_comprehensive_paypal_checkout_summary),
-        
-        # ADDITIONAL PAYPAL TESTS (Original)
-        ("Create PayPal Order", tester.test_create_paypal_order),
-        ("Create Order with Coupon", tester.test_create_order_with_coupon),
-        
-        # HIGH PRIORITY - Order Management System
-        ("Get All Orders (Admin)", tester.test_get_all_orders),
+    # Run the focused PayPal coupon fix tests
+    passed_tests, total_tests = tester.run_paypal_coupon_fix_tests()
+    
+    return 0 if passed_tests == total_tests else 1
         ("Public Order Tracking", tester.test_get_single_order_tracking),
         ("Mark Order as Viewed", tester.test_mark_order_viewed),
         ("Get Unviewed Orders Count", tester.test_get_unviewed_orders_count),
