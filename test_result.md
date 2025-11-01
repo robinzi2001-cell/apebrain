@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Add blog multimedia features: YouTube video embed, audio file upload/playback, and text-to-speech reader with browser API. Include admin toggles for each feature. Remove coupon box from blog pages."
+user_problem_statement: "Comprehensive testing of all features in apebrain.cloud application: blog system with AI generation and multimedia, e-commerce shop with PayPal integration, order management with DHL tracking and email notifications, admin panel with authentication, and configurable settings."
 
 backend:
   - task: "Product image upload endpoint"
