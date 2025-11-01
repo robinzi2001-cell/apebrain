@@ -877,7 +877,8 @@ async def create_shop_order(order: CreateOrder):
                 "quantity": item.quantity
             })
         
-        payment = paypalrestsdk.Payment({
+        # Debug logging for PayPal request
+        paypal_request = {
             "intent": "sale",
             "payer": {
                 "payment_method": "paypal"
@@ -896,7 +897,16 @@ async def create_shop_order(order: CreateOrder):
                 },
                 "description": "ApeBrain.cloud Shop Purchase"
             }]
-        })
+        }
+        
+        # Log the PayPal request for debugging
+        logging.info(f"PayPal Request: {paypal_request}")
+        logging.info(f"Items list: {items_list}")
+        logging.info(f"Order total: {order.total}")
+        logging.info(f"Discount amount: {discount_amount}")
+        logging.info(f"Discount percentage: {discount_percentage}")
+        
+        payment = paypalrestsdk.Payment(paypal_request)
 
         if payment.create():
             # Save order to database
