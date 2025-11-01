@@ -1504,17 +1504,12 @@ class MushroomBlogAPITester:
 
     def test_validate_coupon(self):
         """Test coupon validation"""
-        validation_data = {
-            "code": "SAVE20",
-            "subtotal": 100.0
-        }
-        
+        # The endpoint expects code and subtotal as query parameters
         success, response = self.run_test(
             "Validate Coupon",
             "POST",
-            "coupons/validate",
-            200,
-            data=validation_data
+            "coupons/validate?code=SAVE20&subtotal=100.0",
+            200
         )
         
         if success and response.get('valid'):
