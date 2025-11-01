@@ -68,7 +68,27 @@ const ShopPage = () => {
   };
 
   const getCartTotal = () => {
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    if (appliedCoupon) {
+      const discount = appliedCoupon.discount_type === 'percentage' 
+        ? subtotal * (appliedCoupon.discount_value / 100)
+        : appliedCoupon.discount_value;
+      return Math.max(0, subtotal - discount).toFixed(2);
+    }
+    return subtotal.toFixed(2);
+  };
+
+  const getSubtotal = () => {
     return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2);
+  };
+
+  const getDiscount = () => {
+    if (!appliedCoupon) return 0;
+    const subtotal = parseFloat(getSubtotal());
+    const discount = appliedCoupon.discount_type === 'percentage'
+      ? subtotal * (appliedCoupon.discount_value / 100)
+      : appliedCoupon.discount_value;
+    return discount.toFixed(2);
   };
 
   const getCartCount = () => {
